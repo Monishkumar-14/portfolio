@@ -1,0 +1,62 @@
+Step 6 — Deploy Frontend on Vercel
+1. Push portfolio-frontend to GitHub
+
+2. Go to → https://vercel.com → New Project
+
+3. Import your GitHub repo
+   - Framework:    Vite
+   - Root:         portfolio-frontend (if monorepo)
+   - Build Cmd:    npm run build
+   - Output Dir:   dist
+
+4. Environment Variables:
+   VITE_API_URL         = https://portfolio-backend-monish.onrender.com
+   VITE_GEMINI_API_KEY  = your_gemini_key
+
+5. Deploy → copy URL:
+   https://monishkumar.vercel.app
+
+
+
+Step 7 — Update CORS on Backend
+After Vercel gives your URL, update Render env var:
+CLIENT_URL = https://monishkumar.vercel.app
+
+
+Step 8 — Custom Domain (Optional)
+Vercel:
+1. Project → Settings → Domains
+2. Add: monishkumar.dev
+3. Update DNS at your registrar:
+   Type: CNAME
+   Name: @
+   Value: cname.vercel-dns.com
+
+Render:
+1. Service → Settings → Custom Domains
+2. Add: api.monishkumar.dev
+
+
+
+ Local Development
+ # Terminal 1 — Backend
+cd portfolio-backend
+npm install
+npm run seed      # seed DB once
+npm run dev       # starts on :5000
+
+# Terminal 2 — Frontend
+cd portfolio-frontend
+npm install
+npm run dev       # starts on :5173
+
+# Open:
+# Portfolio  → http://localhost:5173
+# Admin      → http://localhost:5173/admin/login
+# API health → http://localhost:5000
+
+URL:      /admin/login
+Username: monish
+Password: Monish@2024
+
+⚠️ Change password after first login!
