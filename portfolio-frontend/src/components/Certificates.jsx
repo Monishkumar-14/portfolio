@@ -453,7 +453,7 @@ const Certificates = () => {
           <motion.div {...fadeUp(0)} className="mb-5">
             <p className="text-[11px] font-semibold uppercase tracking-[3px]
               text-violet-400 mb-3">
-              03 — Certifications
+              04 — Certifications
             </p>
             <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight
               leading-tight mb-4">

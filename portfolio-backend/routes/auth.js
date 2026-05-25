@@ -4,6 +4,7 @@ import {
   seedAdmin,
   changePassword,
   getMe,
+  getStats,
 } from "../controllers/authController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
@@ -13,5 +14,6 @@ router.post("/login",           loginAdmin);
 router.post("/seed",            seedAdmin);
 router.post("/change-password", protect, changePassword);
 router.get("/me",               protect, getMe);
+router.get("/stats",            protect, getStats);
 
 export default router;

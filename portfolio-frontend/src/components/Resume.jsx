@@ -48,7 +48,7 @@ const Resume = () => {
               </div>
               <div>
                 <p className="text-sm font-bold text-white/85">Monishkumar_Resume.pdf</p>
-                <p className="text-[10px] text-white/35 mt-0.5">Full-Stack Developer · 2025</p>
+                <p className="text-[10px] text-white/35 mt-0.5">Full-Stack Developer · 2026</p>
               </div>
             </div>
 
@@ -86,7 +86,7 @@ const Resume = () => {
           </div>
 
           {/* PDF Embed Area */}
-          <div className="relative bg-[#1a1a2e] flex items-center justify-center"
+          <div className="relative bg-[#1a1a2e] pdf-viewer-bg flex items-center justify-center"
                style={{ minHeight: "780px" }}>
 
             {/* Loading shimmer */}

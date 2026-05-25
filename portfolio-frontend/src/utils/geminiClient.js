@@ -21,6 +21,13 @@ PROJECTS:
 CERTIFICATIONS: Google Cybersecurity Professional (2024), Google Cloud Engineering (2024), NPTEL Python for Data Science 85% (2024), C/C++/DSA from LearnTube (2023)
 ACHIEVEMENTS: NSS Coordinator (150+ participants), LeetCode active, 20+ GitHub repos
 
+INTERNSHIP / EXPERIENCE:
+- Software Engineering Intern at AstraZeneca, Chennai (May 18, 2026 – Jul 17, 2026)
+- Department: Enterprise Technology Solutions (ETS)
+- Built a RAG (Retrieval-Augmented Generation) based chatbot for internal document intelligence
+- Processes 100+ internal documents (SOPs, research notes, policies)
+- Tech: Python, LangChain, FAISS/ChromaDB, HuggingFace Embeddings, LLM, Prompt Engineering
+
 RULES:
 - Resume: say it is downloadable from the Resume section of this site
 - Contact: give monish1421@gmail.com and GitHub/LinkedIn

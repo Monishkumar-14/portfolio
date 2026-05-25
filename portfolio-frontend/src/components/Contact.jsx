@@ -256,7 +256,7 @@ const Contact = () => {
         {/* ── Header ── */}
         <motion.div {...fadeUp(0)} className="mb-14">
           <p className="text-[11px] font-semibold uppercase tracking-[3px] text-violet-400 mb-3">
-            05 — Contact
+            06 — Contact
           </p>
           <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight mb-4">
             Let's Build{" "}

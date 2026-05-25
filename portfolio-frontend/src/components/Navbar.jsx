@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 const navLinks = [
   { label: "Home",         href: "#home"         },
   { label: "About",        href: "#about"        },
+  { label: "Experience",   href: "#experience"   },
   { label: "Projects",     href: "#projects"     },
   { label: "Certificates", href: "#certificates" },
   { label: "Resume",       href: "#resume"       },
@@ -79,31 +80,32 @@ const Navbar = () => {
       className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-48px)] max-w-4xl"
     >
       {/* ── Floating pill ── */}
-      <div className="glass-nav flex items-center justify-between px-6 h-14 rounded-full
-        shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]">
+      <div className="glass-nav flex items-center justify-between px-5 h-14 rounded-full">
 
         {/* Logo */}
         <button
           onClick={() => scrollTo("#home")}
-          className="text-lg font-bold tracking-tight text-white"
+          className="text-lg font-bold tracking-tight flex-shrink-0"
+          style={{ color: "var(--nav-logo)" }}
         >
           Monish<span className="text-violet-400">.</span>
         </button>
 
         {/* Desktop links */}
-        <ul className="hidden md:flex items-center gap-1">
+        <ul className="hidden md:flex items-center gap-0.5">
           {navLinks.map(({ label, href }) => {
             const isActive = activeSection === href.replace("#", "");
             return (
               <li key={label}>
                 <button
                   onClick={() => scrollTo(href)}
-                  className={`relative px-4 py-1.5 rounded-full text-sm font-medium
+                  className={`relative px-3 py-1.5 rounded-full text-[13px] font-medium
                     transition-all duration-200
                     ${isActive
                       ? "bg-violet-500/20 text-violet-300 border border-violet-500/30 shadow-[0_0_12px_rgba(124,58,237,0.2)]"
-                      : "text-white/50 hover:text-white hover:bg-white/10"
+                      : "hover:bg-violet-500/8"
                     }`}
+                  style={{ color: isActive ? undefined : "var(--nav-text)" }}
                 >
                   {label}
                 </button>
@@ -113,21 +115,26 @@ const Navbar = () => {
         </ul>
 
         {/* Right controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 flex-shrink-0">
           <motion.button
             whileTap={{ scale: 0.88 }}
             onClick={toggleTheme}
-            className="w-9 h-9 flex items-center justify-center rounded-full
-              bg-white/8 border border-white/15 text-white/70 hover:bg-white/15 transition-all"
+            className="w-8 h-8 flex items-center justify-center rounded-full
+              border transition-all"
+            style={{
+              background: "var(--badge-bg)",
+              borderColor: "var(--border-card)",
+              color: "var(--nav-text)",
+            }}
           >
-            {isDark ? <Sun size={15}/> : <Moon size={15}/>}
+            {isDark ? <Sun size={14}/> : <Moon size={14}/>}
           </motion.button>
 
           <motion.button
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/admin/login")}
-            className="hidden md:block btn-primary-glass px-5 py-1.5 text-sm"
+            className="hidden md:flex items-center btn-primary-glass px-4 py-1.5 text-xs font-semibold"
           >
             Admin
           </motion.button>
@@ -136,8 +143,13 @@ const Navbar = () => {
           <motion.button
             whileTap={{ scale: 0.88 }}
             onClick={() => setMenuOpen((o) => !o)}
-            className="md:hidden w-9 h-9 flex items-center justify-center rounded-full
-              bg-white/8 border border-white/15 text-white"
+            className="md:hidden w-8 h-8 flex items-center justify-center rounded-full
+              border"
+            style={{
+              background: "var(--badge-bg)",
+              borderColor: "var(--border-card)",
+              color: "var(--text-primary)",
+            }}
           >
             <AnimatePresence mode="wait" initial={false}>
               {menuOpen
@@ -146,14 +158,14 @@ const Navbar = () => {
                     animate={{ rotate: 0, opacity: 1 }}
                     exit={{ rotate: 90, opacity: 0 }}
                     transition={{ duration: 0.18 }}>
-                    <X size={16}/>
+                    <X size={15}/>
                   </motion.span>
                 : <motion.span key="menu"
                     initial={{ rotate: 90, opacity: 0 }}
                     animate={{ rotate: 0, opacity: 1 }}
                     exit={{ rotate: -90, opacity: 0 }}
                     transition={{ duration: 0.18 }}>
-                    <Menu size={16}/>
+                    <Menu size={15}/>
                   </motion.span>
               }
             </AnimatePresence>
@@ -169,14 +181,21 @@ const Navbar = () => {
             animate={{ opacity: 1, scaleY: 1,    y: 0   }}
             exit={{    opacity: 0, scaleY: 0.88,  y: -12 }}
             transition={iosSpring}
-            style={{ transformOrigin: "top center" }}
-            className="mt-2 rounded-3xl p-3 flex flex-col gap-0.5
-              bg-[rgba(10,10,26,0.75)] backdrop-blur-3xl backdrop-saturate-[180%]
-              border border-white/10
-              shadow-[0_20px_60px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)]"
+            className="mt-2 rounded-3xl p-3 flex flex-col gap-0.5"
+            style={{
+              transformOrigin: "top center",
+              background: isDark ? "rgba(10,10,26,0.75)" : "rgba(255,255,255,0.90)",
+              backdropFilter: "blur(40px) saturate(180%)",
+              WebkitBackdropFilter: "blur(40px) saturate(180%)",
+              border: `1px solid ${isDark ? "rgba(255,255,255,0.10)" : "rgba(124,58,237,0.15)"}`,
+              boxShadow: isDark
+                ? "0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)"
+                : "0 20px 60px rgba(124,58,237,0.08), inset 0 1px 0 rgba(255,255,255,0.5)",
+            }}
           >
             {/* Swipe-to-close hint bar */}
-            <div className="w-9 h-1 rounded-full bg-white/20 mx-auto mb-2" />
+            <div className="w-9 h-1 rounded-full mx-auto mb-2"
+              style={{ background: isDark ? "rgba(255,255,255,0.20)" : "rgba(30,27,75,0.15)" }} />
 
             {navLinks.map(({ label, href }, i) => {
               const isActive = activeSection === href.replace("#", "");
@@ -190,8 +209,11 @@ const Navbar = () => {
                   className={`text-left px-4 py-3.5 rounded-2xl text-sm font-medium transition-all
                     ${isActive
                       ? "bg-violet-500/20 text-violet-300"
-                      : "text-white/60 hover:bg-white/8 hover:text-white"
+                      : ""
                     }`}
+                  style={{
+                    color: isActive ? undefined : (isDark ? "rgba(255,255,255,0.60)" : "rgba(30,27,75,0.60)"),
+                  }}
                 >
                   {label}
                 </motion.button>

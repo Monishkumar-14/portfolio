@@ -12,8 +12,34 @@ dotenv.config();
 const app  = express();
 const PORT = process.env.PORT || 5000;
 
+// ── Allowed origins ───────────────────────────────────────────────
+const ALLOWED_ORIGINS = [
+  "http://localhost:5173",
+  "http://localhost:4173",
+  "http://127.0.0.1:5173",
+  // Add your deployed frontend URL here when you go live, e.g.:
+  // "https://your-portfolio.vercel.app",
+  process.env.CLIENT_URL,           // still respected if set in .env
+].filter(Boolean);                  // removes undefined if CLIENT_URL isn't set
+
 // ── Middleware ────────────────────────────────────────────────────
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+app.use(cors({
+  origin: (origin, callback) => {
+    // allow requests with no origin (Postman, curl, server-to-server)
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked: ${origin}`));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+// Handle preflight requests for all routes
+app.options("*", cors());
+
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 

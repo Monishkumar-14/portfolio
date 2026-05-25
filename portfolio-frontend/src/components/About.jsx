@@ -18,21 +18,29 @@ const fadeLeft = (delay = 0) => ({
 // ── Resume Data ───────────────────────────────────────────────────
 
 const miniStats = [
-  { num: "4+",   label: "Deployed Projects",      color: "text-violet-400" },
-  { num: "4",    label: "Certifications",          color: "text-cyan-400"   },
+  { num: "10+",   label: "Deployed Projects",      color: "text-violet-400" },
+  { num: "6",    label: "Certifications",          color: "text-cyan-400"   },
   { num: "8.20", label: "CGPA / 10",               color: "text-pink-400"   },
-  { num: "20+",  label: "GitHub Repositories",     color: "text-amber-400"  },
+  { num: "15+",  label: "GitHub Repositories",     color: "text-amber-400"  },
+  { num: "1",    label: "Internship",              color: "text-green-400"  },
 ];
 
 const chips = [
   { label: "BTech IT · CEG Anna University", icon: <Star size={11}/>, cls: "bg-violet-500/15 border-violet-500/30 text-violet-300"  },
   { label: "Chennai, India",                 icon: <MapPin size={11}/>, cls: "bg-cyan-500/12  border-cyan-500/28   text-cyan-300"    },
   { label: "Open to Work",                   icon: <Briefcase size={11}/>, cls: "bg-pink-500/12  border-pink-500/28   text-pink-300"    },
+  { label: "Intern · AstraZeneca",           cls: "bg-green-500/12 border-green-500/28  text-green-400"  },
   { label: "CGPA 8.20 / 10",                icon: <Star size={11}/>, cls: "bg-amber-500/12 border-amber-500/28  text-amber-300"   },
   { label: "NSS Coordinator",               icon: <span className="text-[10px]">🌱</span>, cls: "bg-green-500/12 border-green-500/28  text-green-400"   },
 ];
 
 const timeline = [
+  {
+    color: "bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.8)]",
+    date: "May 2026 — Present",
+    title: "SWE Intern · AstraZeneca 🧬",         // ← ADD
+    sub: "Building RAG chatbot for document intelligence · ETS Dept · Chennai",
+  },
   {
     color: "bg-violet-500 shadow-[0_0_8px_rgba(124,58,237,0.7)]",
     date: "2026 — Present",
@@ -153,8 +161,8 @@ const activity = [
     icon: "⌥",
     iconBg: "bg-white/8 border-white/12",
     title: "GitHub — Monishkumar-14",
-    sub: "20+ public repos across full-stack, ML & systems projects",
-    badge: "20+ Repos",
+    sub: "15+ public repos across full-stack, ML & systems projects",
+    badge: "15+ Repos",
     badgeCls: "bg-green-500/12 border-green-500/25 text-green-400",
   },
   {
@@ -172,12 +180,12 @@ const About = () => {
   return (
     <div className="min-h-screen flex items-start py-24 px-6">
       <div className="max-w-6xl mx-auto w-full">
-
+        <p className="text-[11px] font-semibold uppercase tracking-[3px]
+            text-violet-400 mb-3">
+            01 — About me
+          </p>
         {/* ── Section Header ── */}
         <motion.div {...fadeUp(0)} className="mb-14">
-          <p className="text-[11px] font-semibold uppercase tracking-[3px] text-violet-400 mb-3">
-            01 — About
-          </p>
           <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight">
             Who is{" "}
             <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-pink-400
@@ -198,21 +206,27 @@ const About = () => {
               className="glass-card p-9 flex flex-col items-center text-center
                 hover:scale-[1.01] hover:shadow-lg transition-transform duration-300"
             >
-              {/* Spinning ring */}
-              <div className="relative w-28 h-28 mb-5">
+              {/* Profile photo with spinning ring */}
+              <div className="relative w-40 h-40 mb-5">
                 <div
                   className="absolute inset-0 rounded-full p-[3px] animate-spin [animation-duration:3s]"
                   style={{
                     background: "conic-gradient(#7c3aed, #06b6d4, #ec4899, #7c3aed)",
                   }}
                 >
-                  <div className="w-full h-full rounded-full bg-[#0a0a1a]" />
+                  <div className="w-full h-full rounded-full bg-[#0a0a1a] avatar-inner-bg" />
                 </div>
-                <div className="absolute inset-[5px] rounded-full bg-gradient-to-br
-                  from-violet-600 to-cyan-500 flex items-center justify-center
-                  text-4xl font-extrabold z-10">
-                  M
-                </div>
+                <img
+                  src="/monish-profile.jpg"
+                  alt="Monishkumar E M"
+                  className="absolute inset-[5px] rounded-full object-cover z-10"
+                  style={{
+                    width: "calc(100% - 10px)",
+                    height: "calc(100% - 10px)",
+                    objectPosition: "center 15%",
+                    transform: "scale(1.25)",
+                  }}
+                />
               </div>
 
               <h3 className="text-xl font-bold mb-1">Monishkumar E M</h3>

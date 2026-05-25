@@ -1,5 +1,8 @@
-import jwt   from "jsonwebtoken";
-import Admin  from "../models/Admin.js";
+import jwt         from "jsonwebtoken";
+import Admin       from "../models/Admin.js";
+import Project     from "../models/Project.js";
+import Certificate from "../models/Certificate.js";
+import Message     from "../models/Message.js";
 
 // ── POST /api/admin/login ─────────────────────────────────────────
 export const loginAdmin = async (req, res) => {
@@ -100,6 +103,29 @@ export const getMe = async (req, res) => {
     if (!admin) return res.status(404).json({ message: "Admin not found." });
     return res.json({ success: true, admin });
   } catch (err) {
+    return res.status(500).json({ message: "Server error." });
+  }
+};
+
+// ── GET /api/admin/stats  (protected — dashboard overview) ────────
+export const getStats = async (req, res) => {
+  try {
+    const [projects, certificates, messages, unreadMessages, recentMessages] =
+      await Promise.all([
+        Project.countDocuments(),
+        Certificate.countDocuments(),
+        Message.countDocuments(),
+        Message.countDocuments({ read: false }),
+        Message.find().sort({ createdAt: -1 }).limit(5).lean(),
+      ]);
+
+    return res.json({
+      success: true,
+      stats: { projects, certificates, messages, unreadMessages },
+      recentMessages,
+    });
+  } catch (err) {
+    console.error("getStats error:", err);
     return res.status(500).json({ message: "Server error." });
   }
 };

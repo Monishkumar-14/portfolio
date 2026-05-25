@@ -13,15 +13,16 @@ import Certificates from "./components/Certificates";
 import Resume from "./components/Resume";
 import Chatbot from "./components/Chatbot";
 import Contact from "./components/Contact";
-
+import Experience from "./components/Experience";
 // Admin Pages
 import AdminLogin from "./admin/AdminLogin";
 import Dashboard from "./admin/Dashboard";
+import AdminOverview from "./admin/AdminOverview";
 import ManageProjects from "./admin/ManageProjects";
 import ManageCertificates from "./admin/ManageCertificates";
 import ViewMessages from "./admin/ViewMessages";
-// ── Replace the PublicLayout in App.jsx with this ─────────────────
-// This fixes the background using CSS variable instead of hardcoded hex
+import AdminSettings from "./admin/AdminSettings";
+import ChangePassword from "./admin/ChangePassword";
 
 import Background from "./components/Background";
 
@@ -34,11 +35,13 @@ const PublicLayout = () => (
       <main>
         <section id="home">         <Hero />         </section>
         <section id="about">        <About />        </section>
+        <section id="experience">   <Experience/>     </section>
         <section id="projects">     <Projects />     </section>
         <section id="certificates"> <Certificates /> </section>
         <section id="resume">       <Resume />       </section>
         <section id="chatbot">      <Chatbot />      </section>
         <section id="contact">      <Contact />      </section>
+        
       </main>
     </div>
   </div>
@@ -73,11 +76,12 @@ const App = () => {
                 </ProtectedRoute>
               }
             >
-              <Route index element={<ManageProjects />} />
+              <Route index element={<AdminOverview />} />
               <Route path="projects" element={<ManageProjects />} />
               <Route path="certificates" element={<ManageCertificates />} />
               <Route path="messages" element={<ViewMessages />} />
-              <Route path="certificates" element={<ManageCertificates />} />
+              <Route path="settings" element={<AdminSettings />} />
+              <Route path="password" element={<ChangePassword />} />
             </Route>
           </Routes>
         </Router>

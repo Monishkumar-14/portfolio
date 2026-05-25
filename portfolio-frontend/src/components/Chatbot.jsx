@@ -468,7 +468,7 @@ export default function Chatbot() {
           className="mb-12 text-center"
         >
           <p className="text-[11px] font-semibold uppercase tracking-[3px] text-violet-400 mb-3">
-            04 — Assistant
+            06 — Assistant
           </p>
           <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
             Chat with{" "}
@@ -731,7 +731,7 @@ export default function Chatbot() {
             </div>
 
             {/* Input bar */}
-            <div className="flex items-center gap-2.5 p-4 border-t border-white/8 bg-black/10 flex-shrink-0">
+            <div className="flex items-center gap-2.5 p-4 border-t border-white/8 bg-black/10 chatbot-input-bar flex-shrink-0">
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}

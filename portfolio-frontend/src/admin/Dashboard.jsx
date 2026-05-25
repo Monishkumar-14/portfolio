@@ -1,4 +1,4 @@
-import { useState }                       from "react";
+import { useState, useEffect }                from "react";
 import { Outlet, NavLink, useNavigate }   from "react-router-dom";
 import { motion, AnimatePresence }        from "framer-motion";
 import {
@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useAuth }    from "../context/AuthContext";
 import toast          from "react-hot-toast";
+import axios          from "axios";
 
 const NAV = [
   { group: "Overview",
@@ -23,7 +24,7 @@ const NAV = [
   },
   { group: "Inbox",
     items: [
-      { to: "/admin/messages",     icon: <MessageSquare size={15}/>,  label: "Messages", badge: 3 },
+      { to: "/admin/messages",     icon: <MessageSquare size={15}/>,  label: "Messages", badgeKey: "unread" },
     ]
   },
   { group: "Settings",
@@ -34,7 +35,7 @@ const NAV = [
   },
 ];
 
-const Sidebar = ({ mobile, onClose }) => {
+const Sidebar = ({ mobile, onClose, unreadCount }) => {
   const { logout } = useAuth();
   const navigate   = useNavigate();
 
@@ -82,7 +83,7 @@ const Sidebar = ({ mobile, onClose }) => {
               text-white/22 px-3 mb-2">
               {group}
             </p>
-            {items.map(({ to, icon, label, badge, end }) => (
+            {items.map(({ to, icon, label, badgeKey, end }) => (
               <NavLink
                 key={to} to={to} end={end}
                 onClick={mobile ? onClose : undefined}
@@ -97,11 +98,11 @@ const Sidebar = ({ mobile, onClose }) => {
               >
                 <span className="flex-shrink-0 opacity-80">{icon}</span>
                 <span className="flex-1">{label}</span>
-                {badge && (
+                {badgeKey === "unread" && unreadCount > 0 && (
                   <span className="min-w-[18px] h-[18px] rounded-full
                     bg-pink-500/30 border border-pink-500/40 text-pink-400
                     text-[9px] font-bold flex items-center justify-center px-1">
-                    {badge}
+                    {unreadCount}
                   </span>
                 )}
               </NavLink>
@@ -139,7 +140,28 @@ const Sidebar = ({ mobile, onClose }) => {
 };
 
 const Dashboard = () => {
+  const { token } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Fetch unread count for sidebar badge
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/admin/stats`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setUnreadCount(data.stats?.unreadMessages ?? 0);
+      } catch {
+        // silently fail — badge just won't show
+      }
+    };
+    fetchUnread();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
+  }, [token]);
 
   return (
     <div className="min-h-screen flex" style={{ background: "#0a0a1a" }}>
@@ -154,7 +176,7 @@ const Dashboard = () => {
 
       {/* Desktop sidebar */}
       <div className="hidden lg:flex flex-col flex-shrink-0 relative z-20">
-        <Sidebar />
+        <Sidebar unreadCount={unreadCount} />
       </div>
 
       {/* Mobile sidebar */}
@@ -171,7 +193,7 @@ const Dashboard = () => {
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
               className="fixed left-0 top-0 bottom-0 z-50 w-[260px] lg:hidden"
             >
-              <Sidebar mobile onClose={() => setMobileOpen(false)} />
+              <Sidebar mobile onClose={() => setMobileOpen(false)} unreadCount={unreadCount} />
             </motion.div>
           </>
         )}
@@ -200,8 +222,10 @@ const Dashboard = () => {
             border border-white/10 flex items-center justify-center
             text-white/50 hover:bg-white/10 transition-all relative">
             <Bell size={15}/>
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full
-              bg-pink-500 border border-[#0a0a1a]"/>
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full
+                bg-pink-500 border border-[#0a0a1a]"/>
+            )}
           </button>
 
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-[10px]

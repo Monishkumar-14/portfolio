@@ -8,10 +8,10 @@ const fadeUp = (delay = 0) => ({
 });
 
 const stats = [
-  { num: "15+", label: "Projects"       },
-  { num: "8",   label: "Certifications" },
+  { num: "10+", label: "Projects"       },
+  { num: "6+",   label: "Certifications" },
   { num: "3+",  label: "Years Experience"},
-  { num: "20+", label: "GitHub Repos"   },
+  { num: "15+", label: "GitHub Repos"   },
 ];
 
 const trust = [
