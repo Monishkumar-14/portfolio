@@ -1,18 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Pencil, Trash2, Github, ExternalLink, X } from "lucide-react";
+import { Plus, Pencil, Trash2, Github, X } from "lucide-react";
 import axios  from "axios";
 import toast  from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 
 // ── Helpers ───────────────────────────────────────────────────────
-const api = () => {
-  const { token } = useAuth();            // called inside component
-  return axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
-    headers: { Authorization: `Bearer ${token}` },
-  });
-};
 
 const EMPTY = {
   title: "", description: "", techStack: "",
@@ -296,7 +289,9 @@ const ManageProjects = () => {
           Loading projects...
         </div>
       ) : (
-        <div className="glass-card overflow-hidden">
+        <>
+          {/* Desktop table */}
+          <div className="hidden md:block glass-card overflow-hidden">
           {/* Head */}
           <div className="grid px-5 py-3 border-b border-white/7
             text-[10px] font-semibold uppercase tracking-[1.5px]
@@ -366,6 +361,7 @@ const ManageProjects = () => {
                   <div className="flex gap-2">
                     {p.githubLink && (
                       <a href={p.githubLink} target="_blank" rel="noreferrer"
+                        aria-label={`View ${p.title} on GitHub`}
                         className="w-7 h-7 rounded-[8px] bg-white/6
                           border border-white/10 flex items-center justify-center
                           text-white/40 hover:text-white hover:bg-white/12
@@ -375,6 +371,7 @@ const ManageProjects = () => {
                     )}
                     <button
                       onClick={() => setModal(p)}
+                      aria-label={`Edit ${p.title}`}
                       className="w-7 h-7 rounded-[8px] bg-violet-500/12
                         border border-violet-500/25 flex items-center
                         justify-center text-violet-400
@@ -383,6 +380,7 @@ const ManageProjects = () => {
                     </button>
                     <button
                       onClick={() => deleteProject(p._id)}
+                      aria-label={`Delete ${p.title}`}
                       className="w-7 h-7 rounded-[8px] bg-red-500/10
                         border border-red-500/22 flex items-center
                         justify-center text-red-400
@@ -395,6 +393,84 @@ const ManageProjects = () => {
             </AnimatePresence>
           )}
         </div>
+
+        {/* Mobile card layout */}
+        <div className="md:hidden flex flex-col gap-3">
+          {projects.length === 0 ? (
+            <div className="text-center py-14 text-white/30 text-sm">
+              No projects yet. Click "+ Add Project" to get started.
+            </div>
+          ) : (
+            projects.map((p) => (
+              <div key={p._id} className="glass-card p-4">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-white truncate">{p.title}</p>
+                    <p className="text-[11px] text-white/35 mt-0.5 line-clamp-2">
+                      {p.description?.slice(0, 80)}...
+                    </p>
+                  </div>
+                  <span className={`inline-flex px-2.5 py-1 rounded-full
+                    text-[10px] font-semibold flex-shrink-0 ml-2
+                    ${p.status === "Live"
+                      ? "bg-green-500/12 border border-green-500/25 text-green-400"
+                      : "bg-amber-500/12 border border-amber-500/25 text-amber-400"
+                    }`}>
+                    ● {p.status}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {(Array.isArray(p.techStack)
+                    ? p.techStack
+                    : p.techStack?.split(",") || []
+                  ).slice(0, 3).map((t) => (
+                    <span key={t}
+                      className="px-2 py-0.5 rounded-full text-[9px]
+                        font-mono bg-white/6 border border-white/9
+                        text-white/40">
+                      {t.trim()}
+                    </span>
+                  ))}
+                  <span className="px-2 py-0.5 rounded-full text-[9px]
+                    font-mono bg-white/4 border border-white/8 text-white/30">
+                    {p.category}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  {p.githubLink && (
+                    <a href={p.githubLink} target="_blank" rel="noreferrer"
+                      aria-label={`View ${p.title} on GitHub`}
+                      className="w-7 h-7 rounded-[8px] bg-white/6
+                        border border-white/10 flex items-center justify-center
+                        text-white/40 hover:text-white hover:bg-white/12
+                        transition-all">
+                      <Github size={12}/>
+                    </a>
+                  )}
+                  <button
+                    onClick={() => setModal(p)}
+                    aria-label={`Edit ${p.title}`}
+                    className="w-7 h-7 rounded-[8px] bg-violet-500/12
+                      border border-violet-500/25 flex items-center
+                      justify-center text-violet-400
+                      hover:bg-violet-500/25 transition-all">
+                    <Pencil size={12}/>
+                  </button>
+                  <button
+                    onClick={() => deleteProject(p._id)}
+                    aria-label={`Delete ${p.title}`}
+                    className="w-7 h-7 rounded-[8px] bg-red-500/10
+                      border border-red-500/22 flex items-center
+                      justify-center text-red-400
+                      hover:bg-red-500/20 transition-all">
+                    <Trash2 size={12}/>
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+        </>
       )}
 
       {/* Modal */}

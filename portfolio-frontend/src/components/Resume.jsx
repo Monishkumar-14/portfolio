@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Download, Eye, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
+import { Download, Eye, ExternalLink, FileText } from "lucide-react";
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 40 },
@@ -44,7 +44,7 @@ const Resume = () => {
             {/* File info */}
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-[10px] bg-violet-500/20 border border-violet-500/30 flex items-center justify-center text-sm">
-                📄
+                <FileText size={16} />
               </div>
               <div>
                 <p className="text-sm font-bold text-white/85">Monishkumar_Resume.pdf</p>
@@ -87,7 +87,7 @@ const Resume = () => {
 
           {/* PDF Embed Area */}
           <div className="relative bg-[#1a1a2e] pdf-viewer-bg flex items-center justify-center"
-               style={{ minHeight: "780px" }}>
+               style={{ minHeight: typeof window !== "undefined" && window.innerWidth < 768 ? "400px" : "780px" }}>
 
             {/* Loading shimmer */}
             {!loaded && !error && (
@@ -107,7 +107,7 @@ const Resume = () => {
             {error && (
               <div className="flex flex-col items-center justify-center gap-5 py-24 px-8 text-center">
                 <div className="w-16 h-16 rounded-2xl bg-amber-500/12 border border-amber-500/25 flex items-center justify-center text-3xl">
-                  📄
+                  <FileText size={28} />
                 </div>
                 <div>
                   <p className="text-base font-bold text-white/70 mb-1">PDF Preview Unavailable</p>
@@ -144,7 +144,7 @@ const Resume = () => {
                 title="Monishkumar Resume"
                 className="w-full transition-opacity duration-500"
                 style={{
-                  height: "780px",
+                  height: typeof window !== "undefined" && window.innerWidth < 768 ? "400px" : "780px",
                   border: "none",
                   opacity: loaded ? 1 : 0,
                   background: "transparent",

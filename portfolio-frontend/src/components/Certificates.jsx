@@ -204,6 +204,7 @@ const Modal = ({ cert, onClose }) => {
           {/* Close */}
           <button
             onClick={onClose}
+            aria-label="Close certificate details"
             className="absolute top-4 right-4 z-10 p-1.5 rounded-full
               bg-white/8 border border-white/12 text-white/50
               hover:bg-white/15 hover:text-white transition-all"
@@ -413,6 +414,7 @@ const CertCard = ({ c, delay, onClick }) => {
       <motion.button
         whileHover={{ scale: 1.04, y: -2 }}
         onClick={(e) => { e.stopPropagation(); window.open(c.link, "_blank"); }}
+        aria-label={`Verify ${c.title} certificate`}
         className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full
           text-xs font-semibold border transition-all w-fit
           ${c.verified

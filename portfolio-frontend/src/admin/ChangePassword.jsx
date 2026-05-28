@@ -81,7 +81,7 @@ const ChangePassword = () => {
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success("Password changed successfully! 🔒");
+      toast.success("Password changed successfully!");
       setSuccess(true);
       setForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
       setTimeout(() => setSuccess(false), 4000);
@@ -94,7 +94,7 @@ const ChangePassword = () => {
 
   const PasswordField = ({ label, name, value, showPw, toggleShow }) => (
     <div>
-      <label className="block text-[10px] font-semibold uppercase
+      <label htmlFor={name} className="block text-[10px] font-semibold uppercase
         tracking-[1.5px] text-white/30 mb-2">
         {label}
       </label>
@@ -102,6 +102,7 @@ const ChangePassword = () => {
         <Lock size={14} className="absolute left-4 top-1/2 -translate-y-1/2
           text-white/25" />
         <input
+          id={name}
           type={showPw ? "text" : "password"}
           value={value}
           onChange={(e) => set(name, e.target.value)}
@@ -111,6 +112,7 @@ const ChangePassword = () => {
         <button
           type="button"
           onClick={toggleShow}
+          aria-label="Toggle password visibility"
           className="absolute right-4 top-1/2 -translate-y-1/2
             text-white/25 hover:text-white/60 transition-colors"
         >
@@ -285,7 +287,7 @@ const ChangePassword = () => {
       {/* Tip */}
       <motion.div {...fadeUp(0.2)} className="mt-5 text-center">
         <p className="text-[10px] text-white/20">
-          🔒 Passwords are encrypted with bcrypt · Minimum 8 characters required
+          <Lock size={11} className="inline mr-1"/> Passwords are encrypted with bcrypt · Minimum 8 characters required
         </p>
       </motion.div>
     </div>

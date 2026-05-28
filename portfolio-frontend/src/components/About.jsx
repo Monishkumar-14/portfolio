@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Github, Linkedin, Mail, Download, ExternalLink, MapPin, Briefcase, Star, Code2, Database, Brain, Layers } from "lucide-react";
+import { Github, Linkedin, Mail, Download, ExternalLink, MapPin, Briefcase, Star, Code2, Database, Brain, Layers, Phone, Code, Leaf, GitBranch, GraduationCap, BookOpen } from "lucide-react";
 
 // ── Animation helpers ─────────────────────────────────────────────
 const fadeUp   = (delay = 0) => ({
@@ -31,14 +31,14 @@ const chips = [
   { label: "Open to Work",                   icon: <Briefcase size={11}/>, cls: "bg-pink-500/12  border-pink-500/28   text-pink-300"    },
   { label: "Intern · AstraZeneca",           cls: "bg-green-500/12 border-green-500/28  text-green-400"  },
   { label: "CGPA 8.20 / 10",                icon: <Star size={11}/>, cls: "bg-amber-500/12 border-amber-500/28  text-amber-300"   },
-  { label: "NSS Coordinator",               icon: <span className="text-[10px]">🌱</span>, cls: "bg-green-500/12 border-green-500/28  text-green-400"   },
+  { label: "NSS Coordinator",               icon: <Leaf size={11}/>, cls: "bg-green-500/12 border-green-500/28  text-green-400"   },
 ];
 
 const timeline = [
   {
     color: "bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.8)]",
     date: "May 2026 — Present",
-    title: "SWE Intern · AstraZeneca 🧬",         // ← ADD
+    title: "SWE Intern · AstraZeneca",
     sub: "Building RAG chatbot for document intelligence · ETS Dept · Chennai",
   },
   {
@@ -150,7 +150,7 @@ const techGroups = [
 
 const activity = [
   {
-    icon: "⚔️",
+    icon: <Code size={14}/>,
     iconBg: "bg-amber-500/15 border-amber-500/25",
     title: "LeetCode — monish14_3",
     sub: "Consistent DSA: arrays, trees, graphs, dynamic programming",
@@ -158,7 +158,7 @@ const activity = [
     badgeCls: "bg-amber-500/15 border-amber-500/25 text-amber-300",
   },
   {
-    icon: "⌥",
+    icon: <GitBranch size={14}/>,
     iconBg: "bg-white/8 border-white/12",
     title: "GitHub — Monishkumar-14",
     sub: "15+ public repos across full-stack, ML & systems projects",
@@ -166,7 +166,7 @@ const activity = [
     badgeCls: "bg-green-500/12 border-green-500/25 text-green-400",
   },
   {
-    icon: "🌱",
+    icon: <Leaf size={14}/>,
     iconBg: "bg-pink-500/12 border-pink-500/25",
     title: "NSS Coordinator",
     sub: "Rural outreach — Puliyambakkam, Kanchipuram, 150+ participants",
@@ -219,6 +219,7 @@ const About = () => {
                 <img
                   src="/monish-profile.jpg"
                   alt="Monishkumar E M"
+                  aria-label="Monishkumar E M profile photo"
                   className="absolute inset-[5px] rounded-full object-cover z-10"
                   style={{
                     width: "calc(100% - 10px)",
@@ -261,9 +262,9 @@ const About = () => {
               {/* Contact info */}
               <div className="flex flex-wrap gap-2 justify-center">
                 {[
-                  { icon: <span>📱</span>, text: "+91 85310 41337" },
+                  { icon: <Phone size={10}/>, text: "+91 85310 41337" },
                   { icon: <MapPin size={10}/>, text: "Chennai" },
-                  { icon: <span>⚔️</span>, text: "LeetCode: monish14_3" },
+                  { icon: <Code size={10}/>, text: "LeetCode: monish14_3" },
                 ].map(({ icon, text }) => (
                   <span key={text}
                     className="flex items-center gap-1 px-3 py-1 rounded-full text-[10px] bg-white/5
@@ -364,7 +365,7 @@ const About = () => {
               <div className="flex flex-col divide-y divide-white/6">
                 {[
                   {
-                    icon: "🎓",
+                    icon: <GraduationCap size={14}/>,
                     iconBg: "bg-violet-500/15 border-violet-500/25",
                     deg: "BTech in Information Technology",
                     inst: "College of Engineering Guindy (CEG), Anna University",
@@ -374,7 +375,7 @@ const About = () => {
                     ],
                   },
                   {
-                    icon: "📚",
+                    icon: <BookOpen size={14}/>,
                     iconBg: "bg-amber-500/12 border-amber-500/25",
                     deg: "Higher Secondary Certificate (HSC)",
                     inst: "Saradha Higher Matric School, Gingee, Villupuram District",
@@ -466,7 +467,7 @@ const About = () => {
                   className={`object-contain flex-shrink-0 ${invert ? "invert brightness-75" : ""}`}
                 />
               ) : (
-                <span className="text-[13px]">🤖</span>
+                <Brain size={13} className="flex-shrink-0" />
               )}
               {name}
             </motion.span>

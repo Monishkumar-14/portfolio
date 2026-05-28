@@ -135,7 +135,9 @@ const ViewMessages = () => {
           No messages in this category.
         </div>
       ) : (
-        <div className="glass-card overflow-hidden">
+        <>
+          {/* Desktop table */}
+          <div className="hidden md:block glass-card overflow-hidden">
           {/* Head */}
           <div className="grid px-5 py-3 border-b border-white/7
             text-[10px] font-semibold uppercase tracking-[1.5px]
@@ -195,6 +197,7 @@ const ViewMessages = () => {
                 <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                   <button
                     onClick={() => openMessage(m)}
+                    aria-label={`View message from ${m.name}`}
                     className="w-7 h-7 rounded-[8px] bg-cyan-500/10
                       border border-cyan-500/22 flex items-center
                       justify-center text-cyan-400
@@ -203,6 +206,7 @@ const ViewMessages = () => {
                   </button>
                   <button
                     onClick={() => deleteMsg(m._id)}
+                    aria-label={`Delete message from ${m.name}`}
                     className="w-7 h-7 rounded-[8px] bg-red-500/10
                       border border-red-500/22 flex items-center
                       justify-center text-red-400
@@ -214,6 +218,64 @@ const ViewMessages = () => {
             ))}
           </AnimatePresence>
         </div>
+
+        {/* Mobile card layout */}
+        <div className="md:hidden flex flex-col gap-3">
+          {filtered.map((m) => (
+            <div
+              key={m._id}
+              onClick={() => openMessage(m)}
+              className={`glass-card p-4 cursor-pointer
+                ${!m.read ? "border-l-2 border-l-pink-500/50" : ""}`}
+            >
+              <div className="flex items-start justify-between mb-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className={`text-sm font-bold truncate
+                      ${!m.read ? "text-white" : "text-white/65"}`}>
+                      {m.name}
+                    </p>
+                    {!m.read && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[8px] font-bold
+                        bg-pink-500/15 border border-pink-500/25 text-pink-400 flex-shrink-0">
+                        NEW
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-white/35 truncate mt-0.5">{m.email}</p>
+                </div>
+                <span className="text-[10px] text-white/25 font-mono flex-shrink-0 ml-2">
+                  {timeAgo(m.createdAt)}
+                </span>
+              </div>
+              <p className="text-xs text-white/50 mb-3">
+                <span className="text-white/60 font-semibold">{m.subject}</span>
+                {" — "}{m.message?.slice(0, 80)}...
+              </p>
+              <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                <button
+                  onClick={() => openMessage(m)}
+                  aria-label={`View message from ${m.name}`}
+                  className="w-7 h-7 rounded-[8px] bg-cyan-500/10
+                    border border-cyan-500/22 flex items-center
+                    justify-center text-cyan-400
+                    hover:bg-cyan-500/20 transition-all">
+                  <Eye size={12}/>
+                </button>
+                <button
+                  onClick={() => deleteMsg(m._id)}
+                  aria-label={`Delete message from ${m.name}`}
+                  className="w-7 h-7 rounded-[8px] bg-red-500/10
+                    border border-red-500/22 flex items-center
+                    justify-center text-red-400
+                    hover:bg-red-500/20 transition-all">
+                  <Trash2 size={12}/>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+        </>
       )}
 
       {/* Message Detail Modal */}

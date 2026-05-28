@@ -17,8 +17,8 @@ const ALLOWED_ORIGINS = [
   "http://localhost:5173",
   "http://localhost:4173",
   "http://127.0.0.1:5173",
-  // Add your deployed frontend URL here when you go live, e.g.:
-  // "https://your-portfolio.vercel.app",
+  "https://monishdev.in",
+  "https://www.monishdev.in",
   process.env.CLIENT_URL,           // still respected if set in .env
 ].filter(Boolean);                  // removes undefined if CLIENT_URL isn't set
 
@@ -50,16 +50,16 @@ app.use("/api/certificates", certificateRoutes);
 app.use("/api/messages",     messageRoutes);
 
 // ── Health check ─────────────────────────────────────────────────
-app.get("/", (req, res) => res.json({ status: "🚀 Portfolio API running" }));
+app.get("/", (req, res) => res.json({ status: "Portfolio API running" }));
 
 // ── Connect DB + Start ────────────────────────────────────────────
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("✅ MongoDB connected");
-    app.listen(PORT, () => console.log(`🚀 Server on port ${PORT}`));
+    console.log("[OK] MongoDB connected");
+    app.listen(PORT, () => console.log(`[SERVER] Running on port ${PORT}`));
   })
   .catch((err) => {
-    console.error("❌ MongoDB error:", err.message);
+    console.error("[ERROR] MongoDB:", err.message);
     process.exit(1);
   });

@@ -156,7 +156,7 @@ const AdminOverview = () => {
             bg-clip-text text-transparent">
             Monish
           </span>
-          {" "}👋
+
         </h1>
         <p className="text-sm text-white/40">
           {now.toLocaleDateString("en-IN", {

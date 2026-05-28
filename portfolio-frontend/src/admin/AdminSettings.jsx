@@ -89,6 +89,9 @@ const AdminSettings = () => {
       </div>
       <button
         onClick={() => onChange(!value)}
+        role="switch"
+        aria-checked={value}
+        aria-label={label}
         className={`relative w-11 h-6 rounded-full transition-all duration-200
           ${value
             ? "bg-violet-500/30 border-violet-500/40"

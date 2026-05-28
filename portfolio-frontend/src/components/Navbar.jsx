@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Moon, Sun, Menu, X } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
-import { useNavigate } from "react-router-dom";
+
 
 const navLinks = [
   { label: "Home",         href: "#home"         },
@@ -20,7 +20,7 @@ const iosSpring = { type: "spring", stiffness: 420, damping: 32, mass: 0.9 };
 
 const Navbar = () => {
   const { isDark, toggleTheme } = useTheme();
-  const navigate = useNavigate();
+
   const [menuOpen,      setMenuOpen]      = useState(false);
   const [activeSection, setActiveSection] = useState("home");
 
@@ -119,6 +119,7 @@ const Navbar = () => {
           <motion.button
             whileTap={{ scale: 0.88 }}
             onClick={toggleTheme}
+            aria-label="Toggle theme"
             className="w-8 h-8 flex items-center justify-center rounded-full
               border transition-all"
             style={{
@@ -130,19 +131,11 @@ const Navbar = () => {
             {isDark ? <Sun size={14}/> : <Moon size={14}/>}
           </motion.button>
 
-          <motion.button
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate("/admin/login")}
-            className="hidden md:flex items-center btn-primary-glass px-4 py-1.5 text-xs font-semibold"
-          >
-            Admin
-          </motion.button>
-
           {/* Hamburger — animated icon swap */}
           <motion.button
             whileTap={{ scale: 0.88 }}
             onClick={() => setMenuOpen((o) => !o)}
+            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
             className="md:hidden w-8 h-8 flex items-center justify-center rounded-full
               border"
             style={{
@@ -220,18 +213,6 @@ const Navbar = () => {
               );
             })}
 
-            <motion.button
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: navLinks.length * 0.04, ...iosSpring }}
-              onClick={() => { navigate("/admin/login"); setMenuOpen(false); }}
-              className="mt-1 px-4 py-3.5 text-sm text-left rounded-2xl font-semibold
-                bg-gradient-to-r from-violet-500/20 to-indigo-500/20
-                border border-violet-500/30 text-violet-300
-                hover:from-violet-500/30 hover:to-indigo-500/30 transition-all"
-            >
-              Admin Panel →
-            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>

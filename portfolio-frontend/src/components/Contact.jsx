@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Github, Linkedin, Mail, CheckCircle2, AlertCircle } from "lucide-react";
+import { Send, Github, Linkedin, Mail, CheckCircle2, AlertCircle, Shield, Phone, MapPin, Clock, Briefcase, Handshake, Wrench, BookOpen, MessageCircle } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -14,28 +14,28 @@ const LeetCodeIcon = () => (
 // ── Data ──────────────────────────────────────────────────────────
 const CONTACT_ITEMS = [
   {
-    icon: "✉️",
+    icon: <Mail size={16} />,
     iconBg: "bg-violet-500/12 border-violet-500/28",
     label: "Email",
     value: "monish1421@gmail.com",
     href: "mailto:monish1421@gmail.com",
   },
   {
-    icon: "📱",
+    icon: <Phone size={16} />,
     iconBg: "bg-cyan-500/10 border-cyan-500/25",
     label: "Phone",
     value: "+91 85310 41337",
     href: "tel:+918531041337",
   },
   {
-    icon: "📍",
+    icon: <MapPin size={16} />,
     iconBg: "bg-pink-500/10 border-pink-500/25",
     label: "Location",
     value: "Chennai, Tamil Nadu, India",
     href: "https://maps.google.com/?q=Chennai,Tamil+Nadu,India",
   },
   {
-    icon: "⏰",
+    icon: <Clock size={16} />,
     iconBg: "bg-amber-500/10 border-amber-500/25",
     label: "Response Time",
     value: "Usually within 24 hours",
@@ -51,11 +51,11 @@ const SOCIALS = [
 ];
 
 const SUBJECTS = [
-  { icon: "💼", label: "Job Opportunity",   extraField: { name: "company", placeholder: "e.g. Google, Startup Inc.", label: "Company Name" } },
-  { icon: "🤝", label: "Collaboration",     extraField: null },
-  { icon: "🛠️", label: "Freelance Project", extraField: { name: "budget",  placeholder: "e.g. ₹50k–₹1L / $500–$2k",  label: "Budget Range" } },
-  { icon: "📚", label: "Open Source",       extraField: null },
-  { icon: "💬", label: "Just Saying Hi",    extraField: null },
+  { icon: <Briefcase size={13} />, label: "Job Opportunity",   extraField: { name: "company", placeholder: "e.g. Google, Startup Inc.", label: "Company Name" } },
+  { icon: <Handshake size={13} />, label: "Collaboration",     extraField: null },
+  { icon: <Wrench size={13} />, label: "Freelance Project", extraField: { name: "budget",  placeholder: "e.g. ₹50k–₹1L / $500–$2k",  label: "Budget Range" } },
+  { icon: <BookOpen size={13} />, label: "Open Source",       extraField: null },
+  { icon: <MessageCircle size={13} />, label: "Just Saying Hi",    extraField: null },
 ];
 
 // ── Validation helpers ────────────────────────────────────────────
@@ -96,6 +96,7 @@ const FloatingInput = ({
   return (
     <div className="relative">
       <Tag
+        id={name}
         name={name}
         value={value}
         onChange={onChange}
@@ -232,7 +233,7 @@ const Contact = () => {
     try {
       await axios.post(`${import.meta.env.VITE_API_URL}/api/messages`, form);
       setSubmitted(true);
-      toast.success("Message sent! Monish will reply soon 🚀");
+      toast.success("Message sent! Monish will reply soon.");
       setForm({ name: "", email: "", subject: "Job Opportunity", company: "", budget: "", message: "" });
       setTouched({});
       setActiveSub("Job Opportunity");
@@ -445,6 +446,7 @@ const Contact = () => {
                     */}
                     <div className="relative">
                       <input
+                        id={extraField.name}
                         name={extraField.name}
                         value={form[extraField.name] || ""}
                         onChange={handleChange}
@@ -452,7 +454,7 @@ const Contact = () => {
                         placeholder=" "
                         className="glass-input w-full px-4 pt-5 pb-2 text-sm !border-violet-500/25 !bg-violet-500/5 focus:ring-2 focus:ring-violet-500/30 outline-none peer transition-all duration-200"
                       />
-                      <label className={[
+                      <label htmlFor={extraField.name} className={[
                         "absolute left-4 pointer-events-none select-none text-sm transition-all duration-200",
                         "text-violet-400/60",
                         "top-1/2 -translate-y-1/2",
@@ -475,6 +477,7 @@ const Contact = () => {
               <div className="mb-4">
                 <div className="relative">
                   <input
+                    id="subject"
                     name="subject"
                     value={form.subject}
                     onChange={handleChange}
@@ -482,7 +485,7 @@ const Contact = () => {
                     placeholder=" "
                     className="glass-input w-full px-4 pt-5 pb-2 text-sm focus:ring-2 focus:ring-violet-500/30 outline-none peer transition-all duration-200"
                   />
-                  <label className={[
+                  <label htmlFor="subject" className={[
                     "absolute left-4 pointer-events-none select-none text-sm transition-all duration-200 text-white/40",
                     "top-1/2 -translate-y-1/2",
                     "peer-focus:!top-2 peer-focus:!translate-y-0 peer-focus:!text-[10px] peer-focus:!leading-none peer-focus:text-violet-400",
@@ -533,6 +536,7 @@ const Contact = () => {
               <motion.button
                 type="submit"
                 disabled={loading}
+                aria-label="Send message"
                 whileHover={!loading ? { scale: 1.02, y: -2 } : {}}
                 whileTap={!loading ? { scale: 0.98 } : {}}
                 className="w-full py-4 rounded-[14px] text-sm font-bold btn-primary-glass flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
@@ -579,10 +583,10 @@ const Contact = () => {
 
               {/* Trust footer */}
               <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
-                {["🔒 Your data is secure", "No spam, ever", "Reply within 24h"].map((t, i) => (
+                {["Your data is secure", "No spam, ever", "Reply within 24h"].map((t, i) => (
                   <span key={t} className="flex items-center gap-2">
                     {i > 0 && <span className="w-1 h-1 rounded-full bg-white/15" />}
-                    <span className="text-[10px] text-white/22">{t}</span>
+                    <span className="text-[10px] text-white/22 flex items-center gap-1">{i === 0 && <Shield size={10} />}{t}</span>
                   </span>
                 ))}
               </div>

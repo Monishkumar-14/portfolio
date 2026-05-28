@@ -1,7 +1,7 @@
 import { useState }    from "react";
 import { useNavigate } from "react-router-dom";
 import { motion }      from "framer-motion";
-import { Eye, EyeOff, Lock, User } from "lucide-react";
+import { Eye, EyeOff, Lock, User, Zap } from "lucide-react";
 import axios           from "axios";
 import toast           from "react-hot-toast";
 import { useAuth }     from "../context/AuthContext";
@@ -27,7 +27,7 @@ const AdminLogin = () => {
         form
       );
       login(data.token);
-      toast.success("Welcome back, Monish! 🚀");
+      toast.success("Welcome back, Monish!");
       navigate("/admin");
     } catch (err) {
       toast.error(err.response?.data?.message || "Invalid credentials.");
@@ -63,7 +63,7 @@ const AdminLogin = () => {
               from-violet-600 to-cyan-500 flex items-center justify-center
               text-3xl mx-auto mb-5
               shadow-[0_8px_32px_rgba(124,58,237,0.4)]">
-              ⚡
+              <Zap size={24}/>
             </div>
             <h1 className="text-2xl font-extrabold tracking-tight mb-1">
               Admin Portal
@@ -77,7 +77,7 @@ const AdminLogin = () => {
 
             {/* Username */}
             <div className="mb-4">
-              <label className="block text-[10px] font-semibold uppercase
+              <label htmlFor="username" className="block text-[10px] font-semibold uppercase
                 tracking-[1.5px] text-white/35 mb-2">
                 Username
               </label>
@@ -85,6 +85,7 @@ const AdminLogin = () => {
                 <User size={14} className="absolute left-4 top-1/2 -translate-y-1/2
                   text-white/30"/>
                 <input
+                  id="username"
                   type="text"
                   value={form.username}
                   onChange={(e) => setForm({ ...form, username: e.target.value })}
@@ -96,7 +97,7 @@ const AdminLogin = () => {
 
             {/* Password */}
             <div className="mb-6">
-              <label className="block text-[10px] font-semibold uppercase
+              <label htmlFor="password" className="block text-[10px] font-semibold uppercase
                 tracking-[1.5px] text-white/35 mb-2">
                 Password
               </label>
@@ -104,6 +105,7 @@ const AdminLogin = () => {
                 <Lock size={14} className="absolute left-4 top-1/2 -translate-y-1/2
                   text-white/30"/>
                 <input
+                  id="password"
                   type={show ? "text" : "password"}
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -113,6 +115,7 @@ const AdminLogin = () => {
                 <button
                   type="button"
                   onClick={() => setShow((s) => !s)}
+                  aria-label="Toggle password visibility"
                   className="absolute right-4 top-1/2 -translate-y-1/2
                     text-white/30 hover:text-white/70 transition-colors"
                 >
@@ -149,7 +152,7 @@ const AdminLogin = () => {
           </form>
 
           <p className="text-center text-[11px] text-white/20 mt-6">
-            🔒 Secured with JWT Authentication
+            <Lock size={12} className="inline mr-1"/> Secured with JWT Authentication
           </p>
         </div>
 

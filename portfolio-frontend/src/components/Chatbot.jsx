@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, RefreshCw, X, Download, ExternalLink, Zap, ChevronDown } from "lucide-react";
+import { Send, RefreshCw, X, Download, ExternalLink, Zap, ChevronDown, Bot, Rocket, GraduationCap, Wrench, User, AlertCircle } from "lucide-react";
 import { sendToGroq } from "../utils/geminiClient";
 
 // ── Constants ─────────────────────────────────────────────────────
@@ -9,7 +9,7 @@ const RESUME_URL = "/Monishkumar_Resume.pdf";
 const CATEGORIES = [
   {
     label: "Projects",
-    icon: "🚀",
+    icon: <Rocket size={13} />,
     questions: [
       {label: "SpareChange Project",   q: "Tell me about the SpareChange project" },
       {label: "Other Projects",        q: "What other projects has Monish built?" },
@@ -17,7 +17,7 @@ const CATEGORIES = [
   },
   {
     label: "Background",
-    icon: "🎓",
+    icon: <GraduationCap size={13} />,
     questions: [
       {label: "Education",             q: "Where does Monish study?" },
       {label: "Achievements",          q: "What are Monish's achievements and certifications?" },
@@ -25,7 +25,7 @@ const CATEGORIES = [
   },
   {
     label: "Skills",
-    icon: "🛠️",
+    icon: <Wrench size={13} />,
     questions: [
       {label: "Tech Stack",            q: "What tech stack does Monish use?" },
       {label: "Frontend Skills",       q: "What are Monish's frontend skills?" },
@@ -33,7 +33,7 @@ const CATEGORIES = [
   },
   {
     label: "Connect",
-    icon: "📬",
+    icon: <Send size={13} />,
     questions: [
       {label: "Download Resume",       q: "How can I download Monish's resume?" },
       {label: "Contact Info",          q: "How can I contact Monish?" },
@@ -50,10 +50,10 @@ const TOUR_STEPS = [
 ];
 
 const FOLLOW_UP_MAP = {
-  project: ["🌐 Show other projects", "🛠️ What tech was used?", "📬 Contact Monish"],
-  skill:   ["🚀 See his projects",    "📄 Download resume",      "📬 Get in touch"],
-  resume:  ["📬 Contact Monish",      "🚀 See his projects",     "🎓 Learn about education"],
-  default: ["🚀 See his projects",    "📄 Download resume",      "📬 Contact Monish"],
+  project: ["Show other projects", "What tech was used?", "Contact Monish"],
+  skill:   ["See his projects",    "Download resume",      "Get in touch"],
+  resume:  ["Contact Monish",      "See his projects",     "Learn about education"],
+  default: ["See his projects",    "Download resume",      "Contact Monish"],
 };
 
 const RESUME_KEYWORDS = ["resume", "cv", "download", "pdf"];
@@ -87,7 +87,7 @@ const AIAvatar = ({ size = "md" }) => {
         animate={{ boxShadow: ["0 0 10px rgba(124,58,237,0.4)", "0 0 30px rgba(124,58,237,0.7)", "0 0 10px rgba(124,58,237,0.4)"] }}
         transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
       >
-        🤖
+        <Bot size={size === "sm" ? 16 : 28} className="text-white" />
       </motion.div>
       {/* Pulse ring */}
       <motion.div
@@ -190,7 +190,7 @@ const Bubble = ({ msg, isStreaming, onStreamDone }) => {
     >
       {isUser ? (
         <div className="w-7 h-7 rounded-full bg-white/12 border border-white/15 flex items-center justify-center text-sm flex-shrink-0 mb-1">
-          👤
+          <User size={14} />
         </div>
       ) : (
         <AIAvatar size="sm" />
@@ -538,7 +538,7 @@ export default function Chatbot() {
                 disabled={loading}
                 className="w-full mb-4 py-2.5 px-4 rounded-[12px] text-xs font-bold bg-gradient-to-r from-violet-600/30 to-cyan-500/20 border border-violet-500/35 text-violet-300 hover:from-violet-600/45 hover:to-cyan-500/35 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
               >
-                🚀 Start Guided Tour
+                <Rocket size={13} /> Start Guided Tour
               </motion.button>
 
               {/* Quick questions by category */}
@@ -580,7 +580,7 @@ export default function Chatbot() {
             <div className="flex items-center gap-3 px-6 py-4 border-b border-white/8 bg-violet-500/5 flex-shrink-0">
               <div className="relative flex-shrink-0">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center text-base">
-                  🤖
+                  <Bot size={18} className="text-white" />
                 </div>
                 <motion.div
                   className="absolute inset-0 rounded-full border border-violet-400/30"
@@ -622,6 +622,7 @@ export default function Chatbot() {
                 whileTap={{ scale: 0.9 }}
                 onClick={resetChat}
                 title="Clear chat"
+                aria-label="Clear chat"
                 className="w-8 h-8 rounded-full bg-white/6 border border-white/10 flex items-center justify-center text-white/50 hover:bg-white/12 hover:text-white transition-all flex-shrink-0"
               >
                 <RefreshCw size={13} />
@@ -638,7 +639,7 @@ export default function Chatbot() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="p-5 rounded-[18px] bg-violet-500/8 border border-violet-500/15"
                 >
-                  <p className="text-sm font-bold text-violet-300 mb-2">👋 Hey there!</p>
+                  <p className="text-sm font-bold text-violet-300 mb-2">Hey there!</p>
                   <p className="text-xs text-white/45 leading-relaxed mb-4">
                     I'm Monish's AI assistant — ask me anything about his projects, skills,
                     achievements, or experience. Or hit{" "}
@@ -646,10 +647,10 @@ export default function Chatbot() {
                     a curated walkthrough!
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {["🚀 Projects", "🎓 Education", "💼 Skills", "📄 Resume"].map((s) => (
+                    {["Projects", "Education", "Skills", "Resume"].map((s) => (
                       <button
                         key={s}
-                        onClick={() => sendMessage(s.replace(/^[\p{Emoji}\s]+/u, "").trim())}
+                        onClick={() => sendMessage(s)}
                         className="px-3 py-1.5 rounded-full text-[11px] bg-violet-500/12 border border-violet-500/25 text-violet-300 hover:bg-violet-500/25 transition-all"
                       >
                         {s}
@@ -692,7 +693,7 @@ export default function Chatbot() {
                     exit={{ opacity: 0 }}
                     className="flex flex-wrap gap-2 pl-9"
                   >
-                    <p className="w-full text-[10px] text-white/25 mb-1 font-medium">👉 You might also ask:</p>
+                    <p className="w-full text-[10px] text-white/25 mb-1 font-medium">You might also ask:</p>
                     {followUps.map((chip) => (
                       <motion.button
                         key={chip}
@@ -749,6 +750,7 @@ export default function Chatbot() {
                 whileTap={{ scale: 0.94 }}
                 onClick={() => sendMessage()}
                 disabled={loading || !input.trim() || !apiReady}
+                aria-label="Send message"
                 className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center text-white shadow-[0_4px_20px_rgba(124,58,237,0.4)] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0"
               >
                 <Send size={15} />

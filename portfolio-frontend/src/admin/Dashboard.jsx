@@ -4,7 +4,7 @@ import { motion, AnimatePresence }        from "framer-motion";
 import {
   LayoutDashboard, FolderOpen, Award,
   MessageSquare, Settings, KeyRound,
-  LogOut, Menu, X, Bell,
+  LogOut, Menu, X, Bell, Zap,
 } from "lucide-react";
 import { useAuth }    from "../context/AuthContext";
 import toast          from "react-hot-toast";
@@ -61,7 +61,7 @@ const Sidebar = ({ mobile, onClose, unreadCount }) => {
           <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br
             from-violet-600 to-cyan-500 flex items-center justify-center
             text-lg shadow-[0_4px_16px_rgba(124,58,237,0.35)]">
-            ⚡
+            <Zap size={18}/>
           </div>
           <div>
             <p className="text-[14px] font-extrabold leading-none">Admin</p>
@@ -69,7 +69,7 @@ const Sidebar = ({ mobile, onClose, unreadCount }) => {
           </div>
         </div>
         {mobile && (
-          <button onClick={onClose} className="text-white/40 hover:text-white">
+          <button onClick={onClose} aria-label="Close navigation menu" className="text-white/40 hover:text-white">
             <X size={18}/>
           </button>
         )}
@@ -209,6 +209,7 @@ const Dashboard = () => {
         >
           <button
             onClick={() => setMobileOpen(true)}
+            aria-label="Open navigation menu"
             className="lg:hidden w-9 h-9 rounded-[10px] bg-white/6
               border border-white/10 flex items-center justify-center
               text-white/60"
@@ -218,7 +219,7 @@ const Dashboard = () => {
 
           <div className="flex-1"/>
 
-          <button className="w-9 h-9 rounded-[10px] bg-white/6
+          <button aria-label="Notifications" className="w-9 h-9 rounded-[10px] bg-white/6
             border border-white/10 flex items-center justify-center
             text-white/50 hover:bg-white/10 transition-all relative">
             <Bell size={15}/>

@@ -18,7 +18,7 @@ const PROJECTS = [
   {
     id: 1,
     num: "01",
-    icon: "💰",
+    icon: <Zap size={20} />,
     iconBg: "bg-violet-500/15 border-violet-500/30",
     cat: ["fullstack", "ml"],
     catLabel: "Full Stack · PERN + ML Integration",
@@ -94,7 +94,7 @@ const PROJECTS = [
   {
     id: 2,
     num: "02",
-    icon: "🍳",
+    icon: <Brain size={20} />,
     iconBg: "bg-pink-500/15 border-pink-500/30",
     cat: ["ml"],
     catLabel: "Machine Learning · Python · NLP",
@@ -165,7 +165,7 @@ const PROJECTS = [
   {
     id: 3,
     num: "03",
-    icon: "⚙️",
+    icon: <Database size={20} />,
     iconBg: "bg-amber-500/15 border-amber-500/30",
     cat: ["dbms"],
     catLabel: "DBMS · PostgreSQL · Backend",
@@ -234,7 +234,7 @@ const PROJECTS = [
   {
     id: 4,
     num: "04",
-    icon: "🌿",
+    icon: <GitBranch size={20} />,
     iconBg: "bg-cyan-500/15 border-cyan-500/30",
     cat: ["systems"],
     catLabel: "Systems · C++ · Advanced DSA",

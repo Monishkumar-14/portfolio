@@ -304,7 +304,9 @@ const ManageCertificates = () => {
           Loading certificates...
         </div>
       ) : (
-        <div className="glass-card overflow-hidden">
+        <>
+          {/* Desktop table */}
+          <div className="hidden md:block glass-card overflow-hidden">
           {/* Head */}
           <div className="grid px-5 py-3 border-b border-white/7
             text-[10px] font-semibold uppercase tracking-[1.5px] text-white/28"
@@ -382,6 +384,7 @@ const ManageCertificates = () => {
                   <div className="flex gap-2">
                     {c.link && (
                       <a href={c.link} target="_blank" rel="noreferrer"
+                        aria-label={`View ${c.title} certificate link`}
                         className="w-7 h-7 rounded-[8px] bg-cyan-500/10
                           border border-cyan-500/22 flex items-center
                           justify-center text-cyan-400
@@ -391,6 +394,7 @@ const ManageCertificates = () => {
                     )}
                     <button
                       onClick={() => setModal(c)}
+                      aria-label={`Edit ${c.title}`}
                       className="w-7 h-7 rounded-[8px] bg-violet-500/12
                         border border-violet-500/25 flex items-center
                         justify-center text-violet-400
@@ -399,6 +403,7 @@ const ManageCertificates = () => {
                     </button>
                     <button
                       onClick={() => deleteCert(c._id)}
+                      aria-label={`Delete ${c.title}`}
                       className="w-7 h-7 rounded-[8px] bg-red-500/10
                         border border-red-500/22 flex items-center
                         justify-center text-red-400
@@ -411,6 +416,84 @@ const ManageCertificates = () => {
             </AnimatePresence>
           )}
         </div>
+
+        {/* Mobile card layout */}
+        <div className="md:hidden flex flex-col gap-3">
+          {certs.length === 0 ? (
+            <div className="text-center py-14 text-white/30 text-sm">
+              No certificates yet. Click "+ Add Certificate".
+            </div>
+          ) : (
+            certs.map((c) => (
+              <div key={c._id} className="glass-card p-4">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-white">{c.title}</p>
+                    <p className="text-[11px] text-white/40 mt-0.5">{c.issuer} · {c.year}</p>
+                  </div>
+                  {c.verified ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5
+                      rounded-full text-[9px] font-semibold flex-shrink-0 ml-2
+                      bg-green-500/12 border border-green-500/25 text-green-400">
+                      <CheckCircle size={9}/> Verified
+                    </span>
+                  ) : (
+                    <span className="inline-flex px-2 py-0.5 rounded-full
+                      text-[9px] font-semibold flex-shrink-0 ml-2
+                      bg-white/5 border border-white/10 text-white/30">
+                      Unverified
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`inline-flex px-2.5 py-1 rounded-full
+                    text-[10px] font-semibold border
+                    ${CAT_COLORS[c.category] || CAT_COLORS["Other"]}`}>
+                    {c.category}
+                  </span>
+                  {c.score && (
+                    <span className="inline-flex items-center gap-1
+                      px-2 py-0.5 rounded-full text-[9px] font-semibold
+                      bg-green-500/12 border border-green-500/25 text-green-400">
+                      ★ {c.score}
+                    </span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  {c.link && (
+                    <a href={c.link} target="_blank" rel="noreferrer"
+                      aria-label={`View ${c.title} certificate link`}
+                      className="w-7 h-7 rounded-[8px] bg-cyan-500/10
+                        border border-cyan-500/22 flex items-center
+                        justify-center text-cyan-400
+                        hover:bg-cyan-500/20 transition-all text-xs">
+                      ↗
+                    </a>
+                  )}
+                  <button
+                    onClick={() => setModal(c)}
+                    aria-label={`Edit ${c.title}`}
+                    className="w-7 h-7 rounded-[8px] bg-violet-500/12
+                      border border-violet-500/25 flex items-center
+                      justify-center text-violet-400
+                      hover:bg-violet-500/25 transition-all">
+                    <Pencil size={11}/>
+                  </button>
+                  <button
+                    onClick={() => deleteCert(c._id)}
+                    aria-label={`Delete ${c.title}`}
+                    className="w-7 h-7 rounded-[8px] bg-red-500/10
+                      border border-red-500/22 flex items-center
+                      justify-center text-red-400
+                      hover:bg-red-500/20 transition-all">
+                    <Trash2 size={11}/>
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+        </>
       )}
 
       {/* Modal */}
