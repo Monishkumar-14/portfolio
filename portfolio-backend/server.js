@@ -19,6 +19,7 @@ const ALLOWED_ORIGINS = [
   "http://127.0.0.1:5173",
   "https://monishdev.in",
   "https://www.monishdev.in",
+  "https://portfolio-phi-ten-lxkms7co9f.vercel.app",
   process.env.CLIENT_URL,           // still respected if set in .env
 ].filter(Boolean);                  // removes undefined if CLIENT_URL isn't set
 
