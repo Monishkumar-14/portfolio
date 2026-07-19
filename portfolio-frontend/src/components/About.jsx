@@ -37,15 +37,15 @@ const chips = [
 const timeline = [
   {
     color: "bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.8)]",
-    date: "May 2026 — Present",
+    date: "May 2026 — July 2026",
     title: "SWE Intern · AstraZeneca",
     sub: "Building RAG chatbot for document intelligence · ETS Dept · Chennai",
   },
   {
     color: "bg-violet-500 shadow-[0_0_8px_rgba(124,58,237,0.7)]",
-    date: "2026 — Present",
-    title: "Portfolio SaaS · Final Year Project",
-    sub: "AI-powered portfolio with admin panel, chatbot & resume analyzer",
+    date: "2026",
+    title: "Portfolio SaaS ",
+    sub: "AI-powered portfolio with admin panel& chatbot",
   },
   {
     color: "bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.7)]",
@@ -236,7 +236,7 @@ const About = () => {
                 Full Stack Developer · AI Enthusiast
               </p>
               <p className="text-[11px] text-white/40 mb-1">CEG, Anna University · Chennai</p>
-              <p className="text-xs text-white/55 font-medium mb-6">CGPA: 8.20 / 10</p>
+              <p className="text-xs text-white/55 font-medium mb-6">CGPA: 8.21 / 10</p>
 
               {/* Socials */}
               <div className="flex flex-wrap gap-2 justify-center mb-4">

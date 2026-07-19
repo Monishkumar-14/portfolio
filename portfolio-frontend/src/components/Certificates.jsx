@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ExternalLink, CheckCircle, Shield, Cloud, Code2, Database,
-  Cpu, X, ZoomIn, BadgeCheck, Calendar, Clock, Award
+  Cpu, X, ZoomIn, BadgeCheck, Calendar, Clock, Award,
+  ChevronLeft, ChevronRight
 } from "lucide-react";
 
 // ── Animation helpers ─────────────────────────────────────────────
@@ -50,6 +51,31 @@ const FEATURED = {
   topics: ["Network Security","Threat Analysis","SIEM Tools","IDS / IPS","Python Automation","Security Operations"],
   link: "https://www.credly.com/badges/6e919e6f-6a0b-4592-9395-5d3f100c6750/public_url",
   IssuerIcon: GoogleIcon,
+};
+
+// CertCard-compatible version of FEATURED for the mobile carousel
+const FEATURED_AS_CARD = {
+  id: "featured",
+  Icon: Shield,
+  iconColor: "text-pink-400",
+  iconBg: "bg-pink-500/15 border-pink-500/30",
+  glowColor: "rgba(236,72,153,0.15)",
+  cat: "security",
+  catLabel: "Security",
+  catCls: "bg-pink-500/12 border-pink-500/28 text-pink-300",
+  ribbonCls: "bg-pink-500/12 border-pink-500/28 text-pink-300",
+  ribbon: "Featured",
+  issuer: "Google · Coursera",
+  IssuerIcon: GoogleIcon,
+  title: "Google Cybersecurity Professional Certificate",
+  year: "2026",
+  duration: "6 months",
+  score: null,
+  desc: FEATURED.desc,
+  topics: FEATURED.topics,
+  link: FEATURED.link,
+  verified: true,
+  credentialId: FEATURED.credentialId,
 };
 
 const CERTS = [
@@ -335,7 +361,7 @@ const CertCard = ({ c, delay, onClick }) => {
       transition={{ duration: 0.5, delay }}
       whileHover={{ y: -8, boxShadow: `0 24px 60px ${glowColor || "rgba(139,92,246,0.1)"}` }}
       onClick={() => onClick(c)}
-      className="relative glass-card p-7 flex flex-col overflow-hidden cursor-pointer
+      className="relative glass-card p-7 flex flex-col h-full overflow-hidden cursor-pointer
         transition-all duration-300 group hover:border-white/15"
     >
       {/* Corner ribbon */}
@@ -441,6 +467,7 @@ const CertCard = ({ c, delay, onClick }) => {
 const Certificates = () => {
   const [active, setActive] = useState("all");
   const [modal, setModal]   = useState(null);
+  const certScrollRef = useRef(null);
 
   const showFeatured = active === "all" || active === FEATURED.cat;
   const filtered     = CERTS.filter((c) => active === "all" || c.cat === active);
@@ -525,7 +552,7 @@ const Certificates = () => {
             </AnimatePresence>
           </motion.div>
 
-          {/* ── Featured Card ── */}
+          {/* ── Featured Card (desktop only — on mobile it's in the carousel) ── */}
           <AnimatePresence>
             {showFeatured && (() => {
               const FI = FEATURED.Icon;
@@ -538,7 +565,7 @@ const Certificates = () => {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.5 }}
                   whileHover={{ y: -4 }}
-                  className="glass-card mb-5 overflow-hidden cursor-pointer
+                  className="hidden sm:block glass-card mb-5 overflow-hidden cursor-pointer
                     hover:border-white/15 transition-colors duration-300"
                   onClick={() => setModal({
                     Icon: FEATURED.Icon,
@@ -694,15 +721,69 @@ const Certificates = () => {
             })()}
           </AnimatePresence>
 
-          {/* ── Certs Grid ── */}
+          {/* ── Certs Grid — Desktop ── */}
           <motion.div layout
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <AnimatePresence>
               {filtered.map((c, i) => (
                 <CertCard key={c.id} c={c} delay={i * 0.07} onClick={setModal} />
               ))}
             </AnimatePresence>
           </motion.div>
+
+          {/* ── Certs Carousel — Mobile ── */}
+          {(() => {
+            const mobileCards = showFeatured ? [FEATURED_AS_CARD, ...filtered] : filtered;
+            return (
+          <div className="sm:hidden relative">
+            <div
+              ref={certScrollRef}
+              className="flex items-stretch gap-4 overflow-x-auto snap-x snap-mandatory pb-4"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
+            >
+              {mobileCards.map((c, i) => (
+                <div key={c.id} className="snap-center flex-shrink-0 w-[82vw] max-w-[320px]">
+                  <CertCard c={c} delay={0} onClick={setModal} />
+                </div>
+              ))}
+            </div>
+            {/* Scroll controls */}
+            <div className="flex items-center justify-center gap-3 mt-4">
+              <button
+                onClick={() => certScrollRef.current?.scrollBy({ left: -280, behavior: 'smooth' })}
+                className="w-8 h-8 rounded-full bg-white/8 border border-white/12 flex items-center justify-center text-white/50 hover:bg-white/14 hover:text-white transition-all"
+                aria-label="Previous certificate"
+              >
+                <ChevronLeft size={14} />
+              </button>
+              <div className="flex gap-1.5">
+                {mobileCards.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      const container = certScrollRef.current;
+                      if (container) {
+                        const card = container.children[i];
+                        card?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                      }
+                    }}
+                    className="w-1.5 h-1.5 rounded-full bg-white/20 hover:bg-cyan-400 transition-all"
+                    aria-label={`Go to certificate ${i + 1}`}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={() => certScrollRef.current?.scrollBy({ left: 280, behavior: 'smooth' })}
+                className="w-8 h-8 rounded-full bg-white/8 border border-white/12 flex items-center justify-center text-white/50 hover:bg-white/14 hover:text-white transition-all"
+                aria-label="Next certificate"
+              >
+                <ChevronRight size={14} />
+              </button>
+            </div>
+            <p className="text-center text-[10px] text-white/25 mt-2">Swipe or use arrows to browse</p>
+          </div>
+          );
+          })()}
 
           {/* ── Footer Note ── */}
           <motion.div {...fadeUp(0.3)} className="mt-12 text-center">

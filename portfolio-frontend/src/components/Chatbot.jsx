@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, RefreshCw, X, Download, ExternalLink, Zap, ChevronDown, Bot, Rocket, GraduationCap, Wrench, User, AlertCircle } from "lucide-react";
+import { Send, RefreshCw, X, Download, ExternalLink, Zap, ChevronDown, Bot, Rocket, GraduationCap, Wrench, User, AlertCircle, MoreHorizontal } from "lucide-react";
 import { sendToGroq } from "../utils/geminiClient";
 
 // ── Constants ─────────────────────────────────────────────────────
@@ -278,6 +278,7 @@ export default function Chatbot() {
   const [messages,    setMessages]    = useState([]);
   const [input,       setInput]       = useState("");
   const [loading,     setLoading]     = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [error,       setError]       = useState(null);
   const [retryCount,  setRetryCount]  = useState(null);
   const [apiReady,    setApiReady]    = useState(false);
@@ -530,41 +531,109 @@ export default function Chatbot() {
 
               <div className="h-px bg-white/7 mb-4" />
 
-              {/* Tour button */}
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={startTour}
-                disabled={loading}
-                className="w-full mb-4 py-2.5 px-4 rounded-[12px] text-xs font-bold bg-gradient-to-r from-violet-600/30 to-cyan-500/20 border border-violet-500/35 text-violet-300 hover:from-violet-600/45 hover:to-cyan-500/35 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
+              {/* Three-dot toggle — mobile only */}
+              <button
+                onClick={() => setSidebarOpen((v) => !v)}
+                className="lg:hidden w-full flex items-center justify-between px-3 py-2.5 rounded-[12px] text-xs font-semibold bg-white/5 border border-white/10 text-white/45 hover:bg-white/10 hover:text-white/70 transition-all mb-2"
               >
-                <Rocket size={13} /> Start Guided Tour
-              </motion.button>
+                <span className="flex items-center gap-2">
+                  <MoreHorizontal size={14} />
+                  Quick Actions
+                </span>
+                <motion.span animate={{ rotate: sidebarOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                  <ChevronDown size={12} />
+                </motion.span>
+              </button>
 
-              {/* Quick questions by category */}
-              <div className="flex flex-col gap-3">
-                {CATEGORIES.map((cat) => (
-                  <CategoryGroup
-                    key={cat.label}
-                    cat={cat}
-                    onSend={(q) => sendMessage(q)}
-                    disabled={loading || !apiReady}
-                  />
-                ))}
+              {/* Mobile: collapsible */}
+              <div className="lg:hidden">
+                <AnimatePresence initial={false}>
+                  {sidebarOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      className="overflow-hidden"
+                    >
+                      {/* Tour button */}
+                      <motion.button
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={startTour}
+                        disabled={loading}
+                        className="w-full mb-4 py-2.5 px-4 rounded-[12px] text-xs font-bold bg-gradient-to-r from-violet-600/30 to-cyan-500/20 border border-violet-500/35 text-violet-300 hover:from-violet-600/45 hover:to-cyan-500/35 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
+                      >
+                        <Rocket size={13} /> Start Guided Tour
+                      </motion.button>
+
+                      {/* Quick questions by category */}
+                      <div className="flex flex-col gap-3">
+                        {CATEGORIES.map((cat) => (
+                          <CategoryGroup
+                            key={cat.label}
+                            cat={cat}
+                            onSend={(q) => sendMessage(q)}
+                            disabled={loading || !apiReady}
+                          />
+                        ))}
+                      </div>
+
+                      {/* Powered by */}
+                      <div className="mt-4 pt-3 border-t border-white/7">
+                        <p className="text-[10px] font-semibold uppercase tracking-[2px] text-white/28 mb-1">
+                          Powered by
+                        </p>
+                        <p className="text-[12px] font-bold text-white/60">
+                          Groq <span className="text-white/25 font-normal">·</span> LLaMA 3.1 8B
+                        </p>
+                        <p className="text-[10px] text-white/25 mt-1">
+                          Fast inference · Multi-turn memory
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            </div>
 
-            {/* Powered by card */}
-            <div className="glass-card p-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[2px] text-white/28 mb-1">
-                Powered by
-              </p>
-              <p className="text-[12px] font-bold text-white/60">
-                Groq <span className="text-white/25 font-normal">·</span> LLaMA 3.1 8B
-              </p>
-              <p className="text-[10px] text-white/25 mt-1">
-                Fast inference · Multi-turn memory
-              </p>
+              {/* Desktop: always visible */}
+              <div className="hidden lg:block">
+                {/* Tour button */}
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={startTour}
+                  disabled={loading}
+                  className="w-full mb-4 py-2.5 px-4 rounded-[12px] text-xs font-bold bg-gradient-to-r from-violet-600/30 to-cyan-500/20 border border-violet-500/35 text-violet-300 hover:from-violet-600/45 hover:to-cyan-500/35 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
+                >
+                  <Rocket size={13} /> Start Guided Tour
+                </motion.button>
+
+                {/* Quick questions by category */}
+                <div className="flex flex-col gap-3">
+                  {CATEGORIES.map((cat) => (
+                    <CategoryGroup
+                      key={cat.label}
+                      cat={cat}
+                      onSend={(q) => sendMessage(q)}
+                      disabled={loading || !apiReady}
+                    />
+                  ))}
+                </div>
+
+                {/* Powered by */}
+                <div className="mt-4 pt-3 border-t border-white/7">
+                  <p className="text-[10px] font-semibold uppercase tracking-[2px] text-white/28 mb-1">
+                    Powered by
+                  </p>
+                  <p className="text-[12px] font-bold text-white/60">
+                    Groq <span className="text-white/25 font-normal">·</span> LLaMA 3.1 8B
+                  </p>
+                  <p className="text-[10px] text-white/25 mt-1">
+                    Fast inference · Multi-turn memory
+                  </p>
+                </div>
+              </div>
             </div>
           </motion.div>
 

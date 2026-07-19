@@ -6,6 +6,7 @@ import projectRoutes     from "./routes/projects.js";
 import certificateRoutes from "./routes/certificates.js";
 import messageRoutes     from "./routes/messages.js";
 import authRoutes        from "./routes/auth.js";
+import chatRoutes        from "./routes/chat.js";
 
 dotenv.config();
 
@@ -49,6 +50,7 @@ app.use("/api/admin",        authRoutes);
 app.use("/api/projects",     projectRoutes);
 app.use("/api/certificates", certificateRoutes);
 app.use("/api/messages",     messageRoutes);
+app.use("/api/chat",         chatRoutes);
 
 // ── Health check ─────────────────────────────────────────────────
 app.get("/", (req, res) => res.json({ status: "Portfolio API running" }));

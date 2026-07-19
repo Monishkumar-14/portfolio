@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Github, ExternalLink, ChevronDown, ChevronUp,
-  X, Users, Layers, Zap, Code2, Database, GitBranch, Brain, Package
+  Github, ExternalLink, ChevronDown, ChevronUp, ChevronLeft, ChevronRight,
+  X, Users, Layers, Zap, Code2, Database, GitBranch, Brain, Package, Cpu, Wifi
 } from "lucide-react";
 
 // ── Animation helpers ─────────────────────────────────────────────
@@ -302,6 +302,142 @@ const PROJECTS = [
       ],
     },
   },
+  {
+    id: 5,
+    num: "05",
+    icon: <Cpu size={20} />,
+    iconBg: "bg-green-500/15 border-green-500/30",
+    cat: ["systems"],
+    catLabel: "Systems · xv6 · OS Internals",
+    catColor: "text-green-300",
+    accentColor: "green",
+    title: "Synchronization in xv6",
+    featured: false,
+    github: "https://github.com/Sithishwar/Schedulingalgo_xv6",
+    live: null,
+    desc: "Implemented a thread-like concurrency system in xv6 using fork() and pipe() to simulate student-teacher interaction, with custom spinlock synchronization and deep exploration of process scheduling.",
+    highlights: [
+      { color: "bg-green-400",  text: "Custom spinlock synchronization without pthreads — fits xv6 model" },
+      { color: "bg-cyan-400",   text: "fork() + pipe() based thread simulation for IPC" },
+      { color: "bg-violet-400", text: "Deep exploration of process communication and scheduling internals" },
+    ],
+    tech: ["C", "xv6", "fork()", "pipe()", "Spinlocks", "OS Internals", "Process Scheduling"],
+    caseStudy: {
+      problem:   "xv6 lacks native threading — need concurrency primitives for student-teacher simulation.",
+      approach:  "Used fork() and pipe() to create thread-like behaviour; custom spinlocks for synchronization.",
+      challenge: "Avoiding pthreads while building reliable synchronization within xv6's minimal kernel.",
+      outcome:   "Functional concurrent simulation with custom sync primitives; deep OS scheduling insights.",
+    },
+    modal: {
+      overview: "A systems programming project that implements thread-like concurrency within the xv6 operating system. Uses fork() and pipe() to simulate student-teacher interaction patterns, with custom spinlock synchronization built from scratch to fit xv6's minimal kernel model.",
+      sections: [
+        {
+          icon: Cpu,
+          title: "OS Internals",
+          color: "text-green-300",
+          borderColor: "border-green-500/20",
+          bgColor: "bg-green-500/8",
+          items: [
+            { label: "Thread Simulation", desc: "fork() + pipe() based thread-like system for concurrent execution" },
+            { label: "Custom Spinlocks", desc: "Built synchronization primitives from scratch without pthreads" },
+            { label: "IPC via Pipes", desc: "Inter-process communication for student-teacher interaction model" },
+          ],
+        },
+        {
+          icon: Layers,
+          title: "Tech Stack",
+          color: "text-cyan-300",
+          borderColor: "border-cyan-500/20",
+          bgColor: "bg-cyan-500/8",
+          items: [
+            { label: "Language", desc: "C — low-level systems programming" },
+            { label: "OS", desc: "xv6 — MIT's educational UNIX-like operating system" },
+            { label: "Concurrency", desc: "Custom spinlocks, fork/pipe based process management" },
+          ],
+        },
+        {
+          icon: Zap,
+          title: "Highlights",
+          color: "text-violet-300",
+          borderColor: "border-violet-500/20",
+          bgColor: "bg-violet-500/8",
+          items: [
+            { label: "No pthreads", desc: "Pure xv6-compatible synchronization without external libraries" },
+            { label: "Scheduling", desc: "Deep exploration of process scheduling and context switching" },
+            { label: "Educational", desc: "Demonstrates OS-level concurrency concepts in a minimal kernel" },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    id: 6,
+    num: "06",
+    icon: <Wifi size={20} />,
+    iconBg: "bg-emerald-500/15 border-emerald-500/30",
+    cat: ["iot"],
+    catLabel: "IoT · ESP32 · RFID",
+    catColor: "text-emerald-300",
+    accentColor: "green",
+    title: "IoT Smart Attendance System",
+    featured: false,
+    github: null,
+    live: null,
+    desc: "IoT-based attendance system using ESP32 and MFRC522 RFID reader with real-time cloud sync to Google Sheets and Blynk mobile monitoring. Supports lecturer-controlled sessions with instant LCD and buzzer feedback.",
+    highlights: [
+      { color: "bg-emerald-400", text: "Real-time cloud sync via Google Sheets + Blynk IoT platform" },
+      { color: "bg-cyan-400",    text: "RFID-based secure authentication with unique UID verification" },
+      { color: "bg-amber-400",   text: "LCD display + buzzer feedback for instant scan confirmation" },
+    ],
+    tech: ["ESP32", "RFID", "MFRC522", "Google Sheets", "Blynk IoT", "C++", "Wi-Fi", "LCD Display"],
+    caseStudy: {
+      problem:   "Manual attendance is time-consuming, error-prone, and vulnerable to proxy attendance.",
+      approach:  "ESP32 + RFID reader with cloud-connected Google Sheets and Blynk mobile dashboard.",
+      challenge: "Reliable Wi-Fi connectivity and session management for concurrent RFID scans.",
+      outcome:   "Automated, secure attendance with real-time cloud sync and remote mobile monitoring.",
+    },
+    modal: {
+      overview: "An IoT-based smart attendance management system using ESP32 microcontroller and MFRC522 RFID reader. Automates attendance recording with lecturer-controlled sessions, real-time cloud sync to Google Sheets via Apps Script, and remote monitoring through the Blynk IoT mobile platform.",
+      sections: [
+        {
+          icon: Wifi,
+          title: "IoT Architecture",
+          color: "text-emerald-300",
+          borderColor: "border-emerald-500/20",
+          bgColor: "bg-emerald-500/8",
+          items: [
+            { label: "ESP32", desc: "Wi-Fi enabled microcontroller handling RFID reads and cloud communication" },
+            { label: "MFRC522 RFID", desc: "Reads unique UIDs from student and lecturer RFID cards" },
+            { label: "LCD + Buzzer", desc: "16×2 LCD and buzzer provide instant scan feedback" },
+          ],
+        },
+        {
+          icon: Database,
+          title: "Cloud Integration",
+          color: "text-cyan-300",
+          borderColor: "border-cyan-500/20",
+          bgColor: "bg-cyan-500/8",
+          items: [
+            { label: "Google Sheets", desc: "Cloud-based attendance storage via Google Apps Script" },
+            { label: "Blynk IoT", desc: "Remote mobile dashboard for live attendance monitoring" },
+            { label: "Real-time Sync", desc: "Attendance records uploaded instantly over Wi-Fi" },
+          ],
+        },
+        {
+          icon: Zap,
+          title: "Highlights",
+          color: "text-amber-300",
+          borderColor: "border-amber-500/20",
+          bgColor: "bg-amber-500/8",
+          items: [
+            { label: "Session Control", desc: "Lecturer RFID card starts and ends attendance sessions" },
+            { label: "Anti-Proxy", desc: "Unique UID verification prevents proxy attendance" },
+            { label: "Scalable", desc: "Suitable for schools, colleges, offices, and institutions" },
+          ],
+        },
+      ],
+    },
+  },
 ];
 
 const FILTERS = [
@@ -310,6 +446,7 @@ const FILTERS = [
   { key: "ml",        label: "ML / AI"      },
   { key: "dbms",      label: "DBMS"         },
   { key: "systems",   label: "Systems"      },
+  { key: "iot",       label: "IoT"          },
 ];
 
 // ── Accent colour map ─────────────────────────────────────────────
@@ -353,6 +490,16 @@ const ACCENT = {
     btnBg: "bg-cyan-500/15 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/25",
     blurBg: "bg-cyan-500/10",
     icon: "text-cyan-400",
+  },
+  green: {
+    glow: "rgba(34,197,94,0.18)",
+    ring: "border-green-500/35",
+    bg: "bg-green-500/15",
+    text: "text-green-300",
+    badge: "bg-green-500/15 border-green-500/30 text-green-300",
+    btnBg: "bg-green-500/15 border-green-500/30 text-green-300 hover:bg-green-500/25",
+    blurBg: "bg-green-500/10",
+    icon: "text-green-400",
   },
 };
 
@@ -588,7 +735,7 @@ const FeaturedCard = ({ p, onOpenModal }) => {
               text-2xl border ${p.iconBg}`}>
               {p.icon}
             </div>
-            <span className="text-[11px] font-mono text-white/20">{p.num} / 04</span>
+            <span className="text-[11px] font-mono text-white/20">{p.num} / 06</span>
           </div>
           <p className={`text-[11px] font-semibold uppercase tracking-[1.5px]
             mb-2 ${p.catColor}`}>
@@ -703,7 +850,7 @@ const ProjectCard = React.forwardRef(({ p, delay, onOpenModal }, ref) => {
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay }}
       whileHover={{ y: -6, boxShadow: `0 24px 60px ${ac.glow}` }}
-      className="glass-card p-8 flex flex-col cursor-pointer hover:border-white/15 transition-colors duration-300"
+      className="glass-card p-8 flex flex-col h-full cursor-pointer hover:border-white/15 transition-colors duration-300"
       onClick={() => onOpenModal(p)}
     >
       <div className="flex items-start justify-between mb-5">
@@ -711,7 +858,7 @@ const ProjectCard = React.forwardRef(({ p, delay, onOpenModal }, ref) => {
           text-2xl border ${p.iconBg}`}>
           {p.icon}
         </div>
-        <span className="text-[11px] font-mono text-white/20">{p.num} / 04</span>
+        <span className="text-[11px] font-mono text-white/20">{p.num} / 06</span>
       </div>
 
       <p className={`text-[11px] font-semibold uppercase tracking-[1.5px]
@@ -789,6 +936,7 @@ const ProjectCard = React.forwardRef(({ p, delay, onOpenModal }, ref) => {
 const Projects = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [modal, setModal] = useState(null);
+  const scrollRef = useRef(null);
 
   const filtered = PROJECTS.filter((p) =>
     activeFilter === "all" || p.cat.includes(activeFilter)
@@ -822,8 +970,8 @@ const Projects = () => {
           <motion.div {...fadeUp(0.1)}
             className="flex flex-wrap gap-3 mb-10">
             {[
-              { dot: "bg-violet-500 shadow-[0_0_6px_#7c3aed]", label: "4 Projects"          },
-              { dot: "bg-cyan-400   shadow-[0_0_6px_#06b6d4]", label: "PERN · ML · C++"     },
+              { dot: "bg-violet-500 shadow-[0_0_6px_#7c3aed]", label: "6 Projects"          },
+              { dot: "bg-cyan-400   shadow-[0_0_6px_#06b6d4]", label: "Full Stack · ML · Systems · IoT" },
               { dot: "bg-pink-400   shadow-[0_0_6px_#ec4899]", label: "All on GitHub"        },
               { dot: "bg-green-400  shadow-[0_0_6px_#4ade80]", label: "1 Live Deployment"    },
             ].map(({ dot, label }) => (
@@ -856,8 +1004,9 @@ const Projects = () => {
             ))}
           </motion.div>
 
-          {/* Grid */}
-          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* Grid — desktop / Carousel — mobile */}
+          {/* Desktop grid */}
+          <motion.div layout className="hidden md:grid md:grid-cols-2 gap-5">
             <AnimatePresence mode="popLayout">
               {filtered.map((p, i) =>
                 p.featured ? (
@@ -868,6 +1017,55 @@ const Projects = () => {
               )}
             </AnimatePresence>
           </motion.div>
+
+          {/* Mobile carousel */}
+          <div className="md:hidden relative">
+            <div
+              ref={scrollRef}
+              className="flex items-stretch gap-4 overflow-x-auto snap-x snap-mandatory pb-4 scrollbar-hide"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
+            >
+              {filtered.map((p, i) => (
+                <div key={p.id} className="snap-center flex-shrink-0 w-[85vw] max-w-[340px]">
+                  <ProjectCard p={p} delay={0} onOpenModal={setModal} />
+                </div>
+              ))}
+            </div>
+            {/* Scroll indicators */}
+            <div className="flex items-center justify-center gap-3 mt-4">
+              <button
+                onClick={() => scrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })}
+                className="w-8 h-8 rounded-full bg-white/8 border border-white/12 flex items-center justify-center text-white/50 hover:bg-white/14 hover:text-white transition-all"
+                aria-label="Previous project"
+              >
+                <ChevronLeft size={14} />
+              </button>
+              <div className="flex gap-1.5">
+                {filtered.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      const container = scrollRef.current;
+                      if (container) {
+                        const card = container.children[i];
+                        card?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                      }
+                    }}
+                    className="w-1.5 h-1.5 rounded-full bg-white/20 hover:bg-violet-400 transition-all"
+                    aria-label={`Go to project ${i + 1}`}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={() => scrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })}
+                className="w-8 h-8 rounded-full bg-white/8 border border-white/12 flex items-center justify-center text-white/50 hover:bg-white/14 hover:text-white transition-all"
+                aria-label="Next project"
+              >
+                <ChevronRight size={14} />
+              </button>
+            </div>
+            <p className="text-center text-[10px] text-white/25 mt-2">Swipe or use arrows to browse</p>
+          </div>
 
           {/* Bottom CTA */}
           <motion.div {...fadeUp(0.3)}
