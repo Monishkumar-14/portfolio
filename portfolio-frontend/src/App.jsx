@@ -32,12 +32,14 @@ const AdminSuspense = ({ children }) => (
 );
 
 import Background from "./components/Background";
+import CustomCursor from "./components/CustomCursor";
 
 const PublicLayout = () => (
   <div className="relative min-h-screen"
     style={{ background: "var(--bg-main)", color: "var(--text-primary)", transition: "background 0.4s" }}>
     <a href="#home" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-violet-600 focus:text-white focus:rounded-lg">Skip to content</a>
     <Background />
+    <CustomCursor />
     <div className="relative z-10">
       <Navbar />
       <main>

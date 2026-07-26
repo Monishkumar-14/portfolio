@@ -30,7 +30,7 @@ const TECH = [
   { label: "LangChain",        cls: "bg-blue-500/12  border-blue-500/28  text-blue-300"    },
   { label: "Vector DB",        cls: "bg-cyan-500/12  border-cyan-500/28  text-cyan-300"    },
   { label: "Python",           cls: "bg-amber-500/12 border-amber-500/28 text-amber-300"   },
-  { label: "OpenAI API",       cls: "bg-green-500/10 border-green-500/25 text-green-400"   },
+  { label: "Ollama models",       cls: "bg-green-500/10 border-green-500/25 text-green-400"   },
   { label: "Document Parsing", cls: "bg-pink-500/12  border-pink-500/28  text-pink-300"    },
   { label: "Embeddings",       cls: "bg-violet-500/12 border-violet-500/28 text-violet-300"},
   { label: "NLP",              cls: "bg-cyan-500/10  border-cyan-500/25  text-cyan-300"    },
@@ -181,7 +181,7 @@ const Experience = () => {
                     </p>
                   </div>
                   <h4 className="text-2xl font-extrabold text-white tracking-tight leading-snug">
-                    AI / ML Intern —{" "}
+                    Summer Intern —{" "}
                     <span className="bg-gradient-to-r from-violet-400 to-cyan-400
                       bg-clip-text text-transparent">
                       RAG Chatbot Developer
@@ -329,13 +329,7 @@ const Experience = () => {
                   AstraZeneca · ETS Department · Chennai, India
                 </p>
               </div>
-              <div className="flex items-center gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-400
-                  shadow-[0_0_6px_#4ade80] animate-pulse" />
-                <span className="text-xs text-green-400/70 font-medium">
-                  Internship ongoing
-                </span>
-              </div>
+              
             </div>
 
           </div>

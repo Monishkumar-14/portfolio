@@ -113,19 +113,56 @@ const TypingDots = () => (
   </div>
 );
 
-// Bold markdown renderer
+// Mini-markdown renderer — supports bold, line breaks, bullets, numbered lists
 const FormatText = ({ text }) => {
-  const parts = text.split(/(\*\*.*?\*\*)/g);
+  const lines = text.split("\n");
+
   return (
-    <>
-      {parts.map((p, i) =>
-        p.startsWith("**") && p.endsWith("**") ? (
-          <strong key={i} className="text-violet-300 font-semibold">{p.slice(2, -2)}</strong>
-        ) : (
-          <span key={i}>{p}</span>
-        )
-      )}
-    </>
+    <div className="flex flex-col gap-0.5">
+      {lines.map((line, li) => {
+        const trimmed = line.trim();
+
+        // Empty line → spacer
+        if (!trimmed) return <div key={li} className="h-1.5" />;
+
+        // Bullet point (- or • or *)
+        const bulletMatch = trimmed.match(/^[-•*]\s+(.*)/);
+        if (bulletMatch) {
+          return (
+            <div key={li} className="flex gap-2 items-start pl-1">
+              <span className="text-violet-400 mt-[2px] flex-shrink-0 text-[10px]">●</span>
+              <span>{renderBold(bulletMatch[1])}</span>
+            </div>
+          );
+        }
+
+        // Numbered list (1. 2. etc.)
+        const numMatch = trimmed.match(/^(\d+)[.)]\s+(.*)/);
+        if (numMatch) {
+          return (
+            <div key={li} className="flex gap-2 items-start pl-1">
+              <span className="text-cyan-400 font-bold flex-shrink-0 text-[11px] min-w-[16px]">{numMatch[1]}.</span>
+              <span>{renderBold(numMatch[2])}</span>
+            </div>
+          );
+        }
+
+        // Regular text line
+        return <p key={li}>{renderBold(trimmed)}</p>;
+      })}
+    </div>
+  );
+};
+
+// Helper: parse **bold** segments within a line
+const renderBold = (text) => {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((p, i) =>
+    p.startsWith("**") && p.endsWith("**") ? (
+      <strong key={i} className="text-violet-300 font-semibold">{p.slice(2, -2)}</strong>
+    ) : (
+      <span key={i}>{p}</span>
+    )
   );
 };
 
@@ -183,9 +220,9 @@ const Bubble = ({ msg, isStreaming, onStreamDone }) => {
   const isUser = msg.role === "user";
   return (
     <motion.div
-      initial={{ opacity: 0, y: 14, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
       className={`flex gap-2.5 items-end ${isUser ? "flex-row-reverse" : ""}`}
     >
       {isUser ? (
@@ -458,7 +495,7 @@ export default function Chatbot() {
   };
 
   return (
-    <div className="min-h-screen py-24 px-6 flex items-center">
+    <div className="min-h-screen py-24 px-6 overflow-x-hidden">
       <div className="max-w-5xl mx-auto w-full">
 
         {/* ── Header ── */}
