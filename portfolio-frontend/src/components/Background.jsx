@@ -1,6 +1,7 @@
 // src/components/Background.jsx
-// Night sky with visible twinkling stars and occasional elegant shooting stars
+// Night sky with twinkling stars (dark) / soft gradient (light)
 import { useEffect, useRef, useMemo } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 /* ── Generate star field ── */
 const generateStars = (count) =>
@@ -11,9 +12,7 @@ const generateStars = (count) =>
     size: Math.random() * 2 + 0.4,
     baseOpacity: Math.random() * 0.55 + 0.25,
     phase: Math.random() * Math.PI * 2,
-    // Visible twinkle speed — each star has different rhythm
     speed: Math.random() * 1.8 + 0.8,
-    // Gentle drift
     driftX: (Math.random() - 0.5) * 0.004,
     driftY: (Math.random() - 0.5) * 0.003,
   }));
@@ -41,24 +40,20 @@ const StarCanvas = () => {
       const t = time / 1000;
 
       starsData.forEach((s) => {
-        // Visible pulsing twinkle — oscillates between dim and bright
         const pulse = Math.sin(s.phase + t * s.speed);
         const twinkle = 0.25 + 0.75 * (0.5 + 0.5 * pulse);
         const alpha = s.baseOpacity * twinkle;
 
-        // Gentle drift
         const driftedX = ((s.x + s.driftX * t * 8) % 100 + 100) % 100;
         const driftedY = ((s.y + s.driftY * t * 8) % 100 + 100) % 100;
         const x = (driftedX / 100) * canvas.width;
         const y = (driftedY / 100) * canvas.height;
 
-        // Star dot
         ctx.beginPath();
         ctx.arc(x, y, s.size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255,255,255,${alpha.toFixed(3)})`;
         ctx.fill();
 
-        // Soft glow halo on brighter stars
         if (s.size > 1.2 && alpha > 0.35) {
           ctx.beginPath();
           ctx.arc(x, y, s.size * 3, 0, Math.PI * 2);
@@ -96,7 +91,7 @@ const ShootingStarCanvas = () => {
     const ctx = canvas.getContext("2d");
     let animId;
     let shooters = [];
-    let nextSpawnTime = performance.now() + 3000; // first one after 3s
+    let nextSpawnTime = performance.now() + 3000;
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -105,7 +100,6 @@ const ShootingStarCanvas = () => {
     resize();
     window.addEventListener("resize", resize);
 
-    // Schedule next spawn 8-15 seconds from now
     const scheduleNext = () => {
       nextSpawnTime = performance.now() + 8000 + Math.random() * 7000;
     };
@@ -113,8 +107,8 @@ const ShootingStarCanvas = () => {
     const spawn = () => {
       const startX = Math.random() * canvas.width * 0.6 + canvas.width * 0.2;
       const startY = Math.random() * canvas.height * 0.35;
-      const angle = (Math.random() * 25 + 25) * (Math.PI / 180); // 25-50 deg downward
-      const speed = Math.random() * 2 + 2; // visible but elegant speed
+      const angle = (Math.random() * 25 + 25) * (Math.PI / 180);
+      const speed = Math.random() * 2 + 2;
       const tailLen = Math.random() * 80 + 50;
 
       shooters.push({
@@ -124,20 +118,18 @@ const ShootingStarCanvas = () => {
         vy: Math.sin(angle) * speed,
         tailLen,
         life: 1,
-        decay: 0.005 + Math.random() * 0.003, // lives ~2-3 seconds
+        decay: 0.005 + Math.random() * 0.003,
       });
     };
 
     const draw = (now) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Spawn check with fixed schedule
       if (now >= nextSpawnTime) {
         spawn();
         scheduleNext();
       }
 
-      // Update & draw active shooters
       shooters = shooters.filter((s) => s.life > 0.01);
 
       shooters.forEach((s) => {
@@ -147,13 +139,10 @@ const ShootingStarCanvas = () => {
         if (s.life < 0) s.life = 0;
 
         const alpha = s.life;
-
-        // Tail direction
         const mag = Math.sqrt(s.vx ** 2 + s.vy ** 2);
         const tailX = s.x - (s.vx / mag) * s.tailLen;
         const tailY = s.y - (s.vy / mag) * s.tailLen;
 
-        // Gradient tail
         const grad = ctx.createLinearGradient(s.x, s.y, tailX, tailY);
         grad.addColorStop(0, `rgba(220,215,255,${alpha.toFixed(3)})`);
         grad.addColorStop(0.35, `rgba(139,92,246,${(alpha * 0.5).toFixed(3)})`);
@@ -167,13 +156,11 @@ const ShootingStarCanvas = () => {
         ctx.lineCap = "round";
         ctx.stroke();
 
-        // Bright head
         ctx.beginPath();
         ctx.arc(s.x, s.y, 2.5, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255,255,255,${alpha.toFixed(3)})`;
         ctx.fill();
 
-        // Head glow
         ctx.beginPath();
         ctx.arc(s.x, s.y, 6, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(167,139,250,${(alpha * 0.25).toFixed(3)})`;
@@ -200,74 +187,115 @@ const ShootingStarCanvas = () => {
 };
 
 /* ── Main Background ── */
-const Background = () => (
-  <div
-    className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
-    style={{
-      background:
-        "linear-gradient(180deg, #020014 0%, #070b2a 25%, #0a0a2e 50%, #0d0820 75%, #050012 100%)",
-      transition: "background 0.4s ease",
-    }}
-  >
-    {/* Nebula glow */}
+const Background = () => {
+  const { isDark } = useTheme();
+
+  return (
     <div
-      className="absolute inset-0"
+      className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
       style={{
-        background: `
-          radial-gradient(ellipse 70% 50% at 15% 15%, rgba(124,58,237,0.1) 0%, transparent 60%),
-          radial-gradient(ellipse 50% 60% at 85% 25%, rgba(6,182,212,0.06) 0%, transparent 55%),
-          radial-gradient(ellipse 60% 40% at 50% 85%, rgba(236,72,153,0.05) 0%, transparent 55%)
-        `,
+        background: isDark
+          ? "linear-gradient(180deg, #020014 0%, #070b2a 25%, #0a0a2e 50%, #0d0820 75%, #050012 100%)"
+          : "linear-gradient(135deg, #f0f0ff 0%, #e8e0ff 30%, #dbeafe 60%, #fce7f3 100%)",
+        transition: "background 0.6s ease",
       }}
-    />
+    >
+      {isDark ? (
+        <>
+          {/* Dark mode: Nebula + Stars + Comets */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `
+                radial-gradient(ellipse 70% 50% at 15% 15%, rgba(124,58,237,0.1) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 60% at 85% 25%, rgba(6,182,212,0.06) 0%, transparent 55%),
+                radial-gradient(ellipse 60% 40% at 50% 85%, rgba(236,72,153,0.05) 0%, transparent 55%)
+              `,
+            }}
+          />
 
-    {/* Slow-floating nebula orbs */}
-    {[
-      { size: 400, color: "rgba(124,58,237,0.06)", top: "-5%", left: "5%", delay: "0s" },
-      { size: 300, color: "rgba(6,182,212,0.04)", top: "40%", right: "0%", delay: "-5s" },
-      { size: 250, color: "rgba(236,72,153,0.04)", bottom: "5%", left: "30%", delay: "-9s" },
-    ].map((o, i) => (
-      <div
-        key={i}
-        className="absolute rounded-full"
-        style={{
-          width: o.size,
-          height: o.size,
-          background: o.color,
-          filter: "blur(100px)",
-          top: o.top,
-          left: o.left,
-          right: o.right,
-          bottom: o.bottom,
-          animation: `floatOrb 18s ease-in-out infinite`,
-          animationDelay: o.delay,
-        }}
-      />
-    ))}
+          {[
+            { size: 400, color: "rgba(124,58,237,0.06)", top: "-5%", left: "5%", delay: "0s" },
+            { size: 300, color: "rgba(6,182,212,0.04)", top: "40%", right: "0%", delay: "-5s" },
+            { size: 250, color: "rgba(236,72,153,0.04)", bottom: "5%", left: "30%", delay: "-9s" },
+          ].map((o, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                width: o.size,
+                height: o.size,
+                background: o.color,
+                filter: "blur(100px)",
+                top: o.top,
+                left: o.left,
+                right: o.right,
+                bottom: o.bottom,
+                animation: `floatOrb 18s ease-in-out infinite`,
+                animationDelay: o.delay,
+              }}
+            />
+          ))}
 
-    {/* Twinkling stars */}
-    <StarCanvas />
+          <StarCanvas />
+          <ShootingStarCanvas />
 
-    {/* Occasional shooting stars */}
-    <ShootingStarCanvas />
+          <div
+            className="absolute bottom-0 left-0 right-0 h-[15%]"
+            style={{
+              background:
+                "linear-gradient(to top, rgba(124,58,237,0.03), transparent)",
+            }}
+          />
+        </>
+      ) : (
+        <>
+          {/* Light mode: soft pastel orbs */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `
+                radial-gradient(ellipse 60% 50% at 20% 20%, rgba(124,58,237,0.08) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 50% at 80% 30%, rgba(6,182,212,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse 55% 40% at 50% 80%, rgba(236,72,153,0.05) 0%, transparent 50%)
+              `,
+            }}
+          />
 
-    {/* Horizon glow */}
-    <div
-      className="absolute bottom-0 left-0 right-0 h-[15%]"
-      style={{
-        background:
-          "linear-gradient(to top, rgba(124,58,237,0.03), transparent)",
-      }}
-    />
+          {[
+            { size: 350, color: "rgba(124,58,237,0.06)", top: "5%", left: "10%", delay: "0s" },
+            { size: 280, color: "rgba(6,182,212,0.05)", top: "45%", right: "5%", delay: "-4s" },
+            { size: 220, color: "rgba(236,72,153,0.04)", bottom: "10%", left: "35%", delay: "-8s" },
+          ].map((o, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                width: o.size,
+                height: o.size,
+                background: o.color,
+                filter: "blur(80px)",
+                top: o.top,
+                left: o.left,
+                right: o.right,
+                bottom: o.bottom,
+                animation: `floatOrb 20s ease-in-out infinite`,
+                animationDelay: o.delay,
+              }}
+            />
+          ))}
+        </>
+      )}
 
-    <style>{`
-      @keyframes floatOrb {
-        0%,100% { transform: translate(0,0) scale(1); }
-        33%      { transform: translate(15px,-20px) scale(1.02); }
-        66%      { transform: translate(-10px,12px) scale(0.98); }
-      }
-    `}</style>
-  </div>
-);
+      <style>{`
+        @keyframes floatOrb {
+          0%,100% { transform: translate(0,0) scale(1); }
+          33%      { transform: translate(15px,-20px) scale(1.02); }
+          66%      { transform: translate(-10px,12px) scale(0.98); }
+        }
+      `}</style>
+    </div>
+  );
+};
 
 export default Background;

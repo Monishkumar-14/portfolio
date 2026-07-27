@@ -1,6 +1,7 @@
 // src/components/CustomCursor.jsx
-// Glowing cursor trail — desktop only (hidden on touch devices)
+// Glowing cursor trail — desktop only, theme-aware
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function CustomCursor() {
   const dotRef = useRef(null);
@@ -9,9 +10,9 @@ export default function CustomCursor() {
   const mouse = useRef({ x: 0, y: 0 });
   const ring = useRef({ x: 0, y: 0 });
   const animId = useRef(null);
+  const { isDark } = useTheme();
 
   useEffect(() => {
-    // Skip on touch devices
     const isTouchDevice =
       "ontouchstart" in window || navigator.maxTouchPoints > 0;
     if (isTouchDevice) return;
@@ -28,7 +29,6 @@ export default function CustomCursor() {
     const onLeave = () => setVisible(false);
     const onEnter = () => setVisible(true);
 
-    // Smooth ring follow
     const lerp = (a, b, n) => a + (b - a) * n;
     const animate = () => {
       ring.current.x = lerp(ring.current.x, mouse.current.x, 0.15);
@@ -52,14 +52,26 @@ export default function CustomCursor() {
     };
   }, [visible]);
 
-  // Don't render on touch
   if (typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0)) {
     return null;
   }
 
+  // Theme-aware colors
+  const ringBorder = isDark
+    ? "1.5px solid rgba(139,92,246,0.35)"
+    : "1.5px solid rgba(124,58,237,0.25)";
+  const ringShadow = isDark
+    ? "0 0 12px rgba(139,92,246,0.15), 0 0 24px rgba(6,182,212,0.08)"
+    : "0 0 10px rgba(124,58,237,0.1), 0 0 20px rgba(124,58,237,0.05)";
+  const dotBg = isDark
+    ? "rgba(167,139,250,0.9)"
+    : "rgba(124,58,237,0.7)";
+  const dotShadow = isDark
+    ? "0 0 8px rgba(139,92,246,0.5), 0 0 20px rgba(6,182,212,0.25)"
+    : "0 0 6px rgba(124,58,237,0.3), 0 0 14px rgba(124,58,237,0.15)";
+
   return (
     <>
-      {/* Outer ring — follows with lag */}
       <div
         ref={ringRef}
         className="fixed top-0 left-0 z-[9999] pointer-events-none"
@@ -69,15 +81,14 @@ export default function CustomCursor() {
           marginLeft: -18,
           marginTop: -18,
           borderRadius: "50%",
-          border: "1.5px solid rgba(139,92,246,0.35)",
-          boxShadow: "0 0 12px rgba(139,92,246,0.15), 0 0 24px rgba(6,182,212,0.08)",
-          transition: "opacity 0.3s ease",
+          border: ringBorder,
+          boxShadow: ringShadow,
+          transition: "opacity 0.3s ease, border 0.4s ease, box-shadow 0.4s ease",
           opacity: visible ? 1 : 0,
           willChange: "transform",
         }}
       />
 
-      {/* Inner dot — snaps to cursor */}
       <div
         ref={dotRef}
         className="fixed top-0 left-0 z-[9999] pointer-events-none"
@@ -87,15 +98,14 @@ export default function CustomCursor() {
           marginLeft: -3,
           marginTop: -3,
           borderRadius: "50%",
-          background: "rgba(167,139,250,0.9)",
-          boxShadow: "0 0 8px rgba(139,92,246,0.5), 0 0 20px rgba(6,182,212,0.25)",
-          transition: "opacity 0.3s ease",
+          background: dotBg,
+          boxShadow: dotShadow,
+          transition: "opacity 0.3s ease, background 0.4s ease, box-shadow 0.4s ease",
           opacity: visible ? 1 : 0,
           willChange: "transform",
         }}
       />
 
-      {/* Hide default cursor on non-interactive elements */}
       <style>{`
         @media (hover: hover) and (pointer: fine) {
           * { cursor: none !important; }

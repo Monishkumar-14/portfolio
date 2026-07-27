@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  MapPin, Calendar, Clock, ChevronDown, ExternalLink,
+  MapPin, Calendar, Clock, ChevronDown, ExternalLink, Download,
   Building2, Cpu, FileText, Database, Layers, Zap,
   BadgeCheck, BrainCircuit, Code2
 } from "lucide-react";
@@ -166,7 +166,7 @@ const Experience = () => {
                     <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
                       text-[11px] font-semibold
                       bg-green-500/10 border border-green-500/25 text-green-400">
-                      <BadgeCheck size={10} /> Current
+                      <BadgeCheck size={10} /> Completed
                     </span>
                   </div>
                 </div>
@@ -321,7 +321,7 @@ const Experience = () => {
             </div>
 
             {/* ── Footer band ── */}
-            <div className="border-t border-white/7 px-8 md:px-10 py-5
+              <div className="border-t border-white/7 px-8 md:px-10 py-5
               flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-2">
                 <Building2 size={13} className="text-white/25" />
@@ -329,7 +329,27 @@ const Experience = () => {
                   AstraZeneca · ETS Department · Chennai, India
                 </p>
               </div>
-              
+              <div className="flex items-center gap-2 flex-wrap">
+                <a
+                  href="/Internship Completion letter- Monishkumar E M.pdf"
+                  download
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-semibold
+                    bg-violet-500/15 border border-violet-500/30 text-violet-300
+                    hover:bg-violet-500/25 transition-all"
+                >
+                  <Download size={12} /> Download Letter
+                </a>
+                <a
+                  href="/Internship Completion letter- Monishkumar E M.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-semibold
+                    bg-white/5 border border-white/10 text-white/50
+                    hover:bg-white/10 hover:text-white/70 transition-all"
+                >
+                  <ExternalLink size={12} /> View PDF
+                </a>
+              </div>
             </div>
 
           </div>
