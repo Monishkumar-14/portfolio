@@ -322,12 +322,13 @@ const About = () => {
                 focused on building scalable full-stack applications and AI-driven solutions.
               </p>
               <p className="text-sm text-white/75 leading-relaxed mb-4">
-                I've developed end-to-end systems using the{" "}
-                <span className="text-cyan-300 font-semibold">PERN stack</span>,
-                including REST APIs,{" "}
-                <span className="text-cyan-300 font-semibold">JWT authentication</span>, and
-                role-based access control — with performance optimized to{" "}
-                <span className="text-cyan-300 font-semibold">sub-200ms response times</span>.
+                During my internship at{" "}
+                <span className="text-cyan-300 font-semibold">AstraZeneca (ETS)</span>,
+                I built enterprise AI solutions using{" "}
+                <span className="text-cyan-300 font-semibold">RAG, LangChain, and Ollama</span>{" "}
+                — including a document intelligence chatbot processing 100+ enterprise documents
+                and a conversational analytics platform with{" "}
+                <span className="text-cyan-300 font-semibold">NL2SQL workflows</span>.
               </p>
               <p className="text-sm text-white/75 leading-relaxed">
                 I'm particularly interested in{" "}

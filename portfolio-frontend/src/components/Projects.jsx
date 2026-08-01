@@ -30,13 +30,13 @@ const PROJECTS = [
     live: null,
     desc: "A full-stack micro-savings platform that rounds transactions and allocates spare change across savings, investments, or donations — powered by an ML recommendation engine.",
     highlights: [
-      { color: "bg-violet-400", text: "Sub-200ms API response time with optimised PostgreSQL queries" },
+      { color: "bg-violet-400", text: "Top 10 project across the IT department with full-stack architecture" },
       { color: "bg-cyan-400",   text: "JWT auth + 3-tier RBAC securing all financial endpoints" },
       { color: "bg-pink-400",   text: "ML engine (scikit-learn) improves allocation accuracy ~40% over baseline" },
     ],
     tech: ["ReactJS", "Node.js", "Express", "PostgreSQL", "JWT + RBAC", "Python", "scikit-learn", "REST API"],
     stats: [
-      { num: "<200ms", label: "API Response",    color: "text-violet-400" },
+      { num: "Top 10", label: "IT Dept Project",  color: "text-violet-400" },
       { num: "~40%",   label: "ML Accuracy Gain",color: "text-cyan-400"   },
       { num: "6+",     label: "DB Tables",        color: "text-pink-400"   },
       { num: "3-Tier", label: "RBAC System",      color: "text-amber-400"  },
@@ -44,7 +44,7 @@ const PROJECTS = [
     caseStudy: {
       problem:   "Users lack simple tools to automate micro-savings without behavioural change.",
       approach:  "PERN stack with normalised DB schema + content-based ML trained on spending patterns.",
-      challenge: "Building a reliable round-up system with sub-200ms latency across 6 normalised tables.",
+      challenge: "Building a reliable round-up system with normalised schema across 6 tables while maintaining clean API architecture.",
       outcome:   "Automated allocation with personalised fund suggestions, ~40% better than random baseline.",
     },
     modal: {
@@ -82,7 +82,7 @@ const PROJECTS = [
           borderColor: "border-pink-500/20",
           bgColor: "bg-pink-500/8",
           items: [
-            { label: "Performance", desc: "Sub-200ms API response time with optimised PostgreSQL queries" },
+            { label: "Recognition", desc: "Top 10 project in the IT department across the entire batch" },
             { label: "Security", desc: "JWT auth + 3-tier RBAC securing all financial endpoints" },
             { label: "Accuracy", desc: "ML engine improves allocation accuracy ~40% over random baseline" },
             { label: "Scalability", desc: "Normalised schema supports complex financial transaction trees" },
