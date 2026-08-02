@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://www.monishdev.online/sitemap.xml
+
+# Block admin routes from indexing
+User-agent: *
+Disallow: /admin/

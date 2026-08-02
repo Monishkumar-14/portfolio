@@ -67,33 +67,37 @@ const Hero = () => (
 
       {/* ── CTA buttons ── */}
       <motion.div {...fadeUp(0.5)} className="flex gap-3 justify-center flex-wrap mb-7">
-        <motion.button
+        <motion.a
+          href="#projects"
+          onClick={(e) => { e.preventDefault(); document.querySelector("#projects")?.scrollIntoView({ behavior: "smooth" }); }}
           whileHover={{ scale: 1.04, boxShadow: "0 0 22px rgba(124,58,237,0.55)" }}
           whileTap={{ scale: 0.96 }}
-          onClick={() => document.querySelector("#projects")?.scrollIntoView({ behavior: "smooth" })}
-          className="btn-primary-glass px-8 py-3.5 text-sm font-semibold"
+          className="btn-primary-glass px-8 py-3.5 text-sm font-semibold inline-block"
         >
           Explore My Work ↓
-        </motion.button>
+        </motion.a>
 
-        <motion.button
+        <motion.a
+          href="/Monishkumar_Resume.pdf"
+          target="_blank"
+          rel="noreferrer"
           whileHover={{ scale: 1.04, boxShadow: "0 0 16px rgba(255,255,255,0.08)" }}
           whileTap={{ scale: 0.96 }}
-          onClick={() => window.open("/Monishkumar_Resume.pdf", "_blank")}
-          className="btn-sec-glass px-8 py-3.5 text-sm font-semibold"
+          className="btn-sec-glass px-8 py-3.5 text-sm font-semibold inline-block"
         >
           View Resume
-        </motion.button>
+        </motion.a>
 
-        <motion.button
+        <motion.a
+          href="#contact"
+          onClick={(e) => { e.preventDefault(); document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" }); }}
           whileHover={{ scale: 1.04, boxShadow: "0 0 16px rgba(167,139,250,0.25)" }}
           whileTap={{ scale: 0.96 }}
-          onClick={() => document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" })}
           className="px-8 py-3.5 text-sm font-semibold rounded-xl border border-violet-400/35
-            text-violet-300 hover:bg-violet-400/10 transition-colors"
+            text-violet-300 hover:bg-violet-400/10 transition-colors inline-block"
         >
           Contact Me
-        </motion.button>
+        </motion.a>
       </motion.div>
 
       {/* ── Trust signals ── */}

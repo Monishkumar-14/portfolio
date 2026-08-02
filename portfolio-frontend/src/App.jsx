@@ -10,12 +10,15 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import About from "./components/About";
-import Projects from "./components/Projects";
-import Certificates from "./components/Certificates";
-import Resume from "./components/Resume";
-import Chatbot from "./components/Chatbot";
-import Contact from "./components/Contact";
 import Experience from "./components/Experience";
+
+// Lazy-loaded below-the-fold sections for faster FCP
+const Projects = lazy(() => import("./components/Projects"));
+const Certificates = lazy(() => import("./components/Certificates"));
+const Resume = lazy(() => import("./components/Resume"));
+const Chatbot = lazy(() => import("./components/Chatbot"));
+const Contact = lazy(() => import("./components/Contact"));
+
 // Admin Pages
 import AdminLogin from "./admin/AdminLogin";
 import Dashboard from "./admin/Dashboard";
@@ -25,6 +28,12 @@ const ManageCertificates = lazy(() => import("./admin/ManageCertificates"));
 const ViewMessages = lazy(() => import("./admin/ViewMessages"));
 const AdminSettings = lazy(() => import("./admin/AdminSettings"));
 const ChangePassword = lazy(() => import("./admin/ChangePassword"));
+
+const SectionFallback = () => (
+  <div className="flex items-center justify-center py-24">
+    <div className="w-6 h-6 border-2 border-violet-400/30 border-t-violet-400 rounded-full animate-spin" />
+  </div>
+);
 
 const AdminSuspense = ({ children }) => (
   <Suspense fallback={<div className="flex items-center justify-center py-32"><div className="w-8 h-8 border-2 border-violet-400/40 border-t-violet-400 rounded-full animate-spin" /></div>}>
@@ -47,11 +56,13 @@ const PublicLayout = () => (
         <section id="home" aria-label="Home">                 <Hero />         </section>
         <section id="about" aria-label="About">               <About />        </section>
         <section id="experience" aria-label="Experience">     <Experience />   </section>
-        <section id="projects" aria-label="Projects">         <Projects />     </section>
-        <section id="certificates" aria-label="Certificates"> <Certificates /> </section>
-        <section id="resume" aria-label="Resume">             <Resume />       </section>
-        <section id="chatbot" aria-label="Chatbot">           <Chatbot />      </section>
-        <section id="contact" aria-label="Contact">           <Contact />      </section>
+        <Suspense fallback={<SectionFallback />}>
+          <section id="projects" aria-label="Projects">         <Projects />     </section>
+          <section id="certificates" aria-label="Certificates"> <Certificates /> </section>
+          <section id="resume" aria-label="Resume">             <Resume />       </section>
+          <section id="chatbot" aria-label="Chatbot">           <Chatbot />      </section>
+          <section id="contact" aria-label="Contact">           <Contact />      </section>
+        </Suspense>
       </main>
     </div>
   </div>

@@ -246,3 +246,12 @@
   .light ::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.15) !important; }
   .light ::-webkit-scrollbar-track { background: rgba(124,58,237,0.03) !important; }
 }
+
+/* ── Accessibility: minimum contrast boost ─────────────────────────
+   Bumps very low opacity text to at least 40% for WCAG 2.1 AA compliance */
+.text-white\/20 { color: rgba(255,255,255,0.40) !important; }
+.text-white\/22 { color: rgba(255,255,255,0.42) !important; }
+.text-white\/25 { color: rgba(255,255,255,0.42) !important; }
+.text-white\/28 { color: rgba(255,255,255,0.44) !important; }
+.text-white\/30 { color: rgba(255,255,255,0.45) !important; }
+.text-white\/35 { color: rgba(255,255,255,0.48) !important; }

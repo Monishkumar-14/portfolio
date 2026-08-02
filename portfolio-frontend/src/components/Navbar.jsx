@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Moon, Sun, Menu, X } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
@@ -28,32 +28,44 @@ const Navbar = () => {
   const touchStartY = useRef(0);
   const touchStartX = useRef(0);
 
-  // ── FIX: scroll-position based active tracking ─────────────────
-  // IntersectionObserver with threshold:0.4 fails on tall sections.
-  // Reading offsetTop directly on every scroll is reliable for all heights.
+  // ── IntersectionObserver for active section tracking ────────────
+  // Replaces per-pixel scroll handler — no layout reflows, 60fps smooth
   useEffect(() => {
-    const handleScroll = () => {
-      const sectionIds = navLinks.map((l) => l.href.replace("#", ""));
-      // Trigger zone = 30% from the top of the viewport
-      const triggerY = window.scrollY + window.innerHeight * 0.3;
+    const sectionIds = navLinks.map((l) => l.href.replace("#", ""));
+    const observers = [];
 
-      let current = sectionIds[0];
-      sectionIds.forEach((id) => {
-        const el = document.getElementById(id);
-        if (el && el.offsetTop <= triggerY) current = id;
-      });
-      setActiveSection(current);
-    };
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // run once on mount
-    return () => window.removeEventListener("scroll", handleScroll);
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setActiveSection(id);
+            }
+          });
+        },
+        {
+          rootMargin: "-30% 0px -65% 0px", // triggers when section is in top 30-35% of viewport
+          threshold: 0,
+        }
+      );
+      observer.observe(el);
+      observers.push(observer);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
   }, []);
 
-  const scrollTo = (href) => {
+  // ── Smooth scroll handler for <a> clicks ───────────────────────
+  const handleNavClick = useCallback((e, href) => {
+    e.preventDefault();
     document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
     setMenuOpen(false);
-  };
+    // Update URL hash without jumping
+    window.history.pushState(null, "", href);
+  }, []);
 
   // ── iOS swipe handlers ─────────────────────────────────────────
   const handleTouchStart = (e) => {
@@ -82,23 +94,25 @@ const Navbar = () => {
       {/* ── Floating pill ── */}
       <div className="glass-nav flex items-center justify-between px-5 h-14 rounded-full">
 
-        {/* Logo */}
-        <button
-          onClick={() => scrollTo("#home")}
+        {/* Logo — now an <a> tag */}
+        <a
+          href="#home"
+          onClick={(e) => handleNavClick(e, "#home")}
           className="text-lg font-bold tracking-tight flex-shrink-0"
           style={{ color: "var(--nav-logo)" }}
         >
           Monish<span className="text-violet-400">.</span>
-        </button>
+        </a>
 
-        {/* Desktop links */}
+        {/* Desktop links — <a> tags for SEO + right-click support */}
         <ul className="hidden md:flex items-center gap-0.5">
           {navLinks.map(({ label, href }) => {
             const isActive = activeSection === href.replace("#", "");
             return (
               <li key={label}>
-                <button
-                  onClick={() => scrollTo(href)}
+                <a
+                  href={href}
+                  onClick={(e) => handleNavClick(e, href)}
                   className={`relative px-3 py-1.5 rounded-full text-[13px] font-medium
                     transition-all duration-200
                     ${isActive
@@ -108,7 +122,7 @@ const Navbar = () => {
                   style={{ color: isActive ? undefined : "var(--nav-text)" }}
                 >
                   {label}
-                </button>
+                </a>
               </li>
             );
           })}
@@ -193,13 +207,14 @@ const Navbar = () => {
             {navLinks.map(({ label, href }, i) => {
               const isActive = activeSection === href.replace("#", "");
               return (
-                <motion.button
+                <motion.a
                   key={label}
+                  href={href}
                   initial={{ opacity: 0, x: -16 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.04, ...iosSpring }}
-                  onClick={() => scrollTo(href)}
-                  className={`text-left px-4 py-3.5 rounded-2xl text-sm font-medium transition-all
+                  onClick={(e) => handleNavClick(e, href)}
+                  className={`text-left px-4 py-3.5 rounded-2xl text-sm font-medium transition-all block
                     ${isActive
                       ? "bg-violet-500/20 text-violet-300"
                       : ""
@@ -209,7 +224,7 @@ const Navbar = () => {
                   }}
                 >
                   {label}
-                </motion.button>
+                </motion.a>
               );
             })}
 
