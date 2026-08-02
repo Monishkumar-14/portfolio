@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/react";
@@ -6,11 +6,13 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-// Public Pages
+// Public Pages — eagerly loaded (above the fold)
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import About from "./components/About";
 import Experience from "./components/Experience";
+import SplashScreen from "./components/SplashScreen";
+import BackToTop from "./components/BackToTop";
 
 // Lazy-loaded below-the-fold sections for faster FCP
 const Projects = lazy(() => import("./components/Projects"));
@@ -18,6 +20,7 @@ const Certificates = lazy(() => import("./components/Certificates"));
 const Resume = lazy(() => import("./components/Resume"));
 const Chatbot = lazy(() => import("./components/Chatbot"));
 const Contact = lazy(() => import("./components/Contact"));
+const NotFound = lazy(() => import("./components/NotFound"));
 
 // Admin Pages
 import AdminLogin from "./admin/AdminLogin";
@@ -50,6 +53,7 @@ const PublicLayout = () => (
     <a href="#home" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-violet-600 focus:text-white focus:rounded-lg">Skip to content</a>
     <Background />
     <CustomCursor />
+    <BackToTop />
     <div className="relative z-10">
       <Navbar />
       <main>
@@ -69,9 +73,14 @@ const PublicLayout = () => (
 );
 
 const App = () => {
+  const [splashDone, setSplashDone] = useState(false);
+
   return (
     <ThemeProvider>
       <AuthProvider>
+        {/* Splash screen — shows only on first load */}
+        {!splashDone && <SplashScreen onComplete={() => setSplashDone(true)} />}
+
         <Router>
           <Toaster
             position="top-right"
@@ -104,6 +113,9 @@ const App = () => {
               <Route path="settings" element={<AdminSuspense><AdminSettings /></AdminSuspense>} />
               <Route path="password" element={<AdminSuspense><ChangePassword /></AdminSuspense>} />
             </Route>
+
+            {/* 404 Catch-all */}
+            <Route path="*" element={<Suspense fallback={<SectionFallback />}><NotFound /></Suspense>} />
           </Routes>
           <Analytics />
         </Router>

@@ -1,6 +1,11 @@
 @import "tailwindcss";
 
 @layer base {
+  /* Smooth scroll for page transitions */
+  html {
+    scroll-behavior: smooth;
+  }
+
   /* CSS variables — toggled by ThemeContext */
   :root {
     --bg-main:     #0a0a1a;

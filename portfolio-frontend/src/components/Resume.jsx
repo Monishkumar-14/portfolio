@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Download, Eye, ExternalLink, FileText } from "lucide-react";
+import { Download, Eye, ExternalLink, FileText, Smartphone } from "lucide-react";
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 40 },
@@ -9,12 +9,20 @@ const fadeUp = (delay = 0) => ({
   transition: { duration: 0.7, delay, ease: "easeOut" },
 });
 
-// ── Update this to your actual PDF path ──────────────────────────
 const RESUME_URL = "/Monishkumar_Resume.pdf";
 
 const Resume = () => {
   const [loaded, setLoaded] = useState(false);
   const [error, setError]   = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Responsive: listen for resize / orientation change
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   return (
     <div className="min-h-screen py-24 px-6">
@@ -40,8 +48,7 @@ const Resume = () => {
         <motion.div {...fadeUp(0.1)} className="glass-card overflow-hidden">
 
           {/* Toolbar */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/8 bg-white/3">
-            {/* File info */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/8 bg-white/3 flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-[10px] bg-violet-500/20 border border-violet-500/30 flex items-center justify-center text-sm">
                 <FileText size={16} />
@@ -52,7 +59,6 @@ const Resume = () => {
               </div>
             </div>
 
-            {/* Action buttons */}
             <div className="flex items-center gap-2">
               <motion.a
                 href={RESUME_URL}
@@ -78,87 +84,100 @@ const Resume = () => {
                 target="_blank"
                 rel="noreferrer"
                 whileHover={{ scale: 1.05, y: -1 }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-blue-500/12 border border-blue-500/25 text-blue-300 hover:bg-blue-500/20 transition-all"
+                className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold bg-blue-500/12 border border-blue-500/25 text-blue-300 hover:bg-blue-500/20 transition-all"
               >
                 <ExternalLink size={13} /> LinkedIn
               </motion.a>
             </div>
           </div>
 
-          {/* PDF Embed Area */}
-          <div className="relative bg-[#1a1a2e] pdf-viewer-bg flex items-center justify-center"
-               style={{ minHeight: typeof window !== "undefined" && window.innerWidth < 768 ? "400px" : "780px" }}>
-
-            {/* Loading shimmer */}
-            {!loaded && !error && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 pointer-events-none">
-                <div className="w-12 h-12 rounded-2xl bg-violet-500/20 border border-violet-500/30 flex items-center justify-center">
-                  <motion.div
-                    className="w-5 h-5 border-2 border-violet-400/40 border-t-violet-400 rounded-full"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
-                  />
-                </div>
-                <p className="text-xs text-white/30">Loading resume…</p>
+          {/* PDF Embed Area — desktop: iframe, mobile: download card */}
+          {isMobile ? (
+            <div className="flex flex-col items-center justify-center gap-6 py-16 px-8 text-center">
+              <div className="w-20 h-20 rounded-2xl bg-violet-500/12 border border-violet-500/25 flex items-center justify-center">
+                <Smartphone size={32} className="text-violet-400" />
               </div>
-            )}
-
-            {/* Fallback if PDF can't embed */}
-            {error && (
-              <div className="flex flex-col items-center justify-center gap-5 py-24 px-8 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-amber-500/12 border border-amber-500/25 flex items-center justify-center text-3xl">
-                  <FileText size={28} />
-                </div>
-                <div>
-                  <p className="text-base font-bold text-white/70 mb-1">PDF Preview Unavailable</p>
-                  <p className="text-xs text-white/35 max-w-xs">
-                    Your browser blocked the inline preview. Use the buttons above to open or download the resume.
-                  </p>
-                </div>
-                <div className="flex gap-3">
-                  <motion.a
-                    href={RESUME_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                    whileHover={{ scale: 1.04 }}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold btn-primary-glass"
-                  >
-                    <Eye size={14} /> Open PDF
-                  </motion.a>
-                  <motion.a
-                    href={RESUME_URL}
-                    download="Monishkumar_Resume.pdf"
-                    whileHover={{ scale: 1.04 }}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold btn-sec-glass"
-                  >
-                    <Download size={14} /> Download
-                  </motion.a>
-                </div>
+              <div>
+                <p className="text-base font-bold text-white/80 mb-2">Best viewed on desktop</p>
+                <p className="text-xs text-white/45 max-w-xs leading-relaxed">
+                  PDF preview works best on larger screens. Use the buttons below to open or download the resume.
+                </p>
               </div>
-            )}
+              <div className="flex gap-3">
+                <motion.a
+                  href={RESUME_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  className="flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold btn-primary-glass"
+                >
+                  <Eye size={15} /> Open PDF
+                </motion.a>
+                <motion.a
+                  href={RESUME_URL}
+                  download="Monishkumar_Resume.pdf"
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  className="flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold btn-sec-glass"
+                >
+                  <Download size={15} /> Download
+                </motion.a>
+              </div>
+            </div>
+          ) : (
+            <div className="relative bg-[#1a1a2e] pdf-viewer-bg flex items-center justify-center"
+                 style={{ minHeight: "75vh" }}>
 
-            {/* The actual PDF embed */}
-            {!error && (
-              <iframe
-                src={`${RESUME_URL}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
-                title="Monishkumar Resume"
-                className="w-full transition-opacity duration-500"
-                style={{
-                  height: typeof window !== "undefined" && window.innerWidth < 768 ? "400px" : "780px",
-                  border: "none",
-                  opacity: loaded ? 1 : 0,
-                  background: "transparent",
-                }}
-                onLoad={() => setLoaded(true)}
-                onError={() => setError(true)}
-              />
-            )}
-          </div>
+              {!loaded && !error && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 pointer-events-none">
+                  <div className="w-12 h-12 rounded-2xl bg-violet-500/20 border border-violet-500/30 flex items-center justify-center">
+                    <motion.div
+                      className="w-5 h-5 border-2 border-violet-400/40 border-t-violet-400 rounded-full"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
+                    />
+                  </div>
+                  <p className="text-xs text-white/30">Loading resume…</p>
+                </div>
+              )}
+
+              {error && (
+                <div className="flex flex-col items-center justify-center gap-5 py-24 px-8 text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-amber-500/12 border border-amber-500/25 flex items-center justify-center text-3xl">
+                    <FileText size={28} />
+                  </div>
+                  <div>
+                    <p className="text-base font-bold text-white/70 mb-1">PDF Preview Unavailable</p>
+                    <p className="text-xs text-white/35 max-w-xs">
+                      Your browser blocked the inline preview. Use the buttons above to open or download the resume.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {!error && (
+                <iframe
+                  src={`${RESUME_URL}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                  title="Monishkumar Resume"
+                  className="w-full transition-opacity duration-500"
+                  style={{
+                    height: "75vh",
+                    border: "none",
+                    opacity: loaded ? 1 : 0,
+                    background: "transparent",
+                  }}
+                  onLoad={() => setLoaded(true)}
+                  onError={() => setError(true)}
+                />
+              )}
+            </div>
+          )}
 
           {/* Bottom hint */}
           <div className="px-6 py-3 border-t border-white/6 bg-white/2 flex items-center justify-between">
             <p className="text-[10px] text-white/20">
-              Scroll inside the viewer to see the full resume
+              {isMobile ? "Tap to open or download" : "Scroll inside the viewer to see the full resume"}
             </p>
             <p className="text-[10px] text-white/20">PDF · 1 page · A4</p>
           </div>
