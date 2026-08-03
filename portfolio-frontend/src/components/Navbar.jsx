@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Moon, Sun, Menu, X } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import { useActiveSection } from "../context/ActiveSectionContext";
 
 
 const navLinks = [
@@ -20,61 +21,13 @@ const iosSpring = { type: "spring", stiffness: 420, damping: 32, mass: 0.9 };
 
 const Navbar = () => {
   const { isDark, toggleTheme } = useTheme();
+  const activeSection = useActiveSection();
 
-  const [menuOpen,      setMenuOpen]      = useState(false);
-  const [activeSection, setActiveSection] = useState("home");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // ── Touch-swipe state ──────────────────────────────────────────
   const touchStartY = useRef(0);
   const touchStartX = useRef(0);
-
-  // ── IntersectionObserver for active section tracking ────────────
-  // Replaces per-pixel scroll handler — no layout reflows, 60fps smooth
-  // Uses MutationObserver to detect lazy-loaded sections appearing in the DOM
-  useEffect(() => {
-    const sectionIds = navLinks.map((l) => l.href.replace("#", ""));
-    const sectionObservers = new Map();
-
-    const observeSection = (id) => {
-      if (sectionObservers.has(id)) return; // already observing
-      const el = document.getElementById(id);
-      if (!el) return;
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setActiveSection(id);
-            }
-          });
-        },
-        {
-          rootMargin: "-30% 0px -65% 0px",
-          threshold: 0,
-        }
-      );
-      observer.observe(el);
-      sectionObservers.set(id, observer);
-    };
-
-    // Observe sections already in the DOM
-    sectionIds.forEach(observeSection);
-
-    // Watch for lazy-loaded sections appearing
-    const mutationObserver = new MutationObserver(() => {
-      sectionIds.forEach(observeSection);
-      // Stop watching once all sections are observed
-      if (sectionObservers.size === sectionIds.length) {
-        mutationObserver.disconnect();
-      }
-    });
-    mutationObserver.observe(document.body, { childList: true, subtree: true });
-
-    return () => {
-      sectionObservers.forEach((o) => o.disconnect());
-      mutationObserver.disconnect();
-    };
-  }, []);
 
   // ── Smooth scroll handler for <a> clicks ───────────────────────
   const handleNavClick = useCallback((e, href) => {

@@ -260,3 +260,41 @@
 .text-white\/28 { color: rgba(255,255,255,0.44) !important; }
 .text-white\/30 { color: rgba(255,255,255,0.45) !important; }
 .text-white\/35 { color: rgba(255,255,255,0.48) !important; }
+
+/* ── Compact mobile layout ─────────────────────────────────────────
+   Reduces vertical padding and heading sizes on mobile to prevent
+   the "endless scroll" feeling on single-page sites */
+@media (max-width: 767px) {
+  /* Tighter section spacing */
+  section > div.min-h-screen {
+    min-height: auto !important;
+    padding-top: 3.5rem !important;
+    padding-bottom: 3.5rem !important;
+  }
+
+  section > div:not(.min-h-screen) {
+    padding-top: 3.5rem !important;
+    padding-bottom: 3.5rem !important;
+  }
+
+  /* Smaller section titles */
+  section h2 {
+    font-size: 2rem !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Tighter margins on section headers */
+  section .mb-14 {
+    margin-bottom: 2rem !important;
+  }
+  section .mb-12 {
+    margin-bottom: 1.75rem !important;
+  }
+
+  /* Hero stays full height */
+  #home > div.min-h-screen {
+    min-height: 100vh !important;
+    padding-top: 6rem !important;
+    padding-bottom: 4rem !important;
+  }
+}
