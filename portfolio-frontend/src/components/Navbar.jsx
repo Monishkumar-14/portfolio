@@ -30,11 +30,13 @@ const Navbar = () => {
 
   // ── IntersectionObserver for active section tracking ────────────
   // Replaces per-pixel scroll handler — no layout reflows, 60fps smooth
+  // Uses MutationObserver to detect lazy-loaded sections appearing in the DOM
   useEffect(() => {
     const sectionIds = navLinks.map((l) => l.href.replace("#", ""));
-    const observers = [];
+    const sectionObservers = new Map();
 
-    sectionIds.forEach((id) => {
+    const observeSection = (id) => {
+      if (sectionObservers.has(id)) return; // already observing
       const el = document.getElementById(id);
       if (!el) return;
 
@@ -47,15 +49,31 @@ const Navbar = () => {
           });
         },
         {
-          rootMargin: "-30% 0px -65% 0px", // triggers when section is in top 30-35% of viewport
+          rootMargin: "-30% 0px -65% 0px",
           threshold: 0,
         }
       );
       observer.observe(el);
-      observers.push(observer);
-    });
+      sectionObservers.set(id, observer);
+    };
 
-    return () => observers.forEach((o) => o.disconnect());
+    // Observe sections already in the DOM
+    sectionIds.forEach(observeSection);
+
+    // Watch for lazy-loaded sections appearing
+    const mutationObserver = new MutationObserver(() => {
+      sectionIds.forEach(observeSection);
+      // Stop watching once all sections are observed
+      if (sectionObservers.size === sectionIds.length) {
+        mutationObserver.disconnect();
+      }
+    });
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      sectionObservers.forEach((o) => o.disconnect());
+      mutationObserver.disconnect();
+    };
   }, []);
 
   // ── Smooth scroll handler for <a> clicks ───────────────────────
