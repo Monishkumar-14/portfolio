@@ -1,6 +1,6 @@
 // src/components/MobileTabBar.jsx
-// Fixed bottom tab navigation — mobile only
-import { useEffect, useState, useCallback } from "react";
+// Fixed bottom tab navigation — mobile only, always visible
+import { useCallback } from "react";
 import { motion } from "framer-motion";
 import { Home, User, Briefcase, Code2, Award, MessageCircle, Mail } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
@@ -19,29 +19,13 @@ const tabs = [
 const MobileTabBar = () => {
   const { isDark } = useTheme();
   const activeSection = useActiveSection();
-  const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
-
-  // Hide on scroll down, show on scroll up
-  useEffect(() => {
-    const onScroll = () => {
-      const currentY = window.scrollY;
-      setIsVisible(currentY < lastScrollY || currentY < 100);
-      setLastScrollY(currentY);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [lastScrollY]);
 
   const handleTap = useCallback((id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
   return (
-    <motion.div
-      initial={{ y: 100 }}
-      animate={{ y: isVisible ? 0 : 100 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+    <div
       className="md:hidden fixed bottom-0 left-0 right-0 z-50"
     >
       {/* Gradient fade above the bar */}
@@ -102,7 +86,7 @@ const MobileTabBar = () => {
           );
         })}
       </div>
-    </motion.div>
+    </div>
   );
 };
 

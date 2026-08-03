@@ -60,7 +60,7 @@ const Navbar = () => {
       transition={{ duration: 0.6, ease: "easeOut" }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-48px)] max-w-4xl"
+      className="hidden md:fixed md:block top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-48px)] max-w-4xl"
     >
       {/* ── Floating pill ── */}
       <div className="glass-nav flex items-center justify-between px-5 h-14 rounded-full">
