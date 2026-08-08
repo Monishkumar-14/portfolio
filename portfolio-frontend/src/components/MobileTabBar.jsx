@@ -1,9 +1,7 @@
 // src/components/MobileTabBar.jsx
-// Fixed bottom tab navigation — mobile only, glassmorphic pill style
-import { useCallback, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Home, User, Briefcase, Code2, Award, MessageCircle, Mail, Sun, Moon } from "lucide-react";
-import { useTheme } from "../context/ThemeContext";
+// Fixed bottom tab navigation — mobile only, glassmorphic pill, dark mode only
+import { useCallback, useRef } from "react";
+import { Home, User, Briefcase, Code2, Award, MessageCircle, Mail } from "lucide-react";
 import { useActiveSection } from "../context/ActiveSectionContext";
 
 const tabs = [
@@ -17,7 +15,6 @@ const tabs = [
 ];
 
 const MobileTabBar = () => {
-  const { isDark, toggleTheme } = useTheme();
   const activeSection = useActiveSection();
 
   // ── Horizontal swipe for scrollable tabs ──────────────────────
@@ -71,16 +68,12 @@ const MobileTabBar = () => {
                   size={16}
                   strokeWidth={isActive ? 2.5 : 1.8}
                   className={`transition-colors duration-200 ${
-                    isActive
-                      ? "text-violet-400"
-                      : isDark ? "text-white/50" : "text-gray-500"
+                    isActive ? "text-violet-400" : "text-white/50"
                   }`}
                 />
                 <span
                   className={`text-[8px] font-bold uppercase tracking-wider transition-colors duration-200 leading-none ${
-                    isActive
-                      ? "text-violet-300"
-                      : isDark ? "text-white/35" : "text-gray-400"
+                    isActive ? "text-violet-300" : "text-white/35"
                   }`}
                 >
                   {label}
@@ -89,39 +82,6 @@ const MobileTabBar = () => {
             );
           })}
         </div>
-
-        {/* Theme toggle — right side */}
-        <button
-          onClick={toggleTheme}
-          aria-label="Toggle theme"
-          className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full
-            border transition-all"
-          style={{
-            background: "var(--badge-bg)",
-            borderColor: "var(--border-card)",
-            color: "var(--nav-text)",
-          }}
-        >
-          <AnimatePresence mode="wait" initial={false}>
-            {isDark ? (
-              <motion.span key="sun"
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.15 }}>
-                <Sun size={13} />
-              </motion.span>
-            ) : (
-              <motion.span key="moon"
-                initial={{ rotate: 90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: -90, opacity: 0 }}
-                transition={{ duration: 0.15 }}>
-                <Moon size={13} />
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </button>
       </div>
     </div>
   );

@@ -4,6 +4,8 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [isDark, setIsDark] = useState(() => {
+    // Force dark mode on mobile
+    if (typeof window !== "undefined" && window.innerWidth < 768) return true;
     const stored = localStorage.getItem("theme");
     return stored ? stored === "dark" : true; // default dark
   });
@@ -93,7 +95,11 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [isDark]);
 
-  const toggleTheme = () => setIsDark((p) => !p);
+  const toggleTheme = () => {
+    // Only allow theme switching on desktop
+    if (typeof window !== "undefined" && window.innerWidth < 768) return;
+    setIsDark((p) => !p);
+  };
 
   return (
     <ThemeContext.Provider value={{ isDark, toggleTheme }}>
