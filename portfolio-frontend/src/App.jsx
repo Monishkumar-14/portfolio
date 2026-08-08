@@ -24,6 +24,7 @@ const Resume = lazy(() => import("./components/Resume"));
 const Chatbot = lazy(() => import("./components/Chatbot"));
 const Contact = lazy(() => import("./components/Contact"));
 const NotFound = lazy(() => import("./components/NotFound"));
+const AppDownload = lazy(() => import("./components/AppDownload"));
 
 // Admin Pages
 import AdminLogin from "./admin/AdminLogin";
@@ -104,6 +105,9 @@ const App = () => {
           <Routes>
             {/* Public Portfolio */}
             <Route path="/" element={<PublicLayout />} />
+
+            {/* App Download Page */}
+            <Route path="/app" element={<Suspense fallback={<SectionFallback />}><AppDownload /></Suspense>} />
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
