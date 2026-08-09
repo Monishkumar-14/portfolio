@@ -31,7 +31,7 @@ const BackToTop = () => {
           transition={{ duration: 0.25, ease: "easeOut" }}
           onClick={scrollToTop}
           aria-label="Back to top"
-          className="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full
+          className="fixed bottom-20 md:bottom-6 right-6 z-40 w-11 h-11 rounded-full
             flex items-center justify-center
             bg-violet-500/20 border border-violet-500/35
             text-violet-300 backdrop-blur-xl
