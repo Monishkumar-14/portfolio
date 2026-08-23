@@ -1,9 +1,16 @@
 // src/components/Background.jsx
 // Night sky with twinkling stars (dark) / soft gradient (light)
-import { useEffect, useRef, useMemo } from "react";
+// Performance-optimized: reduced stars on mobile, uses CSS stars fallback on iOS
+import { useEffect, useRef, useMemo, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 
-/* ── Generate star field ── */
+/* ── Detect mobile/iOS for perf scaling ── */
+const isMobile = () => typeof window !== "undefined" && window.innerWidth < 768;
+const isIOS = () =>
+  typeof navigator !== "undefined" &&
+  /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+/* ── Generate star field — fewer on mobile ── */
 const generateStars = (count) =>
   Array.from({ length: count }, (_, i) => ({
     id: i,
@@ -17,50 +24,93 @@ const generateStars = (count) =>
     driftY: (Math.random() - 0.5) * 0.003,
   }));
 
-/* ── Canvas: twinkling + drifting stars ── */
+/* ── CSS-only stars for iOS (no canvas, no rAF) ── */
+const CSSStars = () => {
+  const stars = useMemo(() => generateStars(60), []);
+  return (
+    <div className="absolute inset-0" style={{ pointerEvents: "none" }}>
+      {stars.map((s) => (
+        <div
+          key={s.id}
+          className="absolute rounded-full bg-white"
+          style={{
+            width: s.size,
+            height: s.size,
+            left: `${s.x}%`,
+            top: `${s.y}%`,
+            opacity: s.baseOpacity * 0.6,
+            animation: `twinkle ${2 + s.speed}s ease-in-out infinite`,
+            animationDelay: `${s.phase}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+/* ── Canvas: twinkling + drifting stars (desktop/Android only) ── */
 const StarCanvas = () => {
   const canvasRef = useRef(null);
-  const starsData = useMemo(() => generateStars(180), []);
+  const mobile = isMobile();
+  const starCount = mobile ? 80 : 180;
+  const starsData = useMemo(() => generateStars(starCount), [starCount]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     let animId;
+    // Throttle to ~30fps on mobile for battery
+    let lastFrame = 0;
+    const frameInterval = mobile ? 33 : 0; // ~30fps mobile, uncapped desktop
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const dpr = Math.min(window.devicePixelRatio, 2);
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
     window.addEventListener("resize", resize);
 
     const draw = (time) => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (frameInterval && time - lastFrame < frameInterval) {
+        animId = requestAnimationFrame(draw);
+        return;
+      }
+      lastFrame = time;
+
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      ctx.clearRect(0, 0, w, h);
       const t = time / 1000;
 
-      starsData.forEach((s) => {
+      for (let i = 0; i < starsData.length; i++) {
+        const s = starsData[i];
         const pulse = Math.sin(s.phase + t * s.speed);
         const twinkle = 0.25 + 0.75 * (0.5 + 0.5 * pulse);
         const alpha = s.baseOpacity * twinkle;
 
         const driftedX = ((s.x + s.driftX * t * 8) % 100 + 100) % 100;
         const driftedY = ((s.y + s.driftY * t * 8) % 100 + 100) % 100;
-        const x = (driftedX / 100) * canvas.width;
-        const y = (driftedY / 100) * canvas.height;
+        const x = (driftedX / 100) * w;
+        const y = (driftedY / 100) * h;
 
         ctx.beginPath();
         ctx.arc(x, y, s.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${alpha.toFixed(3)})`;
+        ctx.fillStyle = `rgba(255,255,255,${alpha.toFixed(2)})`;
         ctx.fill();
 
-        if (s.size > 1.2 && alpha > 0.35) {
+        // Glow only for large bright stars on desktop
+        if (!mobile && s.size > 1.2 && alpha > 0.35) {
           ctx.beginPath();
           ctx.arc(x, y, s.size * 3, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(180,170,255,${(alpha * 0.08).toFixed(3)})`;
+          ctx.fillStyle = `rgba(180,170,255,${(alpha * 0.08).toFixed(2)})`;
           ctx.fill();
         }
-      });
+      }
 
       animId = requestAnimationFrame(draw);
     };
@@ -70,7 +120,7 @@ const StarCanvas = () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
     };
-  }, [starsData]);
+  }, [starsData, mobile]);
 
   return (
     <canvas
@@ -81,7 +131,7 @@ const StarCanvas = () => {
   );
 };
 
-/* ── Canvas: rare, slow falling stars ── */
+/* ── Canvas: rare, slow falling stars (desktop only) ── */
 const ShootingStarCanvas = () => {
   const canvasRef = useRef(null);
 
@@ -112,12 +162,10 @@ const ShootingStarCanvas = () => {
       const tailLen = Math.random() * 80 + 50;
 
       shooters.push({
-        x: startX,
-        y: startY,
+        x: startX, y: startY,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
-        tailLen,
-        life: 1,
+        tailLen, life: 1,
         decay: 0.005 + Math.random() * 0.003,
       });
     };
@@ -189,6 +237,13 @@ const ShootingStarCanvas = () => {
 /* ── Main Background ── */
 const Background = () => {
   const { isDark } = useTheme();
+  const [useCSS, setUseCSS] = useState(false);
+  const mobile = isMobile();
+
+  useEffect(() => {
+    // iOS Safari chokes on dual canvas + blur — use CSS stars instead
+    setUseCSS(isIOS());
+  }, []);
 
   return (
     <div
@@ -202,7 +257,7 @@ const Background = () => {
     >
       {isDark ? (
         <>
-          {/* Dark mode: Nebula + Stars + Comets */}
+          {/* Dark mode: Nebula gradients (CSS only, no blur filter) */}
           <div
             className="absolute inset-0"
             style={{
@@ -214,6 +269,7 @@ const Background = () => {
             }}
           />
 
+          {/* Ambient orbs — reduced blur on mobile for GPU perf */}
           {[
             { size: 400, color: "rgba(124,58,237,0.06)", top: "-5%", left: "5%", delay: "0s" },
             { size: 300, color: "rgba(6,182,212,0.04)", top: "40%", right: "0%", delay: "-5s" },
@@ -223,22 +279,26 @@ const Background = () => {
               key={i}
               className="absolute rounded-full"
               style={{
-                width: o.size,
-                height: o.size,
+                width: mobile ? o.size * 0.7 : o.size,
+                height: mobile ? o.size * 0.7 : o.size,
                 background: o.color,
-                filter: "blur(100px)",
+                filter: mobile ? "blur(50px)" : "blur(100px)",
                 top: o.top,
                 left: o.left,
                 right: o.right,
                 bottom: o.bottom,
                 animation: `floatOrb 18s ease-in-out infinite`,
                 animationDelay: o.delay,
+                willChange: "transform",
               }}
             />
           ))}
 
-          <StarCanvas />
-          <ShootingStarCanvas />
+          {/* Stars: CSS on iOS, Canvas elsewhere */}
+          {useCSS ? <CSSStars /> : <StarCanvas />}
+
+          {/* Shooting stars: desktop only */}
+          {!mobile && <ShootingStarCanvas />}
 
           <div
             className="absolute bottom-0 left-0 right-0 h-[15%]"
@@ -274,13 +334,14 @@ const Background = () => {
                 width: o.size,
                 height: o.size,
                 background: o.color,
-                filter: "blur(80px)",
+                filter: mobile ? "blur(40px)" : "blur(80px)",
                 top: o.top,
                 left: o.left,
                 right: o.right,
                 bottom: o.bottom,
                 animation: `floatOrb 20s ease-in-out infinite`,
                 animationDelay: o.delay,
+                willChange: "transform",
               }}
             />
           ))}
@@ -292,6 +353,10 @@ const Background = () => {
           0%,100% { transform: translate(0,0) scale(1); }
           33%      { transform: translate(15px,-20px) scale(1.02); }
           66%      { transform: translate(-10px,12px) scale(0.98); }
+        }
+        @keyframes twinkle {
+          0%,100% { opacity: 0.2; }
+          50%     { opacity: 0.7; }
         }
       `}</style>
     </div>

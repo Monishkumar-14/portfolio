@@ -1,8 +1,15 @@
 // src/components/SplashScreen.jsx
-// Branded "M" loading animation — shows for ~1.8s on first load
+// Branded "M" loading animation — max 1.5s, optimized for iOS
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 
 const SplashScreen = ({ onComplete }) => {
+  // Hard timeout — ensure splash never blocks for more than 1.5s
+  useEffect(() => {
+    const timer = setTimeout(() => onComplete(), 1500);
+    return () => clearTimeout(timer);
+  }, [onComplete]);
+
   return (
     <motion.div
       className="fixed inset-0 z-[9999] flex items-center justify-center"
@@ -11,75 +18,48 @@ const SplashScreen = ({ onComplete }) => {
       }}
       initial={{ opacity: 1 }}
       animate={{ opacity: 0 }}
-      transition={{ duration: 0.5, delay: 1.6, ease: "easeInOut" }}
+      transition={{ duration: 0.4, delay: 1.1, ease: "easeInOut" }}
       onAnimationComplete={onComplete}
     >
-      {/* Ambient glow */}
-      <div className="absolute w-[300px] h-[300px] rounded-full bg-violet-500/10 blur-[100px]" />
-      <div className="absolute w-[200px] h-[200px] rounded-full bg-cyan-500/8 blur-[80px] translate-x-20 -translate-y-10" />
+      {/* Ambient glow — reduced blur for iOS */}
+      <div className="absolute w-[250px] h-[250px] rounded-full bg-violet-500/10 blur-[60px]" />
 
-      <div className="flex flex-col items-center gap-6">
+      <div className="flex flex-col items-center gap-5">
         {/* Animated "M" */}
         <motion.div
-          initial={{ scale: 0, rotate: -180, opacity: 0 }}
-          animate={{ scale: 1, rotate: 0, opacity: 1 }}
-          transition={{
-            duration: 0.8,
-            ease: [0.16, 1, 0.3, 1], // custom spring-like ease
-          }}
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="relative"
         >
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-500/20 to-cyan-500/10
+          <div className="w-18 h-18 rounded-2xl bg-gradient-to-br from-violet-500/20 to-cyan-500/10
             border border-violet-500/30 flex items-center justify-center
-            shadow-[0_0_60px_rgba(124,58,237,0.3)]"
+            shadow-[0_0_40px_rgba(124,58,237,0.25)]"
           >
-            <motion.span
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              className="text-3xl font-extrabold bg-gradient-to-r from-violet-400 via-cyan-400 to-pink-400
-                bg-clip-text text-transparent"
-            >
+            <span className="text-3xl font-extrabold bg-gradient-to-r from-violet-400 via-cyan-400 to-pink-400
+              bg-clip-text text-transparent">
               M
-            </motion.span>
+            </span>
           </div>
-
-          {/* Orbiting dot */}
-          <motion.div
-            className="absolute w-2 h-2 rounded-full bg-violet-400 shadow-[0_0_12px_rgba(124,58,237,0.6)]"
-            style={{ top: -4, left: "50%", marginLeft: -4 }}
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, ease: "linear", repeat: 1 }}
-          />
         </motion.div>
 
         {/* Text */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-          className="text-center"
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
+          className="text-sm font-semibold text-white/70 tracking-wide"
         >
-          <p className="text-sm font-semibold text-white/70 tracking-wide">
-            Monish<span className="text-violet-400">.</span>
-          </p>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.9, duration: 0.4 }}
-            className="text-[10px] text-white/30 uppercase tracking-[3px] mt-1"
-          >
-            Loading portfolio
-          </motion.p>
-        </motion.div>
+          Monish<span className="text-violet-400">.</span>
+        </motion.p>
 
         {/* Progress bar */}
-        <motion.div className="w-32 h-[2px] rounded-full bg-white/8 overflow-hidden">
+        <motion.div className="w-28 h-[2px] rounded-full bg-white/8 overflow-hidden">
           <motion.div
             className="h-full bg-gradient-to-r from-violet-400 via-cyan-400 to-pink-400 rounded-full"
             initial={{ width: "0%" }}
             animate={{ width: "100%" }}
-            transition={{ duration: 1.4, delay: 0.2, ease: "easeInOut" }}
+            transition={{ duration: 1.0, delay: 0.1, ease: "easeInOut" }}
           />
         </motion.div>
       </div>
