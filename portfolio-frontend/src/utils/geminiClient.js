@@ -338,7 +338,7 @@ export const sendToGroq = async (history) => {
       "Authorization": `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "llama-3.1-8b-instant",
+      model: "qwen/qwen3.6-27b",
       max_tokens: 600,
       temperature: 0.7,
       messages: [
@@ -355,5 +355,10 @@ export const sendToGroq = async (history) => {
   }
 
   const data = await response.json();
-  return data.choices[0].message.content;
+  let content = data.choices[0].message.content || "";
+
+  // Strip <think>...</think> blocks that qwen outputs
+  content = content.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+
+  return content;
 };

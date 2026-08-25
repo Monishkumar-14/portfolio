@@ -516,7 +516,7 @@ export default function Chatbot() {
           </h2>
           <p className="text-sm text-white/40 max-w-md mx-auto leading-relaxed">
             Your personal AI guide to explore Monish's work and experience.{" "}
-            <span className="text-violet-300 font-semibold">Powered by Groq · Llama 3.1</span>
+            <span className="text-violet-300 font-semibold">Powered by Groq · Qwen 3.6</span>
           </p>
         </motion.div>
 
@@ -622,7 +622,7 @@ export default function Chatbot() {
                           Powered by
                         </p>
                         <p className="text-[12px] font-bold text-white/60">
-                          Groq <span className="text-white/25 font-normal">·</span> LLaMA 3.1 8B
+                          Groq <span className="text-white/25 font-normal">·</span> Qwen 3.6 27B
                         </p>
                         <p className="text-[10px] text-white/25 mt-1">
                           Fast inference · Multi-turn memory
@@ -664,7 +664,7 @@ export default function Chatbot() {
                     Powered by
                   </p>
                   <p className="text-[12px] font-bold text-white/60">
-                    Groq <span className="text-white/25 font-normal">·</span> LLaMA 3.1 8B
+                    Groq <span className="text-white/25 font-normal">·</span> Qwen 3.6 27B
                   </p>
                   <p className="text-[10px] text-white/25 mt-1">
                     Fast inference · Multi-turn memory
@@ -702,7 +702,7 @@ export default function Chatbot() {
                     animate={{ opacity: [1, 0.3, 1] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                   />
-                  Groq AI · Llama 3.1 · Always online
+                  Groq AI · Qwen 3.6 · Always online
                 </p>
               </div>
 
