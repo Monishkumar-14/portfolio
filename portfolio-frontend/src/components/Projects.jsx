@@ -449,7 +449,7 @@ const PROJECTS = [
     catColor: "text-blue-300",
     accentColor: "cyan",
     title: "PlaceTrack",
-    featured: true,
+    featured: false,
     github: "https://github.com/Monishkumar-14/placetrack",
     live: "https://placetrack-beta.vercel.app/",
     desc: "A full-stack placement management platform for college students to track campus recruitment — from company registration to final offer — with real-time analytics and a visual pipeline.",
