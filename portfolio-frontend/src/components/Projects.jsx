@@ -2,7 +2,8 @@ import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Github, ExternalLink, ChevronDown, ChevronUp, ChevronLeft, ChevronRight,
-  X, Users, Layers, Zap, Code2, Database, GitBranch, Brain, Package, Cpu, Wifi
+  X, Users, Layers, Zap, Code2, Database, GitBranch, Brain, Package, Cpu, Wifi,
+  BarChart3
 } from "lucide-react";
 
 // ── Animation helpers ─────────────────────────────────────────────
@@ -433,6 +434,83 @@ const PROJECTS = [
             { label: "Session Control", desc: "Lecturer RFID card starts and ends attendance sessions" },
             { label: "Anti-Proxy", desc: "Unique UID verification prevents proxy attendance" },
             { label: "Scalable", desc: "Suitable for schools, colleges, offices, and institutions" },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    id: 7,
+    num: "07",
+    icon: <BarChart3 size={20} />,
+    iconBg: "bg-blue-500/15 border-blue-500/30",
+    cat: ["fullstack"],
+    catLabel: "Full Stack · FastAPI + React + TypeScript",
+    catColor: "text-blue-300",
+    accentColor: "cyan",
+    title: "PlaceTrack",
+    featured: true,
+    github: "https://github.com/Monishkumar-14/placetrack",
+    live: "https://placetrack-beta.vercel.app/",
+    desc: "A full-stack placement management platform for college students to track campus recruitment — from company registration to final offer — with real-time analytics and a visual pipeline.",
+    highlights: [
+      { color: "bg-blue-400",   text: "8-model database schema covering the entire placement lifecycle" },
+      { color: "bg-cyan-400",   text: "Visual placement pipeline: Registered → OA → Shortlisted → Interview → Selected" },
+      { color: "bg-violet-400", text: "Real-time analytics with funnel visualization and CTC insights" },
+    ],
+    tech: ["React 19", "TypeScript", "Vite", "Tailwind v4", "Shadcn/UI", "FastAPI", "PostgreSQL", "SQLAlchemy", "JWT", "TanStack Query", "Recharts"],
+    stats: [
+      { num: "8",     label: "DB Models",       color: "text-blue-400" },
+      { num: "21+",   label: "UI Components",   color: "text-cyan-400" },
+      { num: "6",     label: "Status Stages",   color: "text-violet-400" },
+      { num: "Live",  label: "Deployed",        color: "text-green-400" },
+    ],
+    caseStudy: {
+      problem:   "Students juggle 20+ companies during placements with no unified tracking — leading to missed deadlines and no visibility.",
+      approach:  "FastAPI + React TypeScript platform with 8-model PostgreSQL schema, JWT auth, and real-time analytics.",
+      challenge: "Designing a flexible status pipeline that covers every stage from registration to final offer across diverse companies.",
+      outcome:   "Unified placement dashboard with visual pipeline, calendar view, and automated CTC analytics — deployed live.",
+    },
+    modal: {
+      overview: "A full-stack placement management platform where each student can register placement drives with company info and CTC details, track their status through each stage (Registered → OA → Shortlisted → Interview → Selected), visualize their entire placement pipeline at a glance, and never miss a deadline with a unified calendar.",
+      sections: [
+        {
+          icon: BarChart3,
+          title: "Key Features",
+          color: "text-blue-300",
+          borderColor: "border-blue-500/20",
+          bgColor: "bg-blue-500/8",
+          items: [
+            { label: "Dashboard", desc: "Stat cards, upcoming events timeline, placement funnel, and CTC overview" },
+            { label: "Drive Management", desc: "Add companies with role, location, CTC, stipend, bond, eligibility and track round-by-round" },
+            { label: "Pipeline Tracker", desc: "Visual funnel: Interested → Registered → OA → Shortlisted → Interview → Selected/Rejected" },
+            { label: "Analytics", desc: "Funnel visualization, compensation overview, and company CTC comparison table" },
+          ],
+        },
+        {
+          icon: Layers,
+          title: "Tech Stack",
+          color: "text-cyan-300",
+          borderColor: "border-cyan-500/20",
+          bgColor: "bg-cyan-500/8",
+          items: [
+            { label: "Frontend", desc: "React 19 + TypeScript + Vite + Tailwind v4 + Shadcn/UI (21 components)" },
+            { label: "Backend", desc: "FastAPI + SQLAlchemy 2.0 (Async) + Pydantic v2 + Alembic migrations" },
+            { label: "Database", desc: "PostgreSQL (Neon Cloud) with 8 models and SSL" },
+            { label: "State Management", desc: "TanStack React Query with caching + Axios JWT interceptors" },
+          ],
+        },
+        {
+          icon: Zap,
+          title: "Highlights",
+          color: "text-violet-300",
+          borderColor: "border-violet-500/20",
+          bgColor: "bg-violet-500/8",
+          items: [
+            { label: "Multi-User", desc: "JWT auth with bcrypt — each student gets isolated private data" },
+            { label: "Calendar", desc: "Unified month view with color-coded PPTs (blue), OAs (orange), Interviews (green)" },
+            { label: "Command Palette", desc: "Ctrl+K / ⌘K quick navigation and search across pages" },
+            { label: "Full Deploy", desc: "Frontend on Vercel, Backend on Render, DB on Neon Cloud" },
           ],
         },
       ],

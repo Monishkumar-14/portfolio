@@ -159,6 +159,31 @@ GitHub: github.com/Monishkumar-14/git-simulator
 - Supports Git branching concepts.
 - Useful educational project for learning Git internals.
 
+--------------------------------------------------
+
+7. PlaceTrack
+(Full Stack · FastAPI + React + TypeScript)
+
+GitHub: github.com/Monishkumar-14/placetrack
+Live: placetrack-beta.vercel.app
+API Docs: placetrack-api-wg65.onrender.com/docs
+
+- Full-stack placement management platform for college students.
+- Tracks campus recruitment from company registration to final offer.
+- 8-model PostgreSQL database schema covering entire placement lifecycle.
+- Visual placement pipeline: Registered → OA → Shortlisted → Interview → Selected.
+- Real-time analytics dashboard with funnel visualization and CTC insights.
+- Unified calendar with color-coded PPTs, OAs, and Interviews.
+- Multi-user JWT authentication with bcrypt password hashing.
+- Command palette (Ctrl+K) for quick navigation.
+- Company directory with priority tagging.
+- Settings page with theme switcher and profile management.
+
+Tech:
+React 19, TypeScript, Vite, Tailwind v4, Shadcn/UI, FastAPI, PostgreSQL, SQLAlchemy (Async), Pydantic v2, JWT, TanStack React Query, Recharts, Alembic
+
+Deployed: Frontend on Vercel, Backend on Render, Database on Neon Cloud
+
 ==================================================
 PORTFOLIO
 ==================================================
@@ -267,7 +292,7 @@ Q: Does Monish have internship experience?
 A: Yes. He completed an internship at AstraZeneca in the Enterprise Technology Services (ETS) department, where he built enterprise AI applications for document intelligence and ServiceNow analytics.
 
 Q: What projects has Monish built?
-A: Enterprise AI Assistant, ServiceNow Conversational Analytics Platform, SpareChange, Ingre2Recipe, Spare Parts Management System and Git Graph Simulator.
+A: Enterprise AI Assistant, ServiceNow Conversational Analytics Platform, SpareChange, Ingre2Recipe, Spare Parts Management System, Git Graph Simulator, and PlaceTrack.
 
 Q: Is Monish looking for opportunities?
 A: Yes. He is interested in Software Engineering, AI Engineering, Backend Development and Full Stack Development roles.
