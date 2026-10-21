@@ -363,7 +363,7 @@ export const sendToGroq = async (history) => {
       "Authorization": `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "qwen/qwen3.6-27b",
+      model: "qwen/qwen3.8-27b",
       max_tokens: 600,
       temperature: 0.7,
       messages: [
