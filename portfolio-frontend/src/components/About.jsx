@@ -18,7 +18,6 @@ const fadeLeft = (delay = 0) => ({
 // ── Resume Data ───────────────────────────────────────────────────
 
 const miniStats = [
-  { num: "10+",   label: "Deployed Projects",      color: "text-violet-400" },
   { num: "6",    label: "Certifications",          color: "text-cyan-400"   },
   { num: "8.2", label: "CGPA / 10",               color: "text-pink-400"   },
   { num: "15+",  label: "GitHub Repositories",     color: "text-amber-400"  },
