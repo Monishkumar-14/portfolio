@@ -336,7 +336,7 @@ const About = () => {
                 </span>, and integrating machine learning into real-world applications.
                 Outside academics I solve DSA on{" "}
                 <span className="text-pink-300 font-semibold">LeetCode (monish14_3)</span>{" "}
-                and maintain 20+ GitHub repos.
+                and maintain 10+ GitHub repos.
               </p>
               <div className="flex gap-3 flex-wrap mt-8">
                 <motion.a
