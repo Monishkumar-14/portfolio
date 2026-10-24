@@ -37,7 +37,7 @@ EDUCATION
 B.Tech Information Technology
 College of Engineering Guindy (Anna University)
 Aug 2023 – Present
-CGPA: 8.21/10
+CGPA: 8.2/10
 
 Higher Secondary (HSC)
 Saradha Higher Matric Secondary School
@@ -241,6 +241,7 @@ CERTIFICATIONS
 
 - Google Cybersecurity Professional Certificate
 - Google Cloud Engineering Certificate
+- IBM DevOps and Software Engineering Professional Certificate
 - NPTEL Python for Data Science (85%)
 - LearnTube: C Programming, C++, Data Structures & Algorithms
 

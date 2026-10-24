@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ExternalLink, CheckCircle, Shield, Cloud, Code2, Database,
   Cpu, X, ZoomIn, BadgeCheck, Calendar, Clock, Award,
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, Wrench
 } from "lucide-react";
 
 // ── Animation helpers ─────────────────────────────────────────────
@@ -29,6 +29,14 @@ const NptelIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
     <rect width="24" height="24" rx="6" fill="#1a56db"/>
     <text x="12" y="16" textAnchor="middle" fontSize="9" fontWeight="bold" fill="white" fontFamily="monospace">IIT</text>
+  </svg>
+);
+
+// -- IBM Icon ---------------------------------------------------------------
+const IbmIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <rect width="24" height="24" rx="6" fill="#0530ad"/>
+    <text x="12" y="16" textAnchor="middle" fontSize="8" fontWeight="bold" fill="white" fontFamily="monospace">IBM</text>
   </svg>
 );
 
@@ -194,6 +202,29 @@ const CERTS = [
     verified: false,
     credentialId: null,
   },
+  {
+    id: 6,
+    Icon: Wrench,
+    iconColor: "text-blue-400",
+    iconBg: "bg-blue-500/12 border-blue-500/28",
+    glowColor: "rgba(59,130,246,0.15)",
+    cat: "devops",
+    catLabel: "DevOps",
+    catCls: "bg-blue-500/12 border-blue-500/28 text-blue-300",
+    ribbonCls: "bg-blue-500/12 border-blue-500/28 text-blue-300",
+    ribbon: "IBM",
+    issuer: "IBM · Coursera",
+    IssuerIcon: IbmIcon,
+    title: "IBM DevOps and Software Engineering Professional Certificate",
+    year: "2026",
+    duration: "Professional",
+    score: null,
+    desc: "Comprehensive professional certificate covering DevOps practices, CI/CD pipelines, containerization with Docker & Kubernetes, microservices architecture, and agile software engineering.",
+    topics: ["CI/CD Pipelines", "Docker", "Kubernetes", "Microservices", "Agile", "Cloud Native"],
+    link: "https://www.credly.com/badges/f8734e8f-6c94-4522-8a56-22e162bee16a/public_url",
+    verified: true,
+    credentialId: "IBM-DEVOPS-2026",
+  },
 ];
 
 const FILTERS = [
@@ -202,6 +233,7 @@ const FILTERS = [
   { key: "security", label: "Security"     },
   { key: "ml",       label: "ML / Data"   },
   { key: "dsa",      label: "DSA"         },
+  { key: "devops",   label: "DevOps"      },
   { key: "prog",     label: "Programming" },
 ];
 

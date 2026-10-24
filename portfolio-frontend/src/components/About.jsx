@@ -20,7 +20,7 @@ const fadeLeft = (delay = 0) => ({
 const miniStats = [
   { num: "10+",   label: "Deployed Projects",      color: "text-violet-400" },
   { num: "6",    label: "Certifications",          color: "text-cyan-400"   },
-  { num: "8.21", label: "CGPA / 10",               color: "text-pink-400"   },
+  { num: "8.2", label: "CGPA / 10",               color: "text-pink-400"   },
   { num: "15+",  label: "GitHub Repositories",     color: "text-amber-400"  },
   { num: "1",    label: "Internship",              color: "text-green-400"  },
 ];
@@ -30,7 +30,7 @@ const chips = [
   { label: "Chennai, India",                 icon: <MapPin size={11}/>, cls: "bg-cyan-500/12  border-cyan-500/28   text-cyan-300"    },
   { label: "Open to Work",                   icon: <Briefcase size={11}/>, cls: "bg-pink-500/12  border-pink-500/28   text-pink-300"    },
   { label: "Intern · AstraZeneca",           cls: "bg-green-500/12 border-green-500/28  text-green-400"  },
-  { label: "CGPA 8.21 / 10",                icon: <Star size={11}/>, cls: "bg-amber-500/12 border-amber-500/28  text-amber-300"   },
+  { label: "CGPA 8.2 / 10",                icon: <Star size={11}/>, cls: "bg-amber-500/12 border-amber-500/28  text-amber-300"   },
   { label: "NSS Coordinator",               icon: <Leaf size={11}/>, cls: "bg-green-500/12 border-green-500/28  text-green-400"   },
 ];
 
@@ -238,7 +238,7 @@ const About = () => {
                 Full Stack Developer · AI Enthusiast
               </p>
               <p className="text-[11px] text-white/40 mb-1">CEG, Anna University · Chennai</p>
-              <p className="text-xs text-white/55 font-medium mb-6">CGPA: 8.21 / 10</p>
+              <p className="text-xs text-white/55 font-medium mb-6">CGPA: 8.2 / 10</p>
 
               {/* Socials */}
               <div className="flex flex-wrap gap-2 justify-center mb-4">
@@ -374,7 +374,7 @@ const About = () => {
                     inst: "College of Engineering Guindy (CEG), Anna University",
                     badges: [
                       { label: "Aug 2023 – Present", cls: "bg-violet-500/15 border-violet-500/25 text-violet-300" },
-                      { label: "CGPA: 8.21 / 10",    cls: "bg-green-500/12  border-green-500/25  text-green-400"  },
+                      { label: "CGPA: 8.2 / 10",    cls: "bg-green-500/12  border-green-500/25  text-green-400"  },
                     ],
                   },
                   {
