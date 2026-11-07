@@ -1,0 +1,52 @@
+/* Floating glass bottom navigation — mobile only (< 768px). Scoped to .mtab.
+   Stacking: sections 1 · rail / tab bar / back-to-top 40 · chatbot launcher + panel 50. */
+.mtab {
+  --accent: var(--primary-accent, #ff6b35);
+  position: fixed;
+  z-index: 40;
+  left: max(12px, env(safe-area-inset-left, 0px));
+  right: max(12px, env(safe-area-inset-right, 0px));
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));   /* never touches the home indicator */
+  max-width: 420px;
+  margin-inline: auto;                                      /* centred on wider phones */
+  font-family: var(--font-body, "Inter", system-ui, -apple-system, "Segoe UI", sans-serif);
+}
+
+/* Glass: translucent charcoal + blur, hairline border, soft shadow, faint orange ambience */
+.mtab__bar {
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px;
+  border-radius: 22px;
+  background: rgba(30, 30, 30, 0.58);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+          backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 26px rgba(255, 107, 53, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .mtab__bar { background: rgba(28, 28, 28, 0.94); }       /* readable fallback without blur support */
+}
+
+.mtab__list { display: flex; flex: 1 1 auto; min-width: 0; margin: 0; padding: 0; list-style: none; gap: 0; }   /* no horizontal scrolling: items share the width */
+.mtab__cell { flex: 1 1 0; min-width: 0; }
+
+.mtab__item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  min-height: 50px; padding: 7px 1px; border-radius: 16px;
+  color: #9299a4; background: transparent; text-decoration: none; -webkit-tap-highlight-color: transparent;
+  transition: color .2s ease, background-color .2s ease;
+}
+.mtab__item svg { flex: none; transition: color .2s ease; }
+.mtab__label {
+  max-width: 100%; overflow: hidden; text-overflow: clip; white-space: nowrap;
+  font-size: clamp(7px, 2.05vw, 8.5px);                    /* "PROJECTS" still fits on 320px screens */
+  font-weight: 700; letter-spacing: .02em; line-height: 1; text-transform: uppercase;
+}
+.mtab__item:active { background: rgba(255, 255, 255, 0.06); }
+.mtab__item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* Active: orange icon + label on a subtle dark-orange translucent pill */
+.mtab__item.is-active { color: var(--accent); background: rgba(255, 107, 53, 0.14); }
+
+@media (min-width: 768px) { .mtab { display: none; } }      /* safety net; the component also unmounts itself */
+@media (prefers-reduced-motion: reduce) { .mtab__item, .mtab__item svg { transition: none; } }

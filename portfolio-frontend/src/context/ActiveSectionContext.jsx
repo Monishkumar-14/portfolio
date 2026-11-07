@@ -6,7 +6,7 @@ const ActiveSectionContext = createContext();
 
 const navSections = [
   "home", "about", "experience", "projects",
-  "certificates", "resume", "chatbot", "contact",
+  "certificates", "contact",
 ];
 
 export const ActiveSectionProvider = ({ children }) => {

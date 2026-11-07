@@ -1,0 +1,41 @@
+/* 404 — builds on Sections.css (.sect / .sect__bg give the shared charcoal grid). Scoped to .nf */
+.sect.nf { min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: calc(60 * var(--u)) 24px; }
+.nf__inner { position: relative; z-index: 1; width: min(100%, 640px); text-align: center; }
+.nf__sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.nf__code { margin: 0 0 calc(30 * var(--u)); font: 800 clamp(88px, calc(150 * var(--u)), 168px)/1 var(--mono); letter-spacing: -0.06em; color: var(--orange); text-shadow: 0 0 calc(50 * var(--u)) rgba(255, 107, 53, 0.25); user-select: none; }
+
+/* Terminal window (same chrome as the Contact / Experience windows) */
+.nf-win { text-align: left; border-radius: 14px; overflow: hidden; background: #1c1c1c; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 20px 50px rgba(0, 0, 0, 0.4); transition: box-shadow .25s; }
+.nf-win:hover { box-shadow: 0 0 0 1px rgba(255, 107, 53, 0.55), 0 20px 50px rgba(0, 0, 0, 0.4); }
+.nf-win__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 40px; padding: 0 18px; background: #262626; }
+.nf-dots { display: inline-flex; gap: 8px; }
+.nf-dots i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+.nf-dots i:nth-child(1) { background: #ff5f56; } .nf-dots i:nth-child(2) { background: #ffbd2e; } .nf-dots i:nth-child(3) { background: #27c93f; }
+.nf-win__file { display: inline-flex; align-items: center; gap: 8px; font: 400 13px/1 var(--mono); color: #aeb3ba; }
+.nf-win__file svg { color: #4d8dff; }
+.nf-win__body { margin: 0; padding: 22px 24px 24px; background: #1a1a1a; display: grid; gap: 6px; font: 400 15px/1.55 var(--mono); color: #d4d4d4; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+.nf-l { display: block; }
+.nf-p { color: var(--orange); font-weight: 700; }
+.nf-path { color: #22d67a; }
+.nf-err { color: #ff6b4f; }
+.nf-err .nf-path { color: #ff6b4f; }
+.nf-code { color: var(--orange); font-weight: 700; }
+
+.nf__title { margin: calc(38 * var(--u)) 0 12px; font: 700 clamp(20px, calc(30 * var(--u)), 32px)/1.3 var(--sans); color: #f0f2f4; }
+.nf__title span { font-family: var(--mono); color: var(--orange); }
+.nf__text { margin: 0 auto; max-width: 420px; font: 400 14px/1.7 var(--mono); color: #8d9299; }
+
+.nf__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: calc(36 * var(--u)); }
+.nf-btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 46px; padding: 0 26px; cursor: pointer; border-radius: 8px; text-decoration: none;
+  font: 700 14px/1 var(--mono); letter-spacing: .03em; color: #d4d4d4; background: #262626; border: 1px solid rgba(255, 255, 255, 0.12); transition: border-color .2s, background .2s, color .2s; }
+.nf-btn:hover { border-color: var(--orange); color: #fff; }
+.nf-btn:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
+.nf-btn--primary { color: #fff; background: #5a2a12; border-color: var(--orange); }
+.nf-btn--primary svg { color: var(--orange); }
+.nf-btn--primary:hover { background: #74361a; }
+
+.nf__foot { margin: calc(56 * var(--u)) 0 0; font: 400 10px/1 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: rgba(255, 255, 255, 0.22); }
+
+@media (max-width: 520px) { .nf-btn { flex: 1 1 100%; } .nf-win__body { font-size: 13px; padding: 18px 16px; } }
+@media (prefers-reduced-motion: reduce) { .nf-win, .nf-btn { transition: none; } }

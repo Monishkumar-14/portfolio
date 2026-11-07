@@ -1,38 +1,31 @@
-import { useState, useEffect }                from "react";
-import { Outlet, NavLink, useNavigate }   from "react-router-dom";
-import { motion, AnimatePresence }        from "framer-motion";
+import { useState, useEffect }              from "react";
+import { Outlet, NavLink, useNavigate }     from "react-router-dom";
+import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import {
-  LayoutDashboard, FolderOpen, Award,
-  MessageSquare, Settings, KeyRound,
-  LogOut, Menu, X, Bell, Zap,
+  LayoutDashboard, FolderOpen, Award, MessageSquare, Settings, KeyRound,
+  LogOut, Menu, X, Bell, Terminal,
 } from "lucide-react";
-import { useAuth }    from "../context/AuthContext";
-import toast          from "react-hot-toast";
-import axios          from "axios";
+import { useAuth } from "../context/AuthContext";
+import toast       from "react-hot-toast";
+import axios       from "axios";
+import Background  from "../components/Background";
+import "./Admin.css";
 
 const NAV = [
-  { group: "Overview",
-    items: [
-      { to: "/admin",             icon: <LayoutDashboard size={15}/>, label: "Dashboard",    end: true },
-    ]
-  },
-  { group: "Content",
-    items: [
-      { to: "/admin/projects",     icon: <FolderOpen size={15}/>,     label: "Projects"      },
-      { to: "/admin/certificates", icon: <Award size={15}/>,          label: "Certificates"  },
-    ]
-  },
-  { group: "Inbox",
-    items: [
-      { to: "/admin/messages",     icon: <MessageSquare size={15}/>,  label: "Messages", badgeKey: "unread" },
-    ]
-  },
-  { group: "Settings",
-    items: [
-      { to: "/admin/settings",     icon: <Settings size={15}/>,       label: "Settings"      },
-      { to: "/admin/password",     icon: <KeyRound size={15}/>,       label: "Change Password"},
-    ]
-  },
+  { group: "Overview", items: [
+    { to: "/admin", icon: <LayoutDashboard size={15}/>, label: "Dashboard", end: true },
+  ]},
+  { group: "Content", items: [
+    { to: "/admin/projects",     icon: <FolderOpen size={15}/>, label: "Projects" },
+    { to: "/admin/certificates", icon: <Award size={15}/>,      label: "Certificates" },
+  ]},
+  { group: "Inbox", items: [
+    { to: "/admin/messages", icon: <MessageSquare size={15}/>, label: "Messages", badgeKey: "unread" },
+  ]},
+  { group: "Settings", items: [
+    { to: "/admin/settings", icon: <Settings size={15}/>, label: "Settings" },
+    { to: "/admin/password", icon: <KeyRound size={15}/>, label: "Change Password" },
+  ]},
 ];
 
 const Sidebar = ({ mobile, onClose, unreadCount }) => {
@@ -46,64 +39,31 @@ const Sidebar = ({ mobile, onClose, unreadCount }) => {
   };
 
   return (
-    <div className={`flex flex-col h-full
-      ${mobile ? "w-full" : "w-[220px]"}`}
-      style={{
-        background: "rgba(10,10,26,0.9)",
-        backdropFilter: "blur(30px)",
-        borderRight: "1px solid rgba(255,255,255,0.07)",
-      }}
-    >
-      {/* Logo */}
-      <div className="flex items-center justify-between px-4 py-5
-        border-b border-white/7">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br
-            from-violet-600 to-cyan-500 flex items-center justify-center
-            text-lg shadow-[0_4px_16px_rgba(124,58,237,0.35)]">
-            <Zap size={18}/>
-          </div>
+    <aside className="adm-sidebar" aria-label="Admin navigation">
+      <div className="adm-brand">
+        <div className="adm-brand__id">
+          <span className="adm-logo"><Terminal size={18} aria-hidden="true" /></span>
           <div>
-            <p className="text-[14px] font-extrabold leading-none">Admin</p>
-            <p className="text-[9px] text-white/28 mt-0.5">Portfolio Panel</p>
+            <p className="adm-brand__t">admin<span style={{ color: "var(--accent)" }}>.</span>panel</p>
+            <p className="adm-brand__s">monish.dev</p>
           </div>
         </div>
         {mobile && (
-          <button onClick={onClose} aria-label="Close navigation menu" className="text-white/40 hover:text-white">
-            <X size={18}/>
-          </button>
+          <button type="button" onClick={onClose} aria-label="Close navigation menu" className="adm-iconbtn"><X size={16}/></button>
         )}
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-4 overflow-y-auto">
+      <nav className="adm-nav" aria-label="Admin sections">
         {NAV.map(({ group, items }) => (
-          <div key={group} className="mb-5">
-            <p className="text-[9px] font-semibold uppercase tracking-[2px]
-              text-white/22 px-3 mb-2">
-              {group}
-            </p>
+          <div key={group} className="adm-nav__group">
+            <p className="adm-nav__label">{group}</p>
             {items.map(({ to, icon, label, badgeKey, end }) => (
-              <NavLink
-                key={to} to={to} end={end}
-                onClick={mobile ? onClose : undefined}
-                className={({ isActive }) =>
-                  `flex items-center gap-2.5 px-3 py-2.5 rounded-[12px]
-                  text-[13px] font-medium mb-1 transition-all border
-                  ${isActive
-                    ? "bg-violet-500/18 border-violet-500/25 text-violet-300"
-                    : "border-transparent text-white/42 hover:bg-white/6 hover:text-white/80"
-                  }`
-                }
-              >
-                <span className="flex-shrink-0 opacity-80">{icon}</span>
-                <span className="flex-1">{label}</span>
+              <NavLink key={to} to={to} end={end} onClick={mobile ? onClose : undefined}
+                className={({ isActive }) => `adm-navlink${isActive ? " is-active" : ""}`}>
+                <span aria-hidden="true">{icon}</span>
+                <span className="adm-navlink__txt">{label}</span>
                 {badgeKey === "unread" && unreadCount > 0 && (
-                  <span className="min-w-[18px] h-[18px] rounded-full
-                    bg-pink-500/30 border border-pink-500/40 text-pink-400
-                    text-[9px] font-bold flex items-center justify-center px-1">
-                    {unreadCount}
-                  </span>
+                  <span className="adm-count" aria-label={`${unreadCount} unread`}>{unreadCount}</span>
                 )}
               </NavLink>
             ))}
@@ -111,40 +71,29 @@ const Sidebar = ({ mobile, onClose, unreadCount }) => {
         ))}
       </nav>
 
-      {/* Profile + logout */}
-      <div className="px-3 py-4 border-t border-white/7">
-        <div className="flex items-center gap-3 px-3 py-3 rounded-[12px]
-          bg-white/4 border border-white/7 mb-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br
-            from-violet-600 to-cyan-500 flex items-center justify-center
-            text-[13px] font-extrabold flex-shrink-0">
-            M
-          </div>
-          <div className="min-w-0">
-            <p className="text-xs font-semibold truncate">Monishkumar</p>
-            <p className="text-[10px] text-white/30">Administrator</p>
+      <div className="adm-side-foot">
+        <div className="adm-profile">
+          <span className="adm-avatar" aria-hidden="true">M</span>
+          <div style={{ minWidth: 0 }}>
+            <p className="adm-profile__n">Monishkumar</p>
+            <p className="adm-profile__r">administrator</p>
           </div>
         </div>
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-2.5
-            rounded-[10px] text-xs font-semibold
-            bg-red-500/8 border border-red-500/18 text-red-400/70
-            hover:bg-red-500/15 hover:text-red-400 transition-all"
-        >
-          <LogOut size={13}/> Logout
+        <button type="button" onClick={handleLogout} className="adm-btn adm-btn--danger adm-btn--block adm-btn--sm">
+          <LogOut size={13} aria-hidden="true"/> Logout
         </button>
       </div>
-    </div>
+    </aside>
   );
 };
 
 const Dashboard = () => {
   const { token } = useAuth();
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const navigate = useNavigate();
+  const [mobileOpen, setMobileOpen]   = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // Fetch unread count for sidebar badge
+  // Unread count for the sidebar badge (refreshed every 30s)
   useEffect(() => {
     const fetchUnread = async () => {
       try {
@@ -154,100 +103,69 @@ const Dashboard = () => {
         );
         setUnreadCount(data.stats?.unreadMessages ?? 0);
       } catch {
-        // silently fail — badge just won't show
+        // silently fail: the badge just won't show
       }
     };
     fetchUnread();
-    // Refresh every 30 seconds
     const interval = setInterval(fetchUnread, 30000);
     return () => clearInterval(interval);
   }, [token]);
 
+  // Mobile drawer: Escape closes it, page scroll is locked while it is open
+  useEffect(() => {
+    if (!mobileOpen) return undefined;
+    const onKey = (e) => e.key === "Escape" && setMobileOpen(false);
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = overflow; };
+  }, [mobileOpen]);
+
   return (
-    <div className="min-h-screen flex" style={{ background: "#0a0a1a" }}>
+    <MotionConfig reducedMotion="user">
+      <div className="adm">
+        <Background />
 
-      {/* Background */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute w-96 h-96 -top-20 -left-20 rounded-full
-          bg-violet-600/15 blur-[100px]"/>
-        <div className="absolute w-72 h-72 bottom-0 right-0 rounded-full
-          bg-cyan-500/10 blur-[90px]"/>
-      </div>
+        <div className="adm-shell">
+          {/* Desktop sidebar (hidden below 1024px by CSS) */}
+          <Sidebar unreadCount={unreadCount} />
 
-      {/* Desktop sidebar */}
-      <div className="hidden lg:flex flex-col flex-shrink-0 relative z-20">
-        <Sidebar unreadCount={unreadCount} />
-      </div>
+          <div className="adm-main">
+            <header className="adm-top">
+              <button type="button" onClick={() => setMobileOpen(true)} aria-label="Open navigation menu"
+                className="adm-iconbtn adm-menu-btn"><Menu size={16}/></button>
+              <div className="adm-top__grow"/>
+              <button type="button" onClick={() => navigate("/admin/messages")}
+                aria-label={unreadCount > 0 ? `Messages, ${unreadCount} unread` : "Messages"}
+                className="adm-iconbtn adm-iconbtn--ghost">
+                <Bell size={15}/>
+                {unreadCount > 0 && <span className="adm-dot" aria-hidden="true"/>}
+              </button>
+              <div className="adm-profile" style={{ margin: 0, padding: "5px 12px 5px 6px" }}>
+                <span className="adm-avatar" style={{ width: 26, height: 26, fontSize: 11 }} aria-hidden="true">M</span>
+                <span className="adm-profile__n" style={{ fontSize: 12 }}>Monishkumar</span>
+              </div>
+            </header>
 
-      {/* Mobile sidebar */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
-              onClick={() => setMobileOpen(false)}
-            />
-            <motion.div
-              initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="fixed left-0 top-0 bottom-0 z-50 w-[260px] lg:hidden"
-            >
-              <Sidebar mobile onClose={() => setMobileOpen(false)} unreadCount={unreadCount} />
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Main */}
-      <div className="flex-1 flex flex-col relative z-10 min-w-0">
-
-        {/* Topbar */}
-        <div className="flex items-center gap-3 px-5 py-3.5
-          border-b border-white/7 flex-shrink-0"
-          style={{ background: "rgba(10,10,26,0.6)", backdropFilter: "blur(20px)" }}
-        >
-          <button
-            onClick={() => setMobileOpen(true)}
-            aria-label="Open navigation menu"
-            className="lg:hidden w-9 h-9 rounded-[10px] bg-white/6
-              border border-white/10 flex items-center justify-center
-              text-white/60"
-          >
-            <Menu size={16}/>
-          </button>
-
-          <div className="flex-1"/>
-
-          <button aria-label="Notifications" className="w-9 h-9 rounded-[10px] bg-white/6
-            border border-white/10 flex items-center justify-center
-            text-white/50 hover:bg-white/10 transition-all relative">
-            <Bell size={15}/>
-            {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full
-                bg-pink-500 border border-[#0a0a1a]"/>
-            )}
-          </button>
-
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-[10px]
-            bg-white/4 border border-white/8">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br
-              from-violet-600 to-cyan-500 flex items-center justify-center
-              text-[10px] font-bold">
-              M
-            </div>
-            <span className="text-xs font-medium text-white/70 hidden sm:block">
-              Monishkumar
-            </span>
+            <main className="adm-content"><Outlet/></main>
           </div>
         </div>
 
-        {/* Page content */}
-        <div className="flex-1 overflow-y-auto p-5 lg:p-6">
-          <Outlet />
-        </div>
+        {/* Mobile / tablet drawer */}
+        <AnimatePresence>
+          {mobileOpen && (
+            <>
+              <motion.div className="adm-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                onClick={() => setMobileOpen(false)} aria-hidden="true"/>
+              <motion.div className="adm-drawer" initial={{ x: -300 }} animate={{ x: 0 }} exit={{ x: -300 }}
+                transition={{ type: "spring", damping: 32, stiffness: 320 }}>
+                <Sidebar mobile onClose={() => setMobileOpen(false)} unreadCount={unreadCount} />
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </div>
-    </div>
+    </MotionConfig>
   );
 };
 

@@ -1,9 +1,22 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, Eye, Mail, X, CheckCheck } from "lucide-react";
+import { Trash2, Eye, Mail, CheckCheck, MessageSquare } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
+import { Modal, PageHeader, Pill, Spinner, timeAgo } from "./AdminUI";
+import "./Admin.css";
+
+const RowActions = ({ m, onView, onDelete }) => (
+  <div className="adm-actions" onClick={(e) => e.stopPropagation()}>
+    <button type="button" onClick={() => onView(m)} aria-label={`View message from ${who(m)}`} className="adm-iconbtn adm-iconbtn--blue"><Eye size={14}/></button>
+    <button type="button" onClick={() => onDelete(m._id)} aria-label={`Delete message from ${who(m)}`} className="adm-iconbtn adm-iconbtn--danger"><Trash2 size={14}/></button>
+  </div>
+);
+
+const who = (m) => m.name?.trim() || "Anonymous";
+
+const COLS = "150px 190px minmax(0, 1fr) 90px 84px";
 
 const ViewMessages = () => {
   const { token }    = useAuth();
@@ -16,10 +29,7 @@ const ViewMessages = () => {
 
   const fetchMessages = async () => {
     try {
-      const { data } = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/messages`,
-        authHeader
-      );
+      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/messages`, authHeader);
       setMessages(data.messages || data);
     } catch {
       toast.error("Failed to fetch messages.");
@@ -28,28 +38,19 @@ const ViewMessages = () => {
     }
   };
 
-  useEffect(() => { fetchMessages(); }, []);
+  useEffect(() => { fetchMessages(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const markRead = async (id) => {
     try {
-      await axios.patch(
-        `${import.meta.env.VITE_API_URL}/api/messages/${id}/read`,
-        {},
-        authHeader
-      );
-      setMessages((prev) =>
-        prev.map((m) => m._id === id ? { ...m, read: true } : m)
-      );
-    } catch {}
+      await axios.patch(`${import.meta.env.VITE_API_URL}/api/messages/${id}/read`, {}, authHeader);
+      setMessages((prev) => prev.map((m) => (m._id === id ? { ...m, read: true } : m)));
+    } catch { /* non-critical */ }
   };
 
   const deleteMsg = async (id) => {
     if (!window.confirm("Delete this message?")) return;
     try {
-      await axios.delete(
-        `${import.meta.env.VITE_API_URL}/api/messages/${id}`,
-        authHeader
-      );
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/messages/${id}`, authHeader);
       toast.success("Message deleted.");
       setMessages((prev) => prev.filter((m) => m._id !== id));
       if (selected?._id === id) setSelected(null);
@@ -63,310 +64,101 @@ const ViewMessages = () => {
     if (!msg.read) markRead(msg._id);
   };
 
-  const timeAgo = (date) => {
-    const diff = Date.now() - new Date(date).getTime();
-    const h = Math.floor(diff / 3.6e6);
-    const d = Math.floor(h / 24);
-    if (d > 0) return `${d}d ago`;
-    if (h > 0) return `${h}h ago`;
-    return "Just now";
-  };
-
-  const filtered = messages.filter((m) => {
-    if (filter === "unread") return !m.read;
-    if (filter === "read")   return m.read;
-    return true;
-  });
-
+  const filtered = messages.filter((m) => (filter === "unread" ? !m.read : filter === "read" ? m.read : true));
   const unreadCount = messages.filter((m) => !m.read).length;
+
+  // Selected message, kept in sync with the list (e.g. after it is marked read)
+  const current = selected ? messages.find((m) => m._id === selected._id) || selected : null;
 
   return (
     <div>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">
-            Messages Inbox
-          </h1>
-          <p className="text-xs text-white/35 mt-1">
-            {messages.length} total ·{" "}
-            <span className="text-pink-400 font-semibold">
-              {unreadCount} unread
-            </span>
-          </p>
-        </div>
-        {/* Filter tabs */}
-        <div className="flex gap-1.5 p-1 rounded-[12px]
-          bg-white/4 border border-white/8">
-          {[
-            { key: "all",    label: "All"    },
-            { key: "unread", label: "Unread" },
-            { key: "read",   label: "Read"   },
-          ].map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setFilter(key)}
-              className={`px-4 py-1.5 rounded-[9px] text-xs font-semibold
-                transition-all
-                ${filter === key
-                  ? "bg-violet-500/20 text-violet-300"
-                  : "text-white/40 hover:text-white/70"
-                }`}
-            >
-              {label}
-              {key === "unread" && unreadCount > 0 && (
-                <span className="ml-1.5 px-1.5 py-0.5 rounded-full
-                  bg-pink-500/30 text-pink-400 text-[9px]">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Inbox" icon={MessageSquare} title="Messages Inbox"
+        sub={<>{messages.length} total · <span style={{ color: "var(--accent)", fontWeight: 600 }}>{unreadCount} unread</span></>}
+        action={
+          <div className="adm-tabs" role="group" aria-label="Filter messages">
+            {[{ key: "all", label: "All" }, { key: "unread", label: "Unread" }, { key: "read", label: "Read" }].map(({ key, label }) => (
+              <button key={key} type="button" className="adm-tab" aria-pressed={filter === key} onClick={() => setFilter(key)}>
+                {label}{key === "unread" && unreadCount > 0 && <span className="adm-count">{unreadCount}</span>}
+              </button>
+            ))}
+          </div>
+        }
+      />
 
-      {/* Message list */}
       {loading ? (
-        <div className="text-center py-20 text-white/30 text-sm">
-          Loading messages...
-        </div>
+        <div className="adm-load"><Spinner size={28}/></div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-20 text-white/30 text-sm">
-          No messages in this category.
-        </div>
+        <div className="adm-card adm-empty"><MessageSquare size={28} aria-hidden="true"/>No messages in this category.</div>
       ) : (
         <>
           {/* Desktop table */}
-          <div className="hidden md:block glass-card overflow-hidden">
-          {/* Head */}
-          <div className="grid px-5 py-3 border-b border-white/7
-            text-[10px] font-semibold uppercase tracking-[1.5px]
-            text-white/28"
-            style={{ gridTemplateColumns: "140px 160px 1fr 90px 80px" }}>
-            <span>From</span>
-            <span>Email</span>
-            <span>Message</span>
-            <span>Time</span>
-            <span>Actions</span>
+          <div className="adm-card adm-table" style={{ "--cols": COLS }}>
+            <div className="adm-row adm-row--head"><span>From</span><span>Email</span><span>Message</span><span>Time</span><span>Actions</span></div>
+            <AnimatePresence>
+              {filtered.map((m) => (
+                <motion.div key={m._id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -16 }}
+                  role="button" tabIndex={0} aria-label={`Open message from ${who(m)}`}
+                  onClick={() => openMessage(m)}
+                  onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openMessage(m); } }}
+                  className={`adm-row adm-row--click${!m.read ? " adm-row--unread" : ""}`}>
+                  <div style={{ minWidth: 0 }}>
+                    <p className="adm-row__t adm-trunc" style={{ color: m.read ? "#aeb3ba" : "#fff" }}>{who(m)}</p>
+                    {!m.read && <span style={{ display: "inline-block", marginTop: 6 }}><Pill tone="orange">Unread</Pill></span>}
+                  </div>
+                  <p className="adm-row__s adm-trunc" style={{ margin: 0 }}>{m.email}</p>
+                  <p className="adm-row__s adm-trunc" style={{ margin: 0, color: "#aeb3ba" }}><span style={{ color: "#d4d4d4" }}>{m.subject} — </span>{m.message}</p>
+                  <span className="adm-time">{timeAgo(m.createdAt)}</span>
+                  <RowActions m={m} onView={openMessage} onDelete={deleteMsg} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
 
-          <AnimatePresence>
-            {filtered.map((m, i) => (
-              <motion.div
-                key={m._id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1,  y: 0  }}
-                exit={{ opacity: 0,      x: -20 }}
-                transition={{ delay: i * 0.04 }}
-                onClick={() => openMessage(m)}
-                className={`grid px-5 py-4 border-b border-white/5
-                  hover:bg-white/3 transition-colors items-center cursor-pointer
-                  ${!m.read ? "bg-violet-500/4" : ""}`}
-                style={{ gridTemplateColumns: "140px 160px 1fr 90px 80px" }}
-              >
-                {/* Name */}
-                <div>
-                  <p className={`text-sm font-bold
-                    ${!m.read ? "text-white" : "text-white/65"}`}>
-                    {m.name}
-                  </p>
-                  {!m.read && (
-                    <span className="inline-flex items-center gap-1 mt-1
-                      px-2 py-0.5 rounded-full text-[9px] font-semibold
-                      bg-pink-500/15 border border-pink-500/25 text-pink-400">
-                      Unread
-                    </span>
-                  )}
-                </div>
-
-                {/* Email */}
-                <p className="text-[11px] text-white/40 truncate">{m.email}</p>
-
-                {/* Preview */}
-                <p className="text-xs text-white/45 truncate pr-4">
-                  <span className="text-white/55">{m.subject} — </span>
-                  {m.message}
-                </p>
-
-                {/* Time */}
-                <p className="text-[11px] text-white/30 font-mono">
-                  {timeAgo(m.createdAt)}
-                </p>
-
-                {/* Actions */}
-                <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    onClick={() => openMessage(m)}
-                    aria-label={`View message from ${m.name}`}
-                    className="w-7 h-7 rounded-[8px] bg-cyan-500/10
-                      border border-cyan-500/22 flex items-center
-                      justify-center text-cyan-400
-                      hover:bg-cyan-500/20 transition-all">
-                    <Eye size={12}/>
-                  </button>
-                  <button
-                    onClick={() => deleteMsg(m._id)}
-                    aria-label={`Delete message from ${m.name}`}
-                    className="w-7 h-7 rounded-[8px] bg-red-500/10
-                      border border-red-500/22 flex items-center
-                      justify-center text-red-400
-                      hover:bg-red-500/20 transition-all">
-                    <Trash2 size={12}/>
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-
-        {/* Mobile card layout */}
-        <div className="md:hidden flex flex-col gap-3">
-          {filtered.map((m) => (
-            <div
-              key={m._id}
-              onClick={() => openMessage(m)}
-              className={`glass-card p-4 cursor-pointer
-                ${!m.read ? "border-l-2 border-l-pink-500/50" : ""}`}
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className={`text-sm font-bold truncate
-                      ${!m.read ? "text-white" : "text-white/65"}`}>
-                      {m.name}
-                    </p>
-                    {!m.read && (
-                      <span className="px-1.5 py-0.5 rounded-full text-[8px] font-bold
-                        bg-pink-500/15 border border-pink-500/25 text-pink-400 flex-shrink-0">
-                        NEW
-                      </span>
-                    )}
+          {/* Mobile cards */}
+          <div className="adm-cards">
+            {filtered.map((m) => (
+              <div key={m._id} role="button" tabIndex={0} aria-label={`Open message from ${who(m)}`} onClick={() => openMessage(m)}
+                onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openMessage(m); } }}
+                className={`adm-card adm-cardrow${!m.read ? " adm-cardrow--unread" : ""}`} style={{ cursor: "pointer" }}>
+                <div className="adm-cardrow__top">
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <p className="adm-row__t adm-trunc" style={{ color: m.read ? "#aeb3ba" : "#fff" }}>{who(m)} {!m.read && <Pill tone="orange">NEW</Pill>}</p>
+                    <p className="adm-row__s adm-trunc">{m.email}</p>
                   </div>
-                  <p className="text-[11px] text-white/35 truncate mt-0.5">{m.email}</p>
+                  <span className="adm-time">{timeAgo(m.createdAt)}</span>
                 </div>
-                <span className="text-[10px] text-white/25 font-mono flex-shrink-0 ml-2">
-                  {timeAgo(m.createdAt)}
-                </span>
+                <p className="adm-row__s" style={{ margin: "0 0 12px", color: "#aeb3ba" }}>
+                  <strong style={{ color: "#d4d4d4" }}>{m.subject}</strong> — {m.message?.length > 80 ? `${m.message.slice(0, 80)}…` : m.message}
+                </p>
+                <RowActions m={m} onView={openMessage} onDelete={deleteMsg} />
               </div>
-              <p className="text-xs text-white/50 mb-3">
-                <span className="text-white/60 font-semibold">{m.subject}</span>
-                {" — "}{m.message?.slice(0, 80)}...
-              </p>
-              <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                <button
-                  onClick={() => openMessage(m)}
-                  aria-label={`View message from ${m.name}`}
-                  className="w-7 h-7 rounded-[8px] bg-cyan-500/10
-                    border border-cyan-500/22 flex items-center
-                    justify-center text-cyan-400
-                    hover:bg-cyan-500/20 transition-all">
-                  <Eye size={12}/>
-                </button>
-                <button
-                  onClick={() => deleteMsg(m._id)}
-                  aria-label={`Delete message from ${m.name}`}
-                  className="w-7 h-7 rounded-[8px] bg-red-500/10
-                    border border-red-500/22 flex items-center
-                    justify-center text-red-400
-                    hover:bg-red-500/20 transition-all">
-                  <Trash2 size={12}/>
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
         </>
       )}
 
-      {/* Message Detail Modal */}
       <AnimatePresence>
-        {selected && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }}
-            onClick={(e) => e.target === e.currentTarget && setSelected(null)}
+        {current && (
+          <Modal
+            title={current.subject || "Message"} subtitle={`Received ${new Date(current.createdAt).toLocaleString()}`}
+            onClose={() => setSelected(null)} width={560}
+            footer={<>
+              <button type="button" onClick={() => deleteMsg(current._id)} className="adm-btn adm-btn--danger" aria-label="Delete message"><Trash2 size={14} aria-hidden="true"/> Delete</button>
+              <a href={`mailto:${current.email}?subject=${encodeURIComponent(`Re: ${current.subject || ""}`)}`} className="adm-btn adm-btn--primary"><Mail size={14} aria-hidden="true"/> REPLY VIA EMAIL</a>
+            </>}
           >
-            <motion.div
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1,    y: 0  }}
-              exit={{ scale: 0.95,    y: 20 }}
-              className="w-full max-w-lg glass-card p-8 relative"
-            >
-              {/* Close */}
-              <button
-                onClick={() => setSelected(null)}
-                className="absolute top-5 right-5 w-8 h-8 rounded-full
-                  bg-white/8 border border-white/12 flex items-center
-                  justify-center text-white/50 hover:text-white
-                  hover:bg-white/15 transition-all">
-                <X size={14}/>
-              </button>
-
-              {/* Sender info */}
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br
-                  from-violet-600 to-cyan-500 flex items-center justify-center
-                  text-lg font-bold flex-shrink-0">
-                  {selected.name[0].toUpperCase()}
-                </div>
-                <div>
-                  <p className="text-base font-bold">{selected.name}</p>
-                  <p className="text-xs text-violet-300 mt-0.5">{selected.email}</p>
-                </div>
-                <div className="ml-auto flex items-center gap-1.5 px-3 py-1.5
-                  rounded-full bg-green-500/10 border border-green-500/25
-                  text-green-400 text-[10px] font-semibold">
-                  <CheckCheck size={11}/> Read
-                </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18, flexWrap: "wrap" }}>
+              <span className="adm-avatar adm-avatar--md" aria-hidden="true">{current.name?.[0]?.toUpperCase() ?? "?"}</span>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <p style={{ margin: 0, font: "700 15px/1.3 var(--sans)" }}>{who(current)}</p>
+                <p className="adm-trunc" style={{ margin: "3px 0 0", font: "400 12px/1.2 var(--mono)", color: "var(--blue)" }}>{current.email}</p>
               </div>
-
-              {/* Subject */}
-              <div className="mb-4 p-3 rounded-[12px] bg-white/5
-                border border-white/9">
-                <p className="text-[10px] text-white/28 uppercase
-                  tracking-[1px] mb-1">
-                  Subject
-                </p>
-                <p className="text-sm font-semibold">{selected.subject}</p>
-              </div>
-
-              {/* Message body */}
-              <div className="p-4 rounded-[14px] bg-white/4 border border-white/8
-                mb-6">
-                <p className="text-sm text-white/65 leading-relaxed">
-                  {selected.message}
-                </p>
-              </div>
-
-              {/* Time */}
-              <p className="text-[11px] text-white/25 mb-5">
-                Received: {new Date(selected.createdAt).toLocaleString()}
-              </p>
-
-              {/* Actions */}
-              <div className="flex gap-3">
-                <a
-                  href={`mailto:${selected.email}?subject=Re: ${selected.subject}`}
-                  className="flex-1 flex items-center justify-center gap-2
-                    py-2.5 rounded-[12px] text-sm font-semibold
-                    btn-primary-glass"
-                >
-                  <Mail size={14}/> Reply via Email
-                </a>
-                <button
-                  onClick={() => deleteMsg(selected._id)}
-                  className="px-5 py-2.5 rounded-[12px] text-sm font-semibold
-                    bg-red-500/10 border border-red-500/22 text-red-400
-                    hover:bg-red-500/20 transition-all"
-                >
-                  <Trash2 size={14}/>
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
+              <Pill tone="green"><CheckCheck size={11} aria-hidden="true"/> Read</Pill>
+            </div>
+            <div className="adm-meta" style={{ marginBottom: 14 }}><small>Subject</small><p>{current.subject}</p></div>
+            <div className="adm-msgbox">{current.message}</div>
+          </Modal>
         )}
       </AnimatePresence>
     </div>

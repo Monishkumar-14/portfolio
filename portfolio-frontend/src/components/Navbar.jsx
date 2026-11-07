@@ -1,208 +1,150 @@
-import { useState, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Moon, Sun, Menu, X } from "lucide-react";
-import { useTheme } from "../context/ThemeContext";
-import { useActiveSection } from "../context/ActiveSectionContext";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { Code2, Terminal, Cpu, GitBranch, FolderOpen, BookOpen, Mail } from "lucide-react";
+import { useMediaQuery } from "../utils/useMediaQuery";
+import "./Navbar.css";
 
-
-const navLinks = [
-  { label: "Home",         href: "#home"         },
-  { label: "About",        href: "#about"        },
-  { label: "Experience",   href: "#experience"   },
-  { label: "Projects",     href: "#projects"     },
-  { label: "Certificates", href: "#certificates" },
-  { label: "Resume",       href: "#resume"       },
-  { label: "Chatbot",      href: "#chatbot"      },
-  { label: "Contact",      href: "#contact"      },
+/* Single source of truth for navigation: a fixed vertical rail on the right.
+   Only the active section shows its full icon; every other section is a small dot on the line.
+   Order = page order. `id` must match the section element's id. */
+const SECTIONS = [
+  { id: "home",         label: "Home",         Icon: Code2 },
+  { id: "about",        label: "About",        Icon: Terminal },
+  { id: "skills",       label: "Skills",       Icon: Cpu },
+  { id: "experience",   label: "Experience",   Icon: GitBranch },
+  { id: "projects",     label: "Projects",     Icon: FolderOpen },
+  { id: "certificates", label: "Certificates", Icon: BookOpen },
+  { id: "contact",      label: "Contact",      Icon: Mail },
 ];
 
-// iOS spring — used everywhere for menu open/close
-const iosSpring = { type: "spring", stiffness: 420, damping: 32, mass: 0.9 };
+// A section becomes "active" when it crosses a thin band through the middle of the viewport.
+const IO_OPTIONS = { rootMargin: "-45% 0px -50% 0px", threshold: 0 };
+const UNLOCK_FALLBACK_MS = 1200;
+
+const prefersReducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 const Navbar = () => {
-  const { isDark, toggleTheme } = useTheme();
-  const activeSection = useActiveSection();
+  const isMobile = useMediaQuery("(max-width: 767px)"); // phones use MobileTabBar instead; never both
+  const [active, setActive] = useState("home");
+  const [present, setPresent] = useState(() => new Set(["home"])); // ids whose target exists in the page
 
-  const [menuOpen, setMenuOpen] = useState(false);
+  const visibleRef = useRef(new Set());   // sections currently crossing the band
+  const lockRef = useRef(false);          // true while a click-initiated smooth scroll is running
+  const lockTimer = useRef(null);
+  const observedRef = useRef(new Map());  // id -> element being observed
 
-  // ── Touch-swipe state ──────────────────────────────────────────
-  const touchStartY = useRef(0);
-  const touchStartX = useRef(0);
-
-  // ── Smooth scroll handler for <a> clicks ───────────────────────
-  const handleNavClick = useCallback((e, href) => {
-    e.preventDefault();
-    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
-    setMenuOpen(false);
-    // Update URL hash without jumping
-    window.history.pushState(null, "", href);
+  /* Pick the active section from what is currently crossing the band (latest in page order wins). */
+  const recompute = useCallback(() => {
+    let next = "home";
+    for (const { id } of SECTIONS) if (visibleRef.current.has(id)) next = id;
+    setActive((prev) => (prev === next ? prev : next));
   }, []);
 
-  // ── iOS swipe handlers ─────────────────────────────────────────
-  const handleTouchStart = (e) => {
-    touchStartY.current = e.touches[0].clientY;
-    touchStartX.current = e.touches[0].clientX;
-  };
+  const unlock = useCallback(() => {
+    clearTimeout(lockTimer.current);
+    if (!lockRef.current) return;
+    lockRef.current = false;
+    recompute();
+  }, [recompute]);
 
-  const handleTouchEnd = (e) => {
-    const dy = e.changedTouches[0].clientY - touchStartY.current;
-    const dx = Math.abs(e.changedTouches[0].clientX - touchStartX.current);
-    if (Math.abs(dy) > dx) {                     // more vertical than horizontal
-      if (dy >  44 && !menuOpen) setMenuOpen(true);   // swipe down → open
-      if (dy < -44 &&  menuOpen) setMenuOpen(false);  // swipe up   → close
+  /* Observe every section that exists. Sections that mount later (lazy loading) are picked up by a
+     short-lived MutationObserver; no scroll listeners are used. */
+  useEffect(() => {
+    if (isMobile) return undefined;          // no observer on phones: MobileTabBar uses the app's ActiveSectionContext
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) visibleRef.current.add(e.target.id);
+        else visibleRef.current.delete(e.target.id);
+      }
+      if (!lockRef.current) recompute(); // ignore intermediate sections while auto-scrolling
+    }, IO_OPTIONS);
+
+    const scan = () => {
+      const found = new Set(["home"]);
+      for (const { id } of SECTIONS) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        found.add(id);
+        if (observedRef.current.get(id) !== el) {
+          observedRef.current.get(id) && io.unobserve(observedRef.current.get(id));
+          observedRef.current.set(id, el);
+          io.observe(el);
+        }
+      }
+      setPresent((prev) => (prev.size === found.size && [...found].every((i) => prev.has(i)) ? prev : found));
+      return found.size === SECTIONS.length;
+    };
+
+    let mo = null, stopTimer = null;
+    if (!scan()) {
+      let raf = 0;
+      mo = new MutationObserver(() => {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => { if (scan()) { mo.disconnect(); clearTimeout(stopTimer); } });
+      });
+      mo.observe(document.body, { childList: true, subtree: true });
+      stopTimer = setTimeout(() => mo?.disconnect(), 10000);
     }
-  };
+
+    const warnTimer = setTimeout(() => {
+      if (import.meta.env?.DEV) {
+        const missing = SECTIONS.filter(({ id }) => id !== "home" && !document.getElementById(id)).map((s) => `#${s.id}`);
+        if (missing.length) console.warn("[Navbar] No section found for:", missing.join(", "), "— those links are hidden.");
+      }
+    }, 3000);
+
+    return () => {
+      io.disconnect(); mo?.disconnect();
+      clearTimeout(stopTimer); clearTimeout(warnTimer); clearTimeout(lockTimer.current);
+      observedRef.current.clear(); visibleRef.current.clear();
+      window.removeEventListener("scrollend", unlock);
+    };
+  }, [recompute, unlock, isMobile]);
+
+  const handleNavClick = useCallback((e, id) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    const behavior = prefersReducedMotion() ? "auto" : "smooth";
+    if (el) el.scrollIntoView({ behavior, block: "start" });
+    else if (id === "home") window.scrollTo({ top: 0, behavior });
+    else return;
+    setActive(id);                       // immediate feedback
+    lockRef.current = true;              // hold the highlight until the scroll finishes
+    clearTimeout(lockTimer.current);
+    lockTimer.current = setTimeout(unlock, UNLOCK_FALLBACK_MS);
+    window.addEventListener("scrollend", unlock, { once: true });
+    window.history.pushState(null, "", `#${id}`);
+  }, [unlock]);
+
+  const items = useMemo(() => SECTIONS.filter(({ id }) => present.has(id)), [present]);
+
+  if (isMobile) return null;
 
   return (
-    <motion.nav
-      initial={{ y: -80, opacity: 0 }}
-      animate={{ y: 0,   opacity: 1 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      className="hidden md:fixed md:block top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-48px)] max-w-4xl"
-    >
-      {/* ── Floating pill ── */}
-      <div className="glass-nav flex items-center justify-between px-5 h-14 rounded-full">
-
-        {/* Logo — now an <a> tag */}
-        <a
-          href="#home"
-          onClick={(e) => handleNavClick(e, "#home")}
-          className="text-lg font-bold tracking-tight flex-shrink-0"
-          style={{ color: "var(--nav-logo)" }}
-        >
-          Monish<span className="text-violet-400">.</span>
-        </a>
-
-        {/* Desktop links — <a> tags for SEO + right-click support */}
-        <ul className="hidden md:flex items-center gap-0.5">
-          {navLinks.map(({ label, href }) => {
-            const isActive = activeSection === href.replace("#", "");
-            return (
-              <li key={label}>
-                <a
-                  href={href}
-                  onClick={(e) => handleNavClick(e, href)}
-                  className={`relative px-3 py-1.5 rounded-full text-[13px] font-medium
-                    transition-all duration-200
-                    ${isActive
-                      ? "bg-violet-500/20 text-violet-300 border border-violet-500/30 shadow-[0_0_12px_rgba(124,58,237,0.2)]"
-                      : "hover:bg-violet-500/8"
-                    }`}
-                  style={{ color: isActive ? undefined : "var(--nav-text)" }}
-                >
-                  {label}
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-
-        {/* Right controls */}
-        <div className="flex items-center gap-1.5 flex-shrink-0">
-          <motion.button
-            whileTap={{ scale: 0.88 }}
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            className="w-8 h-8 flex items-center justify-center rounded-full
-              border transition-all"
-            style={{
-              background: "var(--badge-bg)",
-              borderColor: "var(--border-card)",
-              color: "var(--nav-text)",
-            }}
-          >
-            {isDark ? <Sun size={14}/> : <Moon size={14}/>}
-          </motion.button>
-
-          {/* Hamburger — animated icon swap */}
-          <motion.button
-            whileTap={{ scale: 0.88 }}
-            onClick={() => setMenuOpen((o) => !o)}
-            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
-            className="md:hidden w-8 h-8 flex items-center justify-center rounded-full
-              border"
-            style={{
-              background: "var(--badge-bg)",
-              borderColor: "var(--border-card)",
-              color: "var(--text-primary)",
-            }}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {menuOpen
-                ? <motion.span key="x"
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{ duration: 0.18 }}>
-                    <X size={15}/>
-                  </motion.span>
-                : <motion.span key="menu"
-                    initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: -90, opacity: 0 }}
-                    transition={{ duration: 0.18 }}>
-                    <Menu size={15}/>
-                  </motion.span>
-              }
-            </AnimatePresence>
-          </motion.button>
-        </div>
-      </div>
-
-      {/* ── Mobile dropdown — iOS spring ── */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, scaleY: 0.88, y: -12 }}
-            animate={{ opacity: 1, scaleY: 1,    y: 0   }}
-            exit={{    opacity: 0, scaleY: 0.88,  y: -12 }}
-            transition={iosSpring}
-            className="mt-2 rounded-3xl p-3 flex flex-col gap-0.5"
-            style={{
-              transformOrigin: "top center",
-              background: isDark ? "rgba(10,10,26,0.75)" : "rgba(255,255,255,0.90)",
-              backdropFilter: "blur(40px) saturate(180%)",
-              WebkitBackdropFilter: "blur(40px) saturate(180%)",
-              border: `1px solid ${isDark ? "rgba(255,255,255,0.10)" : "rgba(124,58,237,0.15)"}`,
-              boxShadow: isDark
-                ? "0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)"
-                : "0 20px 60px rgba(124,58,237,0.08), inset 0 1px 0 rgba(255,255,255,0.5)",
-            }}
-          >
-            {/* Swipe-to-close hint bar */}
-            <div className="w-9 h-1 rounded-full mx-auto mb-2"
-              style={{ background: isDark ? "rgba(255,255,255,0.20)" : "rgba(30,27,75,0.15)" }} />
-
-            {navLinks.map(({ label, href }, i) => {
-              const isActive = activeSection === href.replace("#", "");
-              return (
-                <motion.a
-                  key={label}
-                  href={href}
-                  initial={{ opacity: 0, x: -16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.04, ...iosSpring }}
-                  onClick={(e) => handleNavClick(e, href)}
-                  className={`text-left px-4 py-3.5 rounded-2xl text-sm font-medium transition-all block
-                    ${isActive
-                      ? "bg-violet-500/20 text-violet-300"
-                      : ""
-                    }`}
-                  style={{
-                    color: isActive ? undefined : (isDark ? "rgba(255,255,255,0.60)" : "rgba(30,27,75,0.60)"),
-                  }}
-                >
-                  {label}
-                </motion.a>
-              );
-            })}
-
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.nav>
+    <nav className="vnav" aria-label="Section navigation">
+      <ul className="vnav__list">
+        <li className="vnav__line" aria-hidden="true" />
+        {items.map(({ id, label, Icon }) => {
+          const isActive = active === id;
+          return (
+            <li key={id} className={`vnav__item${isActive ? " is-active" : ""}`}>
+              <a
+                href={`#${id}`}
+                className="vnav__btn"
+                aria-label={label}
+                aria-current={isActive ? "location" : undefined}
+                onClick={(e) => handleNavClick(e, id)}
+              >
+                {/* One element per section: a small dot when inactive, the full icon when active */}
+                <span className="vnav__dot" aria-hidden="true">
+                  <Icon size={20} strokeWidth={1.6} />
+                </span>
+                <span className="vnav__label" aria-hidden="true">{">"} {label}</span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
   );
 };
 

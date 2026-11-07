@@ -1,20 +1,13 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
-  MapPin, Calendar, Clock, ChevronDown, ExternalLink, Download,
-  Building2, Cpu, FileText, Database, Layers, Zap,
-  BadgeCheck, BrainCircuit, Code2
+  MapPin, Calendar, Clock, ChevronDown, ExternalLink, Download, FileText, Database,
+  BrainCircuit, GitCommit, GitBranch, ArrowRight, GraduationCap, Code2, Rocket,
+  Briefcase, Hourglass, BookOpen,
 } from "lucide-react";
+import "./Sections.css";
+import "./Experience.css";
 
-// ── Animation helpers ─────────────────────────────────────────────
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 40 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.7, delay, ease: "easeOut" },
-});
-
-// ── AZ Logo SVG (official icon) ───────────────────────────────────
 const AZLogo = ({ size = 32 }) => (
   <svg width={size} height={size} viewBox="0 0 95.4 115.5" fill="none">
     <path
@@ -24,354 +17,268 @@ const AZLogo = ({ size = 32 }) => (
   </svg>
 );
 
-// ── Tech stack pills ──────────────────────────────────────────────
-const TECH = [
-  { label: "RAG Pipeline",     cls: "bg-violet-500/15 border-violet-500/30 text-violet-300" },
-  { label: "LangChain",        cls: "bg-blue-500/12  border-blue-500/28  text-blue-300"    },
-  { label: "Vector DB",        cls: "bg-cyan-500/12  border-cyan-500/28  text-cyan-300"    },
-  { label: "Python",           cls: "bg-amber-500/12 border-amber-500/28 text-amber-300"   },
-  { label: "Ollama models",       cls: "bg-green-500/10 border-green-500/25 text-green-400"   },
-  { label: "Document Parsing", cls: "bg-pink-500/12  border-pink-500/28  text-pink-300"    },
-  { label: "Embeddings",       cls: "bg-violet-500/12 border-violet-500/28 text-violet-300"},
-  { label: "NLP",              cls: "bg-cyan-500/10  border-cyan-500/25  text-cyan-300"    },
+
+/* ─────────────────────────────────────────────────────────────
+   Timeline data. Order = top → bottom (chronological).
+   Cards alternate left/right automatically.
+   Only facts from your source files / brief; no invented stats.
+   ───────────────────────────────────────────────────────────── */
+const KINDS = {
+  education: { label: "Education", Icon: GraduationCap },
+  learning: { label: "Technical development", Icon: Code2 },
+  projects: { label: "Projects", Icon: Rocket },
+  industry: { label: "Professional internship", Icon: Briefcase },
+  upcoming: { label: "Upcoming milestone", Icon: Hourglass },
+};
+
+const LETTER = "/Internship Completion letter- Monishkumar E M.pdf";
+
+const MILESTONES = [
+  {
+    id: "init_2023", kind: "education", branch: "education",
+    date: "Aug 2023 – Present", dateTime: "2023-08",
+    title: "B.Tech Information Technology",
+    org: "College of Engineering, Guindy — Anna University", orgShort: "CEG · Anna University",
+    description:
+      "Started my undergraduate journey in Information Technology, building a foundation in programming, computer science, problem-solving and software development.",
+    chips: ["Programming", "Computer Science", "Problem Solving", "Software Development"],
+    footer: [
+      { icon: GraduationCap, text: "4-year B.Tech programme" },
+      { icon: BookOpen, text: "CGPA 8.2 / 10", tone: "ok" },
+    ],
+  },
+  {
+    id: "foundations_2024", kind: "learning", branch: "learning",
+    date: "2024", dateTime: "2024",
+    title: "Building Technical Foundations",
+    orgShort: "CEG · Anna University",
+    description:
+      "Developed core programming and computer science knowledge through coursework, practical assignments and technical exploration.",
+    chips: ["Python", "Java", "C++", "SQL"],
+    footer: [{ icon: BookOpen, text: "Coursework · assignments · exploration" }],
+  },
+  {
+    id: "projects_2025", kind: "projects", branch: "projects",
+    date: "2025", dateTime: "2025",
+    title: "Software Development & AI/ML Projects",
+    orgShort: "Portfolio projects",
+    description:
+      "Applied my technical knowledge to practical projects involving full-stack development, databases, backend systems and machine learning.",
+    chips: ["React", "Node.js", "FastAPI", "PostgreSQL", "Machine Learning"],
+    footer: [{ icon: Rocket, text: "See the Projects section", href: "#projects" }],
+  },
+  {
+    id: "astrazeneca_2026", kind: "industry", branch: "industry", featured: true,
+    date: "18 May 2026 – 17 Jul 2026", dateTime: "2026-05-18",
+    title: "AstraZeneca India Pvt. Ltd.",
+    orgShort: "AstraZeneca · Chennai",
+    department: "GITC · Enterprise Technology Solutions (ETS)",
+    role: "Junior Data Analyst Intern",
+    meta: [
+      { icon: MapPin, text: "Chennai, India" },
+      { icon: Calendar, text: "18 May – 17 Jul 2026" },
+      { icon: Clock, text: "2 months" },
+    ],
+    description:
+      "Worked with the Enterprise Technology Solutions team on enterprise AI and data intelligence solutions, including an internal document assistant using Retrieval-Augmented Generation and an enterprise data analytics platform for ServiceNow data.",
+    blocks: [
+      {
+        icon: BrainCircuit, title: "Enterprise RAG Assistant",
+        points: [
+          "Developed an AI-powered assistant for querying internal enterprise documents.",
+          "Worked with document ingestion, retrieval and LLM-based response generation.",
+        ],
+      },
+      {
+        icon: Database, title: "Enterprise Data Intelligence Platform",
+        points: [
+          "Processed ServiceNow CSV exports.",
+          "Used data processing and database workflows.",
+          "Implemented natural-language-to-SQL queries.",
+          "Presented analytical insights as text and visual outputs.",
+        ],
+      },
+    ],
+    breakdown: [
+      { title: "Document ingestion", detail: "Parsed internal documents — extracted clean text and split it into semantically meaningful chunks." },
+      { title: "Vector embedding & indexing", detail: "Generated dense embeddings and stored them in a vector database for fast similarity search." },
+      { title: "Retrieval pipeline", detail: "Top-k most relevant chunks retrieved using cosine similarity." },
+      { title: "LLM-powered generation", detail: "Retrieved context injected into prompts sent to an LLM for grounded responses." },
+      { title: "Chatbot interface", detail: "Conversational UI for ETS department employees to query the knowledge base." },
+    ],
+    chips: ["RAG", "LangChain", "Qdrant", "Python", "Ollama", "FastAPI", "PostgreSQL", "NLP", "NL2SQL"],
+    actions: [
+      { label: "Download Letter", icon: Download, href: LETTER, download: true },
+      { label: "View PDF", icon: ExternalLink, href: LETTER, external: true, ghost: true },
+    ],
+  },
+  {
+    id: "graduation_2027", kind: "upcoming", branch: "next", upcoming: true,
+    date: "Expected May 2027", dateTime: "2027-05",
+    title: "B.Tech Graduation — Expected",
+    org: "College of Engineering, Guindy — Anna University", orgShort: "CEG · Anna University",
+    description:
+      "Expected completion of my undergraduate degree in Information Technology at College of Engineering, Guindy, Anna University.",
+    footer: [{ icon: Hourglass, text: "Upcoming — not yet completed", tone: "warn" }],
+  },
 ];
 
-// ── Highlights ────────────────────────────────────────────────────
-const HIGHLIGHTS = [
-  {
-    Icon: FileText,
-    iconCls: "text-violet-400",
-    bgCls: "bg-violet-500/12 border-violet-500/28",
-    title: "100+ Documents Processed",
-    desc: "Ingested and indexed a large corpus of internal company documents for intelligent retrieval.",
-  },
-  {
-    Icon: BrainCircuit,
-    iconCls: "text-cyan-400",
-    bgCls: "bg-cyan-500/12 border-cyan-500/28",
-    title: "RAG Architecture",
-    desc: "Built a Retrieval-Augmented Generation pipeline combining vector search with LLM generation for accurate, grounded answers.",
-  },
-  {
-    Icon: Layers,
-    iconCls: "text-pink-400",
-    bgCls: "bg-pink-500/12 border-pink-500/28",
-    title: "ETS Department",
-    desc: "Worked within the Enterprise Technology Solutions team, delivering an internal AI tool for knowledge management.",
-  },
-  {
-    Icon: Zap,
-    iconCls: "text-amber-400",
-    bgCls: "bg-amber-500/10 border-amber-500/25",
-    title: "Context-Aware Chatbot",
-    desc: "The chatbot retrieves relevant document chunks and generates responses grounded in AstraZeneca's own knowledge base.",
-  },
-];
+const scrollToHash = (e, href) => {
+  if (!href?.startsWith("#")) return;
+  const el = document.querySelector(href);
+  if (el) { e.preventDefault(); el.scrollIntoView({ behavior: "smooth" }); }
+};
 
-// ── Main Component ────────────────────────────────────────────────
-const Experience = () => {
-  const [expanded, setExpanded] = useState(false);
-
+const Breakdown = ({ steps }) => {
+  const [open, setOpen] = useState(false);
   return (
-    <div className="min-h-screen py-24 px-6">
-      <div className="max-w-6xl mx-auto">
-
-        {/* ── Header ── */}
-        <motion.div {...fadeUp(0)} className="mb-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[3px]
-            text-violet-400 mb-3">
-            02 — Experience
-          </p>
-          <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight
-            leading-tight mb-4">
-            Where I've{" "}
-            <span className="bg-gradient-to-r from-violet-400 via-cyan-400
-              to-pink-400 bg-clip-text text-transparent">
-              Worked
-            </span>
-          </h2>
-          <p className="text-sm text-white/40 leading-relaxed max-w-lg">
-            Real-world experience building AI-powered systems at a global
-            pharmaceutical company.
-          </p>
-        </motion.div>
-
-        {/* ── Stats Strip ── */}
-        <motion.div {...fadeUp(0.08)} className="flex flex-wrap gap-3 mb-12">
-          {[
-            { dot: "bg-violet-500 shadow-[0_0_6px_#7c3aed]", label: "1 Internship"            },
-            { dot: "bg-cyan-400   shadow-[0_0_6px_#06b6d4]", label: "AstraZeneca · Chennai"    },
-            { dot: "bg-pink-400   shadow-[0_0_6px_#ec4899]", label: "AI / ML · Chatbot · RAG"  },
-            { dot: "bg-green-400  shadow-[0_0_6px_#4ade80]", label: "May 2026 – Jul 2026"       },
-          ].map(({ dot, label }) => (
-            <span key={label}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full
-                text-xs font-medium bg-white/5 border border-white/9 text-white/50">
-              <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dot}`}/>
-              {label}
-            </span>
-          ))}
-        </motion.div>
-
-        {/* ── Experience Card ── */}
-        <motion.div {...fadeUp(0.12)}>
-          <div className="glass-card overflow-hidden">
-
-            {/* ── Top Band ── */}
-            <div className="relative border-b border-white/8 overflow-hidden">
-              {/* Ambient glow */}
-              <div className="absolute -top-10 -right-10 w-64 h-64 rounded-full
-                bg-violet-500/6 blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full
-                bg-cyan-500/5 blur-3xl pointer-events-none" />
-
-              <div className="relative p-8 md:p-10">
-                <div className="flex flex-col md:flex-row md:items-start gap-6">
-
-                  {/* Logo + company */}
-                  <div className="flex items-center gap-4 flex-shrink-0">
-                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center
-                      bg-black/40 border border-amber-500/20
-                      shadow-[0_0_32px_rgba(249,176,0,0.2)]">
-                      <AZLogo size={42} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[2.5px]
-                        text-white/30 font-semibold mb-0.5">
-                        Internship
-                      </p>
-                      <h3 className="text-xl font-extrabold text-white tracking-tight">
-                        AstraZeneca
-                      </h3>
-                      <p className="text-xs text-white/40 mt-0.5 font-medium">
-                        Enterprise Technology Solutions (ETS)
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Meta badges */}
-                  <div className="flex flex-wrap gap-2 md:ml-auto items-start">
-                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
-                      text-[11px] font-semibold bg-white/5 border border-white/10 text-white/45">
-                      <MapPin size={10} /> Chennai, India
-                    </span>
-                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
-                      text-[11px] font-semibold bg-white/5 border border-white/10 text-white/45">
-                      <Calendar size={10} /> 18 May – 17 Jul 2026
-                    </span>
-                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
-                      text-[11px] font-semibold bg-white/5 border border-white/10 text-white/45">
-                      <Clock size={10} /> 2 months
-                    </span>
-                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
-                      text-[11px] font-semibold
-                      bg-green-500/10 border border-green-500/25 text-green-400">
-                      <BadgeCheck size={10} /> Completed
-                    </span>
-                  </div>
-                </div>
-
-                {/* Role title */}
-                <div className="mt-6">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Code2 size={14} className="text-violet-400" />
-                    <p className="text-[10px] uppercase tracking-[2px]
-                      text-white/30 font-semibold">
-                      Role
-                    </p>
-                  </div>
-                  <h4 className="text-2xl font-extrabold text-white tracking-tight leading-snug">
-                    Summer Intern —{" "}
-                    <span className="bg-gradient-to-r from-violet-400 to-cyan-400
-                      bg-clip-text text-transparent">
-                      RAG Chatbot Developer
-                    </span>
-                  </h4>
-                </div>
-              </div>
-            </div>
-
-            {/* ── Body ── */}
-            <div className="p-8 md:p-10 space-y-8">
-
-              {/* Summary */}
-              <div>
-                <p className="text-sm text-white/50 leading-relaxed max-w-3xl">
-                  Designed and developed an intelligent document chatbot for AstraZeneca's
-                  internal knowledge base using a Retrieval-Augmented Generation (RAG)
-                  architecture. Processed hundreds of internal documents — converting them
-                  into vector embeddings — enabling employees to query institutional
-                  knowledge conversationally and receive precise, source-grounded answers.
-                </p>
-              </div>
-
-              {/* Highlights grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {HIGHLIGHTS.map(({ Icon, iconCls, bgCls, title, desc }) => (
-                  <motion.div
-                    key={title}
-                    whileHover={{ y: -4 }}
-                    className="flex gap-4 p-5 rounded-2xl bg-white/[0.03]
-                      border border-white/8 hover:border-white/14
-                      transition-all duration-300"
-                  >
-                    <div className={`w-10 h-10 rounded-[12px] flex items-center
-                      justify-center border flex-shrink-0 ${bgCls}`}>
-                      <Icon size={18} className={iconCls} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-white mb-1">{title}</p>
-                      <p className="text-xs text-white/40 leading-relaxed">{desc}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Expandable detail */}
-              <div className="rounded-2xl border border-white/8 overflow-hidden">
-                <button
-                  onClick={() => setExpanded(!expanded)}
-                  className="w-full flex items-center justify-between px-6 py-4
-                    text-xs font-semibold text-white/50 hover:text-white/70
-                    hover:bg-white/4 transition-all duration-200"
-                >
-                  <span className="flex items-center gap-2">
-                    <Database size={13} className="text-violet-400" />
-                    What I built — technical breakdown
-                  </span>
-                  <motion.div
-                    animate={{ rotate: expanded ? 180 : 0 }}
-                    transition={{ duration: 0.25 }}
-                  >
-                    <ChevronDown size={14} />
-                  </motion.div>
-                </button>
-
-                <AnimatePresence>
-                  {expanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.35, ease: "easeInOut" }}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-6 pb-6 border-t border-white/6 pt-5 space-y-4">
-                        {[
-                          {
-                            step: "01",
-                            title: "Document ingestion",
-                            detail: "Parsed 100+ internal company documents (PDFs, Word files) — extracted clean text and split them into semantically meaningful chunks.",
-                          },
-                          {
-                            step: "02",
-                            title: "Vector embedding & indexing",
-                            detail: "Generated dense embeddings for each chunk using an embedding model and stored them in a vector database for fast similarity search.",
-                          },
-                          {
-                            step: "03",
-                            title: "Retrieval pipeline",
-                            detail: "On each user query, the top-k most relevant document chunks are retrieved from the vector store using cosine similarity.",
-                          },
-                          {
-                            step: "04",
-                            title: "LLM-powered generation",
-                            detail: "Retrieved context is injected into a prompt sent to an LLM, which generates a grounded, accurate response citing the company's own documents.",
-                          },
-                          {
-                            step: "05",
-                            title: "Chatbot interface",
-                            detail: "Delivered a conversational UI that employees in the ETS department can use to query internal knowledge without digging through files manually.",
-                          },
-                        ].map(({ step, title, detail }) => (
-                          <div key={step} className="flex gap-4">
-                            <span className="text-[10px] font-mono text-violet-500/60
-                              pt-0.5 flex-shrink-0 w-5">
-                              {step}
-                            </span>
-                            <div>
-                              <p className="text-xs font-bold text-white/70 mb-0.5">{title}</p>
-                              <p className="text-xs text-white/35 leading-relaxed">{detail}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Tech stack */}
-              <div>
-                <p className="text-[10px] uppercase tracking-[2px] text-white/25
-                  font-semibold mb-3">
-                  Technologies Used
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {TECH.map(({ label, cls }) => (
-                    <span key={label}
-                      className={`px-3 py-1.5 rounded-full text-[11px]
-                        font-semibold border ${cls}`}>
-                      {label}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-            </div>
-
-            {/* ── Footer band ── */}
-              <div className="border-t border-white/7 px-8 md:px-10 py-5
-              flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <Building2 size={13} className="text-white/25" />
-                <p className="text-xs text-white/30">
-                  AstraZeneca · ETS Department · Chennai, India
-                </p>
-              </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <a
-                  href="/Internship Completion letter- Monishkumar E M.pdf"
-                  download
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-semibold
-                    bg-violet-500/15 border border-violet-500/30 text-violet-300
-                    hover:bg-violet-500/25 transition-all"
-                >
-                  <Download size={12} /> Download Letter
-                </a>
-                <a
-                  href="/Internship Completion letter- Monishkumar E M.pdf"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-semibold
-                    bg-white/5 border border-white/10 text-white/50
-                    hover:bg-white/10 hover:text-white/70 transition-all"
-                >
-                  <ExternalLink size={12} /> View PDF
-                </a>
-              </div>
-            </div>
-
-          </div>
-        </motion.div>
-
-        {/* ── Footer note ── */}
-        <motion.div {...fadeUp(0.3)} className="mt-12 text-center">
-          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full
-            bg-white/4 border border-white/8">
-            <Cpu size={13} className="text-violet-400" />
-            <p className="text-xs text-white/35">
-              Built with RAG · LangChain · Vector Embeddings
-              <span className="text-white/20 mx-1.5">·</span>
-              <span className="text-violet-400/70">AstraZeneca ETS</span>
-              <span className="text-white/20 mx-1.5">·</span>
-              May – Jul 2026
-            </p>
-          </div>
-        </motion.div>
-
-      </div>
+    <div className="tl-break">
+      <button type="button" className="tl-break__btn" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+        <span><FileText size={13} aria-hidden="true" /> RAG technical breakdown</span>
+        <ChevronDown size={15} aria-hidden="true" style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform .25s" }} />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.ol
+            className="tl-break__list"
+            initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }} style={{ overflow: "hidden" }}
+          >
+            {steps.map((s, i) => (
+              <li key={s.title}>
+                <span className="tl-break__n">{String(i + 1).padStart(2, "0")}</span>
+                <div><p className="tl-break__t">{s.title}</p><p className="tl-break__d">{s.detail}</p></div>
+              </li>
+            ))}
+          </motion.ol>
+        )}
+      </AnimatePresence>
     </div>
+  );
+};
+
+const TimelineCard = ({ m }) => {
+  const { label: kindLabel, Icon: KindIcon } = KINDS[m.kind];
+  return (
+    <article className="tl-card" aria-label={`${m.title} — ${kindLabel}`}>
+      <header className="tl-card__head">
+        <span className="tl-card__hash">{m.id}</span>
+        <span className="tl-card__branch">HEAD <ArrowRight size={12} aria-hidden="true" /> {m.branch}</span>
+        <span className="tl-card__org">{m.orgShort}</span>
+      </header>
+
+      <div className="tl-card__body">
+        <span className={`tl-kind${m.upcoming ? " tl-kind--upcoming" : ""}`}><KindIcon size={13} aria-hidden="true" />{kindLabel}</span>
+
+        {m.featured ? (
+          <>
+            <div className="tl-az">
+              <div className="tl-az__logo"><AZLogo size={34} /></div>
+              <div>
+                <h3 className="tl-az__org">{m.title}</h3>
+                <p className="tl-az__dept">{m.department}</p>
+              </div>
+            </div>
+            <ul className="tl-meta">
+              {m.meta.map(({ icon: I, text }) => <li key={text}><I size={11} aria-hidden="true" />{text}</li>)}
+            </ul>
+            <p className="tl-role">Role</p>
+            <p className="tl-role-name"><span>{m.role}</span></p>
+          </>
+        ) : (
+          <h3 className="tl-card__title">
+            {m.title}
+            {m.org && <span className="tl-card__at"> @ {m.org}</span>}
+          </h3>
+        )}
+
+        <p className="tl-card__desc">{m.description}</p>
+
+        {m.blocks && (
+          <div className="tl-blocks">
+            {m.blocks.map(({ icon: I, title, points }) => (
+              <section key={title} className="tl-block">
+                <h4 className="tl-block__head"><span className="tl-block__icon"><I size={15} aria-hidden="true" /></span>{title}</h4>
+                <ul>{points.map((p) => <li key={p}>{p}</li>)}</ul>
+              </section>
+            ))}
+          </div>
+        )}
+
+        {m.breakdown && <Breakdown steps={m.breakdown} />}
+
+        {m.chips && (
+          <ul className="tl-chips" aria-label="Technologies and topics">
+            {m.chips.map((c) => <li key={c} className="tl-chip">{c}</li>)}
+          </ul>
+        )}
+      </div>
+
+      {(m.footer || m.actions) && (
+        <footer className="tl-card__foot">
+          {m.featured && <span className="tl-foot"><GitCommit size={13} aria-hidden="true" /> AstraZeneca · ETS · Chennai</span>}
+          {m.footer?.map(({ icon: I, text, tone, href }) =>
+            href ? (
+              <a key={text} href={href} className="tl-foot" onClick={(e) => scrollToHash(e, href)}><I size={13} aria-hidden="true" />{text}</a>
+            ) : (
+              <span key={text} className={`tl-foot${tone ? ` tl-foot--${tone}` : ""}`}><I size={13} aria-hidden="true" />{text}</span>
+            )
+          )}
+          {m.actions && (
+            <span className="tl-btns">
+              {m.actions.map(({ label, icon: I, href, download, external, ghost }) => (
+                <a key={label} href={encodeURI(href)} className={`tl-btn${ghost ? " tl-btn--ghost" : ""}`}
+                  {...(download ? { download: true } : {})} {...(external ? { target: "_blank", rel: "noreferrer" } : {})}>
+                  <I size={12} aria-hidden="true" /> {label}
+                </a>
+              ))}
+            </span>
+          )}
+        </footer>
+      )}
+    </article>
+  );
+};
+
+const Experience = () => {
+  const reduce = useReducedMotion();
+  return (
+    <section id="experience" className="sect exp" aria-labelledby="exp-title">
+      <div className="sect__bg" aria-hidden="true" />
+      <div className="sect__inner">
+        <motion.h2
+          id="exp-title" className="sect__title"
+          initial={{ opacity: 0, y: reduce ? 0 : 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
+        >
+          <span className="sect__icon"><GitBranch size={34} aria-hidden="true" /></span>$ git log --stat --oneline
+        </motion.h2>
+        <p className="exp__sub">Engineering Journey — from starting B.Tech IT at CEG in 2023 to an AstraZeneca internship in 2026 and expected graduation in 2027.</p>
+
+        <div className="exp__start" aria-hidden="true">
+          <span className="exp__pill"><GitCommit size={15} /> Initial Commit (Hello World)</span>
+        </div>
+
+        <div className="exp__track">
+          <div className="exp__line" aria-hidden="true" />
+          <ol className="exp__list">
+            {MILESTONES.map((m, i) => (
+              <motion.li
+                key={m.id}
+                className={`tl ${i % 2 === 0 ? "is-left" : "is-right"}${m.upcoming ? " tl--upcoming" : ""}`}
+                initial={{ opacity: 0, y: reduce ? 0 : 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.55, ease: "easeOut" }}
+              >
+                <span className="tl-marker" aria-hidden="true" />
+                <time className="tl-date" dateTime={m.dateTime}><Calendar size={15} aria-hidden="true" />{m.date}</time>
+                <TimelineCard m={m} />
+              </motion.li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
   );
 };
 

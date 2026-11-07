@@ -1,5 +1,3 @@
-// src/components/ScrollProgress.jsx
-// Thin gradient progress bar at the top of the viewport
 import { useEffect, useState } from "react";
 import { motion, useSpring } from "framer-motion";
 
@@ -26,7 +24,7 @@ const ScrollProgress = () => {
         className="h-full origin-left"
         style={{
           scaleX: springProgress,
-          background: "linear-gradient(90deg, #7c3aed, #06b6d4, #ec4899)",
+          background: "linear-gradient(90deg, #FF6B35, #FF8F65, #FFB088)",
         }}
       />
     </div>

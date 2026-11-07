@@ -42,7 +42,7 @@ EDUCATION
 B.Tech Information Technology
 College of Engineering Guindy (Anna University)
 Aug 2023 – Present
-CGPA: 8.21/10
+CGPA: 8.20/10
 
 Higher Secondary (HSC)
 Saradha Higher Matric Secondary School

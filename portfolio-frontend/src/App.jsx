@@ -11,18 +11,18 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import About from "./components/About";
+import Skills from "./components/Skills";
 import Experience from "./components/Experience";
 import SplashScreen from "./components/SplashScreen";
 import BackToTop from "./components/BackToTop";
 import ScrollProgress from "./components/ScrollProgress";
 import MobileTabBar from "./components/MobileTabBar";
 
-// Lazy-loaded below-the-fold sections for faster FCP
+// Lazy-loaded below-the-fold sections
 const Projects = lazy(() => import("./components/Projects"));
 const Certificates = lazy(() => import("./components/Certificates"));
-const Resume = lazy(() => import("./components/Resume"));
-const Chatbot = lazy(() => import("./components/Chatbot"));
 const Contact = lazy(() => import("./components/Contact"));
+const FloatingChatbot = lazy(() => import("./components/FloatingChatbot"));
 const NotFound = lazy(() => import("./components/NotFound"));
 const AppDownload = lazy(() => import("./components/AppDownload"));
 
@@ -38,7 +38,8 @@ const ChangePassword = lazy(() => import("./admin/ChangePassword"));
 
 const SectionFallback = () => (
   <div className="flex items-center justify-center py-24">
-    <div className="w-6 h-6 border-2 border-violet-400/30 border-t-violet-400 rounded-full animate-spin" />
+    <div className="w-5 h-5 border-2 rounded-full animate-spin"
+      style={{ borderColor: "var(--badge-border)", borderTopColor: "var(--primary-accent)" }} />
   </div>
 );
 
@@ -55,7 +56,8 @@ const PublicLayout = () => (
   <ActiveSectionProvider>
     <div className="relative min-h-screen"
       style={{ background: "var(--bg-main)", color: "var(--text-primary)", transition: "background 0.4s" }}>
-      <a href="#home" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-violet-600 focus:text-white focus:rounded-lg">Skip to content</a>
+      <a href="#home" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:rounded-lg"
+        style={{ background: "var(--primary-accent)", color: "#fff" }}>Skip to content</a>
       <ScrollProgress />
       <Background />
       <CustomCursor />
@@ -66,18 +68,21 @@ const PublicLayout = () => (
         <main>
           <section id="home" aria-label="Home">                 <Hero />         </section>
           <section id="about" aria-label="About">               <About />        </section>
+          <section id="skills" aria-label="Skills">             <Skills />       </section>
           <section id="experience" aria-label="Experience">     <Experience />   </section>
           <Suspense fallback={<SectionFallback />}>
             <section id="projects" aria-label="Projects">         <Projects />     </section>
             <section id="certificates" aria-label="Certificates"> <Certificates /> </section>
-            <section id="resume" aria-label="Resume">             <Resume />       </section>
-            <section id="chatbot" aria-label="Chatbot">           <Chatbot />      </section>
             <section id="contact" aria-label="Contact">           <Contact />      </section>
           </Suspense>
         </main>
         {/* Bottom padding for mobile tab bar */}
         <div className="md:hidden h-20" />
       </div>
+      {/* Floating AI Chatbot */}
+      <Suspense fallback={null}>
+        <FloatingChatbot />
+      </Suspense>
     </div>
   </ActiveSectionProvider>
 );
@@ -88,7 +93,6 @@ const App = () => {
   return (
     <ThemeProvider>
       <AuthProvider>
-        {/* Splash screen — shows only on first load */}
         {!splashDone && <SplashScreen onComplete={() => setSplashDone(true)} />}
 
         <Router>
@@ -96,20 +100,18 @@ const App = () => {
             position="top-right"
             toastOptions={{
               style: {
-                background: "#1f2937",
-                color: "#f9fafb",
-                borderRadius: "10px",
+                background: "#1E1E1E",
+                color: "#F0F2F4",
+                borderRadius: "8px",
+                border: "1px solid rgba(255,255,255,0.08)",
+                fontFamily: "var(--font-mono)",
+                fontSize: "13px",
               },
             }}
           />
           <Routes>
-            {/* Public Portfolio */}
             <Route path="/" element={<PublicLayout />} />
-
-            {/* App Download Page */}
             <Route path="/app" element={<Suspense fallback={<SectionFallback />}><AppDownload /></Suspense>} />
-
-            {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route
               path="/admin"
@@ -126,8 +128,6 @@ const App = () => {
               <Route path="settings" element={<AdminSuspense><AdminSettings /></AdminSuspense>} />
               <Route path="password" element={<AdminSuspense><ChangePassword /></AdminSuspense>} />
             </Route>
-
-            {/* 404 Catch-all */}
             <Route path="*" element={<Suspense fallback={<SectionFallback />}><NotFound /></Suspense>} />
           </Routes>
           <Analytics />

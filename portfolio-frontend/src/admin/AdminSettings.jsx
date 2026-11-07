@@ -1,31 +1,23 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
-  Settings, User, Shield, Trash2, AlertTriangle,
-  Globe, Bell, Eye, Moon, RefreshCw, CheckCircle,
+  Settings, User, Shield, Trash2, AlertTriangle, Globe, Bell, Eye, Moon, RefreshCw, CheckCircle,
 } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
-
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, delay, ease: "easeOut" },
-});
+import { PageHeader, SettingRow, Spinner, Pill, fadeUp } from "./AdminUI";
+import "./Admin.css";
 
 const AdminSettings = () => {
   const { token } = useAuth();
   const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [clearing, setClearing] = useState(false);
 
-  // Site preferences (stored in localStorage)
+  // Preferences live in this browser's localStorage only
   const [prefs, setPrefs] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("adminPrefs") || "{}");
-    } catch {
-      return {};
-    }
+    try { return JSON.parse(localStorage.getItem("adminPrefs") || "{}"); } catch { return {}; }
   });
 
   useEffect(() => {
@@ -53,10 +45,12 @@ const AdminSettings = () => {
   };
 
   const clearAllMessages = async () => {
-    if (!window.confirm("⚠️ Are you sure you want to delete ALL messages? This cannot be undone.")) return;
-    if (!window.confirm("This is permanent. Type 'yes' mentally and click OK to proceed.")) return;
+    if (clearing) return;
+    if (!window.confirm("Are you sure you want to delete ALL messages? This cannot be undone.")) return;
+    if (!window.confirm("This is permanent. Click OK to delete every message.")) return;
+    setClearing(true);
     try {
-      // We'll delete all messages by fetching IDs and deleting one by one
+      // No bulk endpoint: fetch the IDs and delete them one by one
       const { data } = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/messages`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -71,234 +65,93 @@ const AdminSettings = () => {
       toast.success(`Deleted ${messages.length} message(s).`);
     } catch {
       toast.error("Failed to clear messages.");
+    } finally {
+      setClearing(false);
     }
   };
 
-  const Toggle = ({ label, desc, icon: Icon, value, onChange }) => (
-    <div className="flex items-center justify-between p-4 rounded-[14px]
-      bg-white/[0.03] border border-white/7 hover:border-white/12 transition-all">
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-[12px] bg-white/5 border border-white/8
-          flex items-center justify-center flex-shrink-0">
-          <Icon size={15} className="text-white/40" />
-        </div>
-        <div>
-          <p className="text-sm font-semibold">{label}</p>
-          <p className="text-[11px] text-white/30 mt-0.5">{desc}</p>
-        </div>
-      </div>
-      <button
-        onClick={() => onChange(!value)}
-        role="switch"
-        aria-checked={value}
-        aria-label={label}
-        className={`relative w-11 h-6 rounded-full transition-all duration-200
-          ${value
-            ? "bg-violet-500/30 border-violet-500/40"
-            : "bg-white/8 border-white/12"
-          } border`}
-      >
-        <motion.div
-          className={`absolute top-[3px] w-4 h-4 rounded-full transition-colors
-            ${value ? "bg-violet-400" : "bg-white/30"}`}
-          animate={{ left: value ? "calc(100% - 19px)" : "3px" }}
-          transition={{ type: "spring", stiffness: 400, damping: 25 }}
-        />
-      </button>
-    </div>
-  );
+  if (loading) return <div className="adm-load"><Spinner size={30} /></div>;
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-32">
-        <motion.div
-          className="w-8 h-8 border-2 border-violet-400/40 border-t-violet-400 rounded-full"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
-        />
-      </div>
-    );
-  }
+  const memberSince = admin?.createdAt && !Number.isNaN(new Date(admin.createdAt).getTime())
+    ? new Date(admin.createdAt).toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" })
+    : null;
 
   return (
-    <div className="max-w-2xl mx-auto">
-      {/* Header */}
-      <motion.div {...fadeUp(0)} className="mb-8">
-        <div className="flex items-center gap-2.5 mb-1">
-          <Settings size={16} className="text-violet-400" />
-          <p className="text-[10px] font-semibold uppercase tracking-[2px]
-            text-white/28">
-            Configuration
-          </p>
-        </div>
-        <h1 className="text-2xl font-extrabold tracking-tight">
-          Admin Settings
-        </h1>
-        <p className="text-xs text-white/35 mt-1">
-          Manage your admin profile and site preferences.
-        </p>
-      </motion.div>
+    <div className="adm-narrow">
+      <PageHeader eyebrow="Configuration" icon={Settings} title="Admin Settings" sub="Manage your admin profile and site preferences." />
 
-      {/* ── Profile Card ── */}
-      <motion.div {...fadeUp(0.05)} className="glass-card p-7 mb-5">
-        <div className="flex items-center gap-2 mb-5">
-          <User size={14} className="text-violet-400" />
-          <p className="text-xs font-bold uppercase tracking-[1px] text-white/30">
-            Admin Profile
-          </p>
-        </div>
-
-        <div className="flex items-center gap-5 mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br
-            from-violet-600 to-cyan-500 flex items-center justify-center
-            text-2xl font-extrabold shadow-[0_4px_20px_rgba(124,58,237,0.35)]
-            flex-shrink-0">
-            {admin?.username?.[0]?.toUpperCase() ?? "M"}
-          </div>
-          <div>
-            <h3 className="text-lg font-extrabold">{admin?.username ?? "Admin"}</h3>
-            <p className="text-xs text-violet-300 font-medium mt-0.5">Administrator</p>
-            <p className="text-[10px] text-white/25 mt-1">
-              Member since {new Date(admin?.createdAt).toLocaleDateString("en-IN", {
-                year: "numeric", month: "long", day: "numeric",
-              })}
-            </p>
+      {/* Profile */}
+      <motion.section {...fadeUp(0.05)} className="adm-card adm-card--pad adm-section" aria-label="Admin profile">
+        <h2 className="adm-h2 adm-section__h"><User size={14} aria-hidden="true"/> Admin Profile</h2>
+        <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 20, flexWrap: "wrap" }}>
+          <span className="adm-avatar adm-avatar--lg" aria-hidden="true">{admin?.username?.[0]?.toUpperCase() ?? "M"}</span>
+          <div style={{ minWidth: 0 }}>
+            <p style={{ margin: 0, font: "800 18px/1.2 var(--mono)" }}>{admin?.username ?? "Admin"}</p>
+            <p style={{ margin: "5px 0 0", font: "500 12px/1 var(--mono)", color: "var(--accent)" }}>Administrator</p>
+            {memberSince && <p style={{ margin: "6px 0 0", font: "400 11px/1 var(--mono)", color: "var(--faint)" }}>Member since {memberSince}</p>}
           </div>
         </div>
-
-        {/* Info Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="adm-infogrid">
           {[
             { label: "Username", value: admin?.username ?? "—", icon: User },
             { label: "Role", value: "Super Admin", icon: Shield },
             { label: "Auth", value: "JWT · 7 day expiry", icon: Shield },
             { label: "API", value: import.meta.env.VITE_API_URL || "localhost", icon: Globe },
           ].map(({ label, value, icon: Icon }) => (
-            <div key={label} className="flex items-center gap-3 p-3.5 rounded-[12px]
-              bg-white/[0.03] border border-white/7">
-              <Icon size={13} className="text-white/25 flex-shrink-0" />
-              <div className="min-w-0">
-                <p className="text-[9px] uppercase tracking-widest text-white/22">{label}</p>
-                <p className="text-xs font-semibold text-white/60 truncate mt-0.5">{value}</p>
-              </div>
+            <div key={label} className="adm-info">
+              <Icon size={14} aria-hidden="true" />
+              <div style={{ minWidth: 0 }}><small>{label}</small><span title={String(value)}>{value}</span></div>
             </div>
           ))}
         </div>
-      </motion.div>
+      </motion.section>
 
-      {/* ── Preferences ── */}
-      <motion.div {...fadeUp(0.1)} className="glass-card p-7 mb-5">
-        <div className="flex items-center gap-2 mb-5">
-          <Bell size={14} className="text-cyan-400" />
-          <p className="text-xs font-bold uppercase tracking-[1px] text-white/30">
-            Preferences
-          </p>
+      {/* Preferences */}
+      <motion.section {...fadeUp(0.1)} className="adm-card adm-card--pad adm-section" aria-label="Preferences">
+        <h2 className="adm-h2 adm-section__h"><Bell size={14} aria-hidden="true"/> Preferences</h2>
+        <p className="adm-hint" style={{ margin: "-6px 0 16px" }}>Saved in this browser only. These toggles do not change the public website or the server.</p>
+        <div className="adm-stack" style={{ gap: 12 }}>
+          <SettingRow icon={Bell}  label="Email Notifications" desc="Receive email when someone sends a message" checked={prefs.emailNotifications ?? true} onChange={(v) => updatePref("emailNotifications", v)} />
+          <SettingRow icon={Eye}   label="Show Chatbot Section" desc="Display the AI chatbot on the portfolio" checked={prefs.showChatbot ?? true} onChange={(v) => updatePref("showChatbot", v)} />
+          <SettingRow icon={Moon}  label="Default Dark Mode" desc="New visitors see dark theme by default" checked={prefs.defaultDark ?? true} onChange={(v) => updatePref("defaultDark", v)} />
+          <SettingRow icon={Globe} label="Show Resume Section" desc="Display resume/PDF viewer on portfolio" checked={prefs.showResume ?? true} onChange={(v) => updatePref("showResume", v)} />
         </div>
+      </motion.section>
 
-        <div className="flex flex-col gap-3">
-          <Toggle
-            icon={Bell}
-            label="Email Notifications"
-            desc="Receive email when someone sends a message"
-            value={prefs.emailNotifications ?? true}
-            onChange={(v) => updatePref("emailNotifications", v)}
-          />
-          <Toggle
-            icon={Eye}
-            label="Show Chatbot Section"
-            desc="Display the AI chatbot on the portfolio"
-            value={prefs.showChatbot ?? true}
-            onChange={(v) => updatePref("showChatbot", v)}
-          />
-          <Toggle
-            icon={Moon}
-            label="Default Dark Mode"
-            desc="New visitors see dark theme by default"
-            value={prefs.defaultDark ?? true}
-            onChange={(v) => updatePref("defaultDark", v)}
-          />
-          <Toggle
-            icon={Globe}
-            label="Show Resume Section"
-            desc="Display resume/PDF viewer on portfolio"
-            value={prefs.showResume ?? true}
-            onChange={(v) => updatePref("showResume", v)}
-          />
-        </div>
-      </motion.div>
-
-      {/* ── Session Info ── */}
-      <motion.div {...fadeUp(0.15)} className="glass-card p-7 mb-5">
-        <div className="flex items-center gap-2 mb-5">
-          <Shield size={14} className="text-green-400" />
-          <p className="text-xs font-bold uppercase tracking-[1px] text-white/30">
-            Session & Security
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between p-4 rounded-[14px]
-            bg-white/[0.03] border border-white/7">
-            <div className="flex items-center gap-3">
-              <CheckCircle size={15} className="text-green-400" />
-              <div>
-                <p className="text-sm font-semibold">Session Status</p>
-                <p className="text-[11px] text-white/30 mt-0.5">
-                  Authenticated · JWT Token Active
-                </p>
-              </div>
+      {/* Session */}
+      <motion.section {...fadeUp(0.15)} className="adm-card adm-card--pad adm-section" aria-label="Session and security">
+        <h2 className="adm-h2 adm-section__h"><Shield size={14} aria-hidden="true"/> Session &amp; Security</h2>
+        <div className="adm-stack" style={{ gap: 12 }}>
+          <div className="adm-setting">
+            <div className="adm-setting__l">
+              <span className="adm-setting__ic" style={{ color: "var(--green)" }}><CheckCircle size={15} aria-hidden="true"/></span>
+              <div><p className="adm-setting__t">Session Status</p><p className="adm-setting__d">Authenticated · JWT token active</p></div>
             </div>
-            <span className="px-3 py-1.5 rounded-full text-[10px] font-bold
-              bg-green-500/12 border border-green-500/25 text-green-400">
-              Active
-            </span>
+            <Pill tone="green">Active</Pill>
           </div>
-
-          <div className="flex items-center justify-between p-4 rounded-[14px]
-            bg-white/[0.03] border border-white/7">
-            <div className="flex items-center gap-3">
-              <RefreshCw size={15} className="text-white/30" />
-              <div>
-                <p className="text-sm font-semibold">Token Expiry</p>
-                <p className="text-[11px] text-white/30 mt-0.5">
-                  Auto-expires after 7 days of inactivity
-                </p>
-              </div>
+          <div className="adm-setting">
+            <div className="adm-setting__l">
+              <span className="adm-setting__ic"><RefreshCw size={15} aria-hidden="true"/></span>
+              <div><p className="adm-setting__t">Token Expiry</p><p className="adm-setting__d">Tokens expire after 7 days</p></div>
             </div>
-            <span className="text-[11px] text-white/25 font-mono">7d</span>
+            <span className="adm-time">7d</span>
           </div>
         </div>
-      </motion.div>
+      </motion.section>
 
-      {/* ── Danger Zone ── */}
-      <motion.div {...fadeUp(0.2)} className="glass-card p-7 border-red-500/15">
-        <div className="flex items-center gap-2 mb-5">
-          <AlertTriangle size={14} className="text-red-400" />
-          <p className="text-xs font-bold uppercase tracking-[1px] text-red-400/50">
-            Danger Zone
-          </p>
-        </div>
-
-        <div className="flex items-center justify-between p-4 rounded-[14px]
-          bg-red-500/5 border border-red-500/15">
+      {/* Danger zone */}
+      <motion.section {...fadeUp(0.2)} className="adm-card adm-card--pad adm-card--danger adm-section" aria-label="Danger zone">
+        <h2 className="adm-h2 adm-section__h" style={{ color: "var(--red)" }}><AlertTriangle size={14} aria-hidden="true" style={{ color: "var(--red)" }}/> Danger Zone</h2>
+        <div className="adm-setting" style={{ background: "rgba(255,90,79,.05)", borderColor: "rgba(255,90,79,.2)" }}>
           <div>
-            <p className="text-sm font-semibold text-red-400/80">Clear All Messages</p>
-            <p className="text-[11px] text-white/30 mt-0.5">
-              Permanently delete all contact messages. This cannot be undone.
-            </p>
+            <p className="adm-setting__t" style={{ color: "#ff8a80" }}>Clear All Messages</p>
+            <p className="adm-setting__d">Permanently delete all contact messages. This cannot be undone.</p>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
-            onClick={clearAllMessages}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-[10px]
-              text-xs font-bold bg-red-500/12 border border-red-500/25
-              text-red-400 hover:bg-red-500/22 transition-all flex-shrink-0"
-          >
-            <Trash2 size={13} /> Delete All
-          </motion.button>
+          <button type="button" onClick={clearAllMessages} disabled={clearing} className="adm-btn adm-btn--danger adm-btn--sm">
+            {clearing ? <Spinner size={13}/> : <Trash2 size={13} aria-hidden="true"/>} Delete All
+          </button>
         </div>
-      </motion.div>
+      </motion.section>
     </div>
   );
 };

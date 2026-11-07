@@ -1,0 +1,89 @@
+/* Floating chatbot: launcher ring treatment + responsive panel sizing. Scoped to .cbx-*. */
+
+/* ── Launcher: image · thin inner outline · rotating dashed outer ring ───────────────── */
+.cbx-launch {
+  --accent: var(--primary-accent, #ff6b35);
+  position: fixed;
+  right: 24px;                          /* same 56px column as the nav rail → shared centre line */
+  z-index: 50;
+  width: 56px; height: 56px;
+  display: grid; place-items: center;
+  padding: 0; border-radius: 50%; cursor: pointer;
+  background: var(--bg-card, #1f1f1f);
+  border: 1px solid rgba(255, 107, 53, 0.55);                 /* thin, light-orange inner outline (static) */
+  box-shadow: 0 4px 24px rgba(255, 107, 53, 0.14);
+  transition: border-color .2s ease, box-shadow .2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.cbx-launch:hover { border-color: rgba(255, 107, 53, 0.9); box-shadow: 0 4px 28px rgba(255, 107, 53, 0.28); }
+.cbx-launch:focus-visible { outline: 2px solid var(--accent); outline-offset: 14px; }
+.cbx-launch__img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }   /* stays still */
+
+/* Outer dashed ring: the ONLY thing that rotates. Decorative, never a click target. */
+.cbx-launch::before {
+  content: ""; position: absolute; inset: -10px; border-radius: 50%;
+  border: 1.5px dashed rgba(255, 107, 53, 0.7);
+  pointer-events: none;
+  animation: cbx-orbit 16s linear infinite;
+}
+@keyframes cbx-orbit { to { transform: rotate(360deg); } }
+
+/* Online status dot, top-right, above the rings */
+.cbx-launch__dot {
+  position: absolute; top: -3px; right: -3px; z-index: 1;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #18c98b; border: 2px solid var(--bg-main, #2d2d2d);
+  pointer-events: none;
+}
+
+/* ── Panel sizing ─────────────────────────────────────────────────────────────────────── */
+/* Base (phones / small tablets): the pre-existing size, kept inside the viewport */
+.cbx-panel {
+  right: 24px; bottom: 24px;
+  width: 420px; max-width: calc(100vw - 2rem);
+  height: 600px; max-height: calc(100dvh - 2rem);
+}
+/* Phones: nearly full screen, safe-area aware */
+@media (max-width: 639px) {
+  .cbx-panel {
+    right: 8px; bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    width: calc(100vw - 1rem); max-width: none;
+    height: calc(100dvh - 1rem - env(safe-area-inset-bottom, 0px));
+    max-height: calc(100dvh - 1rem - env(safe-area-inset-bottom, 0px));
+  }
+}
+/* Tablet (768–1023px): the nav rail is visible, so sit to its left. Intermediate size. */
+@media (min-width: 768px) {
+  .cbx-panel {
+    right: 84px; bottom: 24px;
+    width: clamp(380px, 52vw, 480px); max-width: calc(100vw - 84px - 1rem);
+    height: min(72dvh, 680px); max-height: calc(100dvh - 3rem);
+  }
+}
+/* Desktop (≥1024px): ~35vw × ~80vh, left of the rail so nothing is hidden */
+@media (min-width: 1024px) {
+  .cbx-panel {
+    right: 96px;
+    width: clamp(400px, 35vw, 600px); max-width: calc(100vw - 96px - 1rem);
+    height: 80dvh; max-height: min(85dvh, calc(100dvh - 3rem));
+  }
+  /* A larger window deserves larger type: lift the small terminal sizes a notch */
+  .cbx-panel [class*="text-[10px]"] { font-size: 11.5px; }
+  .cbx-panel [class*="text-[11px]"] { font-size: 12.5px; }
+  .cbx-panel [class*="text-[12px]"] { font-size: 14px; }
+  .cbx-panel .text-xs { font-size: 13.5px; }
+  .cbx-panel .text-sm { font-size: 15px; }
+  .cbx-panel .cbx-hav { width: 40px; height: 40px; }
+  .cbx-panel .cbx-messages { padding: 20px; gap: 14px; }
+}
+
+/* Header avatar echoes the launcher: thin static orange outline with a small gap */
+.cbx-hav { outline: 1px solid rgba(255, 107, 53, 0.55); outline-offset: 2px; }
+
+/* Column layout: the conversation takes all spare height and scrolls on its own */
+.cbx-messages { flex: 1 1 0%; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cbx-launch::before { animation: none; }        /* no rotation when reduced motion is requested */
+  .cbx-launch { transition: none; }
+}

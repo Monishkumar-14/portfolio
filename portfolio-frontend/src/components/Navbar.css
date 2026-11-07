@@ -1,0 +1,75 @@
+/* Right-side vertical navigation rail. Scoped to .vnav.
+   Every section owns a fixed-size slot, so nothing moves when the active section changes:
+   inactive = small dot, active = full circular icon with a dotted ring. */
+.vnav {
+  --sz: clamp(32px, calc((100dvh - 150px) / 10.6), 50px);   /* slot / active-icon size, shrinks on short viewports */
+  --gap: calc(var(--sz) * 0.3);                             /* slot spacing (dots make a tighter rail possible) */
+  --dot: 12px;                                              /* inactive marker */
+  --accent: var(--primary-accent, #ff6b35);
+  position: fixed;
+  z-index: 40;                       /* below the chatbot (z-50) */
+  top: 0;
+  right: 24px;                       /* same 56px column as the chatbot launcher → shared centre line */
+  bottom: 104px;                     /* reserves room for the chatbot launcher */
+  width: 56px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--gap);
+  pointer-events: none;              /* only the slots are interactive */
+  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, monospace);
+}
+.vnav__list { position: relative; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; align-items: center; gap: var(--gap); }
+
+/* Connecting line behind the markers; never intercepts pointer events */
+.vnav__line { position: absolute; z-index: 0; left: 50%; top: calc(var(--sz) / 2); bottom: calc(var(--sz) / 2); width: 1px; transform: translateX(-50%);
+  background: linear-gradient(to bottom, rgba(255,107,53,.15), rgba(255,107,53,.45) 12%, rgba(255,107,53,.45) 88%, rgba(255,107,53,.15)); pointer-events: none; }
+
+/* Fixed slot: same size for active and inactive items → no layout shift */
+.vnav__item { position: relative; z-index: 1; width: var(--sz); height: var(--sz); }
+.vnav__btn { pointer-events: auto; display: block; width: 100%; height: 100%; text-decoration: none; cursor: pointer; border-radius: 50%; -webkit-tap-highlight-color: transparent; }
+.vnav__btn:focus-visible { outline: none; }
+
+/* The visible marker. Centered in the slot; resizes in place. */
+.vnav__dot {
+  position: absolute; left: 50%; top: 50%; display: grid; place-items: center; border-radius: 50%; box-sizing: border-box;
+  width: var(--dot); height: var(--dot); transform: translate(-50%, -50%);
+  background: #262626; border: 1px solid rgba(255,255,255,.16); color: var(--accent);
+  transition: width .28s ease, height .28s ease, background-color .25s ease, border-color .25s ease, box-shadow .25s ease, transform .2s ease;
+}
+.vnav__dot svg { opacity: 0; transform: scale(.4); stroke-width: 1.6; transition: opacity .2s ease, transform .25s ease; pointer-events: none; }
+.vnav__dot::before { content: ""; position: absolute; inset: -7px; border-radius: 50%; border: 1px dotted rgba(255,107,53,.3); pointer-events: none; transition: border-color .25s ease; }   /* static ring: never animated */
+
+/* Inactive hover / keyboard focus: subtle orange highlight, stays a dot */
+.vnav__item:not(.is-active) .vnav__btn:hover .vnav__dot,
+.vnav__item:not(.is-active) .vnav__btn:focus-visible .vnav__dot { background: rgba(255,107,53,.45); border-color: var(--accent); box-shadow: 0 0 8px rgba(255,107,53,.3); }
+.vnav__item:not(.is-active) .vnav__btn:hover .vnav__dot::before,
+.vnav__item:not(.is-active) .vnav__btn:focus-visible .vnav__dot::before { border-color: rgba(255,107,53,.6); }
+
+/* Active: full circular icon, orange outline, graphite fill, dotted ring */
+.vnav__item.is-active .vnav__dot { width: var(--sz); height: var(--sz); background: rgba(31,31,31,.72); border: 1px solid rgba(255,107,53,.9); box-shadow: 0 0 12px rgba(255,107,53,.22); }
+.vnav__item.is-active .vnav__dot svg { opacity: 1; transform: scale(1); }
+.vnav__item.is-active .vnav__dot::before { border-color: rgba(255,107,53,.6); }
+.vnav__item.is-active .vnav__btn:hover .vnav__dot, .vnav__item.is-active .vnav__btn:focus-visible .vnav__dot { transform: translate(-50%, -50%) scale(1.04); box-shadow: 0 0 16px rgba(255,107,53,.38); }
+
+/* Visible keyboard focus indicator (dot or icon) */
+.vnav__btn:focus-visible .vnav__dot { outline: 2px solid var(--accent); outline-offset: 5px; }
+
+/* Label to the LEFT of the marker. Absolutely positioned: never shifts siblings. */
+.vnav__label {
+  position: absolute; top: 50%; right: calc(100% - (var(--sz) - var(--dot)) / 2 + 18px); transform: translate(8px, -50%); opacity: 0; visibility: hidden; pointer-events: none; white-space: nowrap;
+  padding: 8px 16px; border-radius: 6px; font: 700 14px/1 var(--font-mono, ui-monospace, monospace); letter-spacing: .01em; color: var(--accent);
+  background: var(--bg-surface, #2c2927); border: 1px solid rgba(255,107,53,.3); box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  transition: opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
+}
+.vnav__item.is-active .vnav__label { right: calc(100% + 22px); }   /* clears the dotted ring of the active icon */
+.vnav__btn:hover .vnav__label, .vnav__btn:focus-visible .vnav__label { opacity: 1; visibility: visible; transform: translate(0, -50%); transition-delay: 0s; }
+
+/* Touch devices: a tap navigates directly; no sticky hover labels */
+@media (hover: none) { .vnav__label { display: none; } }
+
+/* Tablet (768–1023px) */
+@media (max-width: 1023px) and (min-width: 768px) { .vnav { --sz: clamp(32px, calc((100dvh - 150px) / 10.6), 44px); right: 14px; } }
+
+/* Phones (< 768px): this rail is not rendered; MobileTabBar takes over. */
+@media (prefers-reduced-motion: reduce) {
+  .vnav__dot, .vnav__dot svg, .vnav__dot::before, .vnav__label { transition: none; }
+  .vnav__item.is-active .vnav__btn:hover .vnav__dot, .vnav__item.is-active .vnav__btn:focus-visible .vnav__dot { transform: translate(-50%, -50%); }
+}

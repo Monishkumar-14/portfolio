@@ -1,0 +1,46 @@
+/* Global background — the single source of truth for the page's charcoal base, glow and grid. */
+.bg-root {
+  --bg-base: #2d2d2d;
+  --bg-cell: 52px;                                /* square cells: same value for width and height */
+  --bg-line: rgba(255, 107, 53, 0.07);            /* thin orange/brown line, low opacity */
+  position: fixed;
+  inset: 0;
+  z-index: 0;                                     /* sections/hero sit above with z-index: 1 */
+  pointer-events: none;                           /* purely decorative: never blocks clicks, forms or scrolling */
+  overflow: hidden;
+  background: var(--bg-base);
+}
+
+/* One soft glow, anchored to the top-left corner of the viewport */
+.bg-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: min(62vw, 720px);
+  height: min(62vh, 600px);
+  background: radial-gradient(
+    ellipse at 0% 0%,
+    rgba(255, 107, 53, 0.17) 0%,
+    rgba(255, 107, 53, 0.08) 38%,
+    rgba(255, 107, 53, 0.03) 62%,
+    transparent 78%
+  );
+}
+
+/* Uniform square grid drawn above the glow so the lines stay visible inside it */
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--bg-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bg-line) 1px, transparent 1px);
+  background-size: var(--bg-cell) var(--bg-cell);
+  background-position: 0 0;
+}
+
+/* A few deliberate breakpoints; cells stay square at every size */
+@media (max-width: 1023px) { .bg-root { --bg-cell: 44px; } }
+@media (max-width: 639px) {
+  .bg-root { --bg-cell: 40px; --bg-line: rgba(255, 107, 53, 0.06); }
+  .bg-glow { width: 78vw; height: min(48vh, 420px); }
+}

@@ -1,0 +1,126 @@
+/* About.system — scoped under .about */
+.about__grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: calc(82 * var(--u)); align-items: stretch;
+}
+.about__col { display: flex; flex-direction: column; gap: calc(41 * var(--u)); min-width: 0; }
+
+/* Profile card — animated orange-and-blue gradient border */
+.about-card {
+  position: relative; flex: 1; display: flex; flex-direction: column; justify-content: center;
+  padding: calc(50 * var(--u)); border-radius: calc(20 * var(--u));
+  background: linear-gradient(180deg, #1a2121 0, #1d1d1d calc(70 * var(--u)), #1d1d1d 100%);
+  box-shadow: 0 calc(24 * var(--u)) calc(60 * var(--u)) rgba(0, 0, 0, 0.45);
+  z-index: 0;
+}
+/* Animated conic-gradient border via pseudo-element */
+.about-card::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--about-card-angle, 0deg),
+    #ff6b35 0%,
+    #ff8f65 15%,
+    #4d8dff 35%,
+    #3b6fdb 50%,
+    #ff6b35 65%,
+    #ff8f65 85%,
+    #ff6b35 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+          mask-composite: exclude;
+  z-index: -1;
+  animation: about-card-rotate 4s linear infinite;
+}
+@keyframes about-card-rotate {
+  to { --about-card-angle: 360deg; }
+}
+/* Register CSS custom property for animation */
+@property --about-card-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .about-card::before {
+    animation: none;
+    background: conic-gradient(
+      from 210deg,
+      #ff6b35 0%,
+      #ff8f65 15%,
+      #4d8dff 35%,
+      #3b6fdb 50%,
+      #ff6b35 65%,
+      #ff8f65 85%,
+      #ff6b35 100%
+    );
+  }
+}
+.about-card__photo { position: relative; width: calc(240 * var(--u)); height: calc(240 * var(--u)); min-width: 150px; min-height: 150px; margin: 0 auto calc(48 * var(--u)); }
+.about-card__ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 210deg, rgba(255,107,53,.85) 0 22%, transparent 22% 50%, rgba(77,141,255,.85) 50% 72%, transparent 72%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
+          mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
+}
+.about-card__img { position: absolute; inset: 11%; width: 78%; height: 78%; border-radius: 50%; object-fit: cover; object-position: center 15%; background: #111; }
+.about-card__dot { position: absolute; right: 14%; bottom: 14%; width: calc(17 * var(--u)); height: calc(17 * var(--u)); min-width: 10px; min-height: 10px; border-radius: 50%; background: #18c98b; box-shadow: 0 0 0 3px #1d1d1d; }
+.about-rows { margin: 0; }
+.about-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px calc(20 * var(--u)); padding: calc(15 * var(--u)) 0; border-bottom: 1px solid rgba(255, 255, 255, 0.07); font-family: var(--mono); font-size: max(calc(17 * var(--u)), 12px); }
+.about-row:last-child { border-bottom: 0; }
+.about-row dt { color: #8a8a8a; text-transform: uppercase; letter-spacing: 0.03em; }
+.about-row dd { margin: 0; text-align: right; color: #f0f2f4; font-weight: 500; }
+.about-row dd.is-orange { color: var(--orange); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.about-row dd.is-blue { color: #3b8cff; text-transform: uppercase; letter-spacing: 0.02em; }
+.about-row dd.is-status { color: #18c98b; background: rgba(24, 201, 139, 0.1); border: 1px solid rgba(24, 201, 139, 0.45); border-radius: 4px; padding: 4px calc(10 * var(--u)); text-transform: uppercase; font-size: max(calc(15 * var(--u)), 11px); }
+.about-links { display: flex; flex-wrap: wrap; gap: calc(10 * var(--u)); margin-top: calc(30 * var(--u)); }
+.about-link { display: inline-flex; align-items: center; gap: 8px; padding: 8px calc(14 * var(--u)); border-radius: 6px; font: 500 max(calc(14 * var(--u)), 11px)/1 var(--mono); color: #cfd2d8; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); text-decoration: none; transition: border-color .2s, color .2s; }
+.about-link:hover { border-color: var(--orange); color: #fff; }
+.about-link:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+.about-link--cta { color: #fff; background: var(--orange); border-color: var(--orange); font-weight: 700; }
+.about-card__phone { margin-top: calc(18 * var(--u)); display: flex; flex-wrap: wrap; gap: 6px calc(16 * var(--u)); font: 400 max(calc(13 * var(--u)), 11px)/1.4 var(--mono); color: #6f737a; }
+.about-card__phone span { display: inline-flex; align-items: center; gap: 6px; }
+
+/* Terminal */
+.about-term { border-radius: calc(14 * var(--u)); overflow: hidden; background: #1d1d1d; box-shadow: 0 0 0 1px rgba(255,255,255,.04), 0 calc(20 * var(--u)) calc(50 * var(--u)) rgba(0,0,0,.4); }
+.about-term__bar { display: flex; align-items: center; gap: calc(12 * var(--u)); height: calc(41 * var(--u)); min-height: 32px; padding: 0 calc(20 * var(--u)); background: #262626; border-bottom: 1px solid rgba(255,255,255,.04); font: 400 max(calc(15 * var(--u)), 11px)/1 var(--mono); color: #9a9a9a; }
+.about-term__bar svg { color: #8a8a8a; }
+.about-term__body { padding: calc(30 * var(--u)) calc(30 * var(--u)) calc(34 * var(--u)); font: 400 max(calc(18 * var(--u)), 13px)/1.6 var(--mono); color: #d4d4d4; }
+.about-cmd { display: flex; align-items: center; gap: calc(14 * var(--u)); margin: 0 0 calc(14 * var(--u)); }
+.about-cmd__arrow { color: var(--blue); flex: none; }
+.about-cmd__fn { color: #c678dd; }
+.about-cmd__fn--blue { color: #4d8dff; }
+.about-out { margin: 0 0 calc(26 * var(--u)); padding-left: calc(20 * var(--u)); border-left: 2px solid rgba(255,255,255,.1); color: #bdbdbd; }
+.about-out:last-child { margin-bottom: 0; }
+.about-out b { color: #fff; font-weight: 700; }
+.about-out .hl { color: var(--orange); font-weight: 700; }
+
+/* Metrics */
+.about-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(21 * var(--u)); }
+.about-metric { padding: calc(20 * var(--u)) calc(21 * var(--u)); border-radius: calc(10 * var(--u)); background: #1f1f1f; box-shadow: 0 0 0 1px rgba(255,255,255,.04); }
+.about-metric__label { display: flex; align-items: center; gap: calc(10 * var(--u)); font: 400 max(calc(15 * var(--u)), 10px)/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #8a8a8a; }
+.about-metric__value { margin-top: calc(14 * var(--u)); display: flex; align-items: baseline; gap: calc(12 * var(--u)); flex-wrap: wrap; font: 800 max(calc(32 * var(--u)), 22px)/1 var(--mono); color: #f4f4f4; }
+.about-metric__unit { font: 600 max(calc(15 * var(--u)), 10px)/1 var(--mono); color: #5d6068; text-transform: uppercase; }
+
+@media (max-width: 999px) {
+  .about__grid { grid-template-columns: minmax(0, 1fr); row-gap: 20px; }
+  .about__col { gap: 16px; }
+  .about-card { padding: 28px 22px; }
+  .about-card__photo { margin-bottom: 28px; }
+  /* Keep all 3 metric cards in one row on mobile */
+  .about-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .about-metric { padding: 12px 10px; text-align: center; }
+  .about-metric__label { justify-content: center; font-size: 9px; gap: 4px; }
+  .about-metric__value { justify-content: center; font-size: 20px; gap: 6px; }
+  .about-metric__unit { font-size: 8.5px; }
+}
+/* Removed the old @media (max-width: 520px) that stacked metrics to 1 column */

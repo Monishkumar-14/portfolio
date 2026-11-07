@@ -1,89 +1,105 @@
-// src/components/MobileTabBar.jsx
-// Fixed bottom tab navigation — mobile only, glassmorphic pill, dark mode only
-import { useCallback, useRef } from "react";
-import { Home, User, Briefcase, Code2, Award, MessageCircle, Mail } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Home, User, Briefcase, Code2, Award, Mail } from "lucide-react";
 import { useActiveSection } from "../context/ActiveSectionContext";
+import { useMediaQuery } from "../utils/useMediaQuery";
+import "./MobileTabBar.css";
+
+/* Mobile-only (< 768px) floating glass tab bar. On wider screens the right-hand rail (Navbar.jsx)
+   is shown instead; each component renders null at the other breakpoint, so the two navigation
+   systems never exist at the same time. Active-section detection is the app's existing
+   ActiveSectionContext (no second observer). */
+export const MOBILE_QUERY = "(max-width: 767px)";
 
 const tabs = [
-  { id: "home",         icon: Home,          label: "Home" },
-  { id: "about",        icon: User,          label: "About" },
-  { id: "experience",   icon: Briefcase,     label: "Work" },
-  { id: "projects",     icon: Code2,         label: "Projects" },
-  { id: "certificates", icon: Award,         label: "Certs" },
-  { id: "chatbot",      icon: MessageCircle, label: "Chat" },
-  { id: "contact",      icon: Mail,          label: "Contact" },
+  { id: "home",         icon: Home,      label: "Home" },
+  { id: "about",        icon: User,      label: "About" },
+  { id: "experience",   icon: Briefcase, label: "Work" },
+  { id: "projects",     icon: Code2,     label: "Projects" },
+  { id: "certificates", icon: Award,     label: "Certs" },
+  { id: "contact",      icon: Mail,      label: "Contact" },
 ];
 
+const HOLD_MS = 1200; // keep the tapped tab highlighted while the smooth scroll runs
+
 const MobileTabBar = () => {
+  const isMobile = useMediaQuery(MOBILE_QUERY);
   const activeSection = useActiveSection();
 
-  // ── Horizontal swipe for scrollable tabs ──────────────────────
-  const scrollRef = useRef(null);
-  const touchStartX = useRef(0);
-  const scrollStartX = useRef(0);
+  const barRef = useRef(null);
+  const holdTimer = useRef(null);
+  const [pending, setPending] = useState(null); // tab the user just tapped
 
-  const handleTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX;
-    scrollStartX.current = scrollRef.current?.scrollLeft || 0;
-  };
+  const current = pending ?? (activeSection || "home");
 
-  const handleTouchMove = (e) => {
-    if (!scrollRef.current) return;
-    const dx = touchStartX.current - e.touches[0].clientX;
-    scrollRef.current.scrollLeft = scrollStartX.current + dx;
-  };
+  /* Publish the bar's real footprint (its height + its offset from the bottom edge, safe area included)
+     as --mnav-offset on <html>. The chatbot launcher, back-to-top button and page padding all position
+     themselves from it, so nothing is ever hidden behind the bar. */
+  useEffect(() => {
+    if (!isMobile) return undefined;
+    const root = document.documentElement;
+    const el = barRef.current;
+    if (!el) return undefined;
+    const publish = () => {
+      const bottom = parseFloat(getComputedStyle(el).bottom) || 0;
+      root.style.setProperty("--mnav-offset", `${Math.round(el.offsetHeight + bottom)}px`);
+    };
+    publish();
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(publish) : null;
+    ro?.observe(el);
+    window.addEventListener("resize", publish);
+    window.addEventListener("orientationchange", publish);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener("resize", publish);
+      window.removeEventListener("orientationchange", publish);
+      root.style.removeProperty("--mnav-offset");
+    };
+  }, [isMobile]);
 
-  const handleTap = useCallback((id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  // Release the tap highlight once the observer catches up (or after a fallback delay).
+  useEffect(() => {
+    if (pending && activeSection === pending) { clearTimeout(holdTimer.current); setPending(null); }
+  }, [activeSection, pending]);
+  useEffect(() => () => clearTimeout(holdTimer.current), []);
+
+  const handleTap = useCallback((e, id) => {
+    e.preventDefault();
+    const behavior = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior, block: "start" });
+    else if (id === "home") window.scrollTo({ top: 0, behavior });
+    else return;
+    setPending(id);
+    clearTimeout(holdTimer.current);
+    holdTimer.current = setTimeout(() => setPending(null), HOLD_MS);
+    window.history.pushState(null, "", `#${id}`);
   }, []);
 
-  return (
-    <div className="md:hidden fixed bottom-3 left-3 right-3 z-50">
-      {/* ── Floating glassmorphic pill ── */}
-      <div className="glass-nav rounded-full px-2 py-1.5 flex items-center gap-1">
+  if (!isMobile) return null;
 
-        {/* Scrollable tab area */}
-        <div
-          ref={scrollRef}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          className="flex items-center gap-0.5 overflow-x-auto flex-1 scrollbar-hide"
-          style={{ scrollBehavior: "smooth", WebkitOverflowScrolling: "touch" }}
-        >
+  return (
+    <nav className="mtab" ref={barRef} aria-label="Section navigation">
+      <div className="mtab__bar">
+        <ul className="mtab__list">
           {tabs.map(({ id, icon: Icon, label }) => {
-            const isActive = activeSection === id;
+            const isActive = current === id;
             return (
-              <button
-                key={id}
-                onClick={() => handleTap(id)}
-                className={`relative flex flex-col items-center justify-center gap-[2px] 
-                  min-w-[46px] py-1.5 px-1 rounded-full transition-all duration-200
-                  ${isActive
-                    ? "bg-violet-500/20 border border-violet-500/30 shadow-[0_0_10px_rgba(124,58,237,0.15)]"
-                    : "border border-transparent"
-                  }`}
-                aria-label={label}
-              >
-                <Icon
-                  size={16}
-                  strokeWidth={isActive ? 2.5 : 1.8}
-                  className={`transition-colors duration-200 ${
-                    isActive ? "text-violet-400" : "text-white/50"
-                  }`}
-                />
-                <span
-                  className={`text-[8px] font-bold uppercase tracking-wider transition-colors duration-200 leading-none ${
-                    isActive ? "text-violet-300" : "text-white/35"
-                  }`}
+              <li key={id} className="mtab__cell">
+                <a
+                  href={`#${id}`}
+                  className={`mtab__item${isActive ? " is-active" : ""}`}
+                  aria-current={isActive ? "location" : undefined}
+                  onClick={(e) => handleTap(e, id)}
                 >
-                  {label}
-                </span>
-              </button>
+                  <Icon size={18} strokeWidth={isActive ? 2.4 : 1.8} aria-hidden="true" />
+                  <span className="mtab__label">{label}</span>
+                </a>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </div>
-    </div>
+    </nav>
   );
 };
 

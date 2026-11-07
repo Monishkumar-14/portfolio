@@ -237,8 +237,8 @@ const Bubble = ({ msg, isStreaming, onStreamDone }) => {
         <div
           className={`px-4 py-3 text-[13px] leading-relaxed ${
             isUser
-              ? "bg-gradient-to-br from-violet-500/40 to-cyan-500/30 border border-violet-500/35 rounded-[18px] rounded-br-[4px] text-white"
-              : "bg-white/8 border border-white/10 rounded-[18px] rounded-bl-[4px] text-white/85"
+              ? "bg-gradient-to-br from-violet-500/40 to-cyan-500/30 border border-violet-500/35 rounded-[18px] rounded-br-[4px] text-white chatbot-user-bubble"
+              : "bg-white/8 border border-white/10 rounded-[18px] rounded-bl-[4px] text-white/85 chatbot-bot-bubble"
           }`}
         >
           {isStreaming && !isUser ? (
@@ -505,18 +505,18 @@ export default function Chatbot() {
           viewport={{ once: true }}
           className="mb-12 text-center"
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[3px] text-violet-400 mb-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[3px] text-blue-600 dark:text-blue-400 mb-3">
             06 — Assistant
           </p>
-          <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-[#14213D] dark:text-[#F1F5F9]">
             Chat with{" "}
-            <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="text-blue-600 dark:text-blue-400">
               my AI
             </span>
           </h2>
-          <p className="text-sm text-white/40 max-w-md mx-auto leading-relaxed">
+          <p className="text-sm text-[#586780] dark:text-[#A6B4C8] max-w-md mx-auto leading-relaxed">
             Your personal AI guide to explore Monish's work and experience.{" "}
-            <span className="text-violet-300 font-semibold">Powered by Groq · Qwen 3.8</span>
+            <span className="text-blue-600 dark:text-blue-400 font-semibold">Powered by Groq · Qwen 3.8</span>
           </p>
         </motion.div>
 
@@ -533,7 +533,7 @@ export default function Chatbot() {
               {/* Glowing avatar */}
               <AIAvatar />
 
-              <h3 className="text-[15px] font-bold mb-0.5">Monish AI Assistant</h3>
+              <h3 className="text-[15px] font-bold mb-0.5">Portfolio AI Assistant</h3>
               <p className="text-[11px] text-white/35 leading-relaxed mb-4">
                 Trained on Monish's projects,<br/>skills &amp; experience
               </p>

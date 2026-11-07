@@ -1,0 +1,15 @@
+/* Boot splash. Background layers come from the shared <Background /> (charcoal base + top-left glow + square grid). */
+.splash { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.splash__inner { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 24px; text-align: center; }
+
+.splash__logo { position: relative; display: grid; place-items: center; width: 68px; height: 68px; border-radius: 50%; color: #ff6b35; background: #1f1f1f; border: 2px solid #ff6b35; box-shadow: 0 0 24px rgba(255, 107, 53, 0.3); font: 800 28px/1 var(--font-mono, "JetBrains Mono", ui-monospace, monospace); }
+.splash__logo::before { content: ""; position: absolute; inset: -9px; border-radius: 50%; border: 1px dotted rgba(255, 107, 53, 0.55); }
+
+.splash__text { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.splash__name { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 15px/1 var(--font-mono, "JetBrains Mono", ui-monospace, monospace); color: #f0f2f4; letter-spacing: .02em; }
+.splash__name i { width: 8px; height: 8px; border-radius: 50%; background: #18c98b; }
+.splash__name b { color: #ff6b35; font-weight: 700; }
+.splash__boot { margin: 0; font: 400 11px/1 var(--font-mono, "JetBrains Mono", ui-monospace, monospace); letter-spacing: .18em; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); }
+
+.splash__bar { width: 120px; height: 2px; border-radius: 99px; overflow: hidden; background: rgba(255, 255, 255, 0.08); }
+.splash__bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #ff6b35, #ff8f65); }

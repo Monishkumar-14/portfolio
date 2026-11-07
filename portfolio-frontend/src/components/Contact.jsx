@@ -1,602 +1,281 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Send, Github, Linkedin, Mail, CheckCircle2, AlertCircle, Shield, Phone, MapPin, Clock, Briefcase, Handshake, Wrench, BookOpen, MessageCircle } from "lucide-react";
+import { useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  Send, Github, Linkedin, Mail, CheckCircle2, AlertCircle, Briefcase, Handshake, Wrench, BookOpen,
+  MessageCircle, Code2, FileCode2,
+} from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import "./Sections.css";
+import "./Contact.css";
 
-// ── Inline LeetCode SVG ───────────────────────────────────────────
-const LeetCodeIcon = () => (
-  <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
-    <path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z"/>
+const LeetCodeIcon = ({ size = 15 }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" aria-hidden="true">
+    <path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z" />
   </svg>
 );
 
-// ── Data ──────────────────────────────────────────────────────────
-const CONTACT_ITEMS = [
-  {
-    icon: <Mail size={16} />,
-    iconBg: "bg-violet-500/12 border-violet-500/28",
-    label: "Email",
-    value: "monish1421@gmail.com",
-    href: "mailto:monish1421@gmail.com",
-  },
-  {
-    icon: <Phone size={16} />,
-    iconBg: "bg-cyan-500/10 border-cyan-500/25",
-    label: "Phone",
-    value: "+91 85310 41337",
-    href: "tel:+918531041337",
-  },
-  {
-    icon: <MapPin size={16} />,
-    iconBg: "bg-pink-500/10 border-pink-500/25",
-    label: "Location",
-    value: "Chennai, Tamil Nadu, India",
-    href: "https://maps.google.com/?q=Chennai,Tamil+Nadu,India",
-  },
-  {
-    icon: <Clock size={16} />,
-    iconBg: "bg-amber-500/10 border-amber-500/25",
-    label: "Response Time",
-    value: "Usually within 24 hours",
-    href: null,
-  },
-];
+const fadeUp = (delay = 0, reduce = false) => ({
+  initial: { opacity: 0, y: reduce ? 0 : 30 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.6, delay, ease: "easeOut" },
+});
+
+/* Your four links, exactly as given in the brief. */
+const LINKS = {
+  github: "https://github.com/Monishkumar-14",
+  linkedin: "http://www.linkedin.com/in/monishkumar-ceg",
+  email: "mailto:monish1421@gmail.com",
+  leetcode: "https://leetcode.com/monish14_3",
+};
+const EMAIL = "monish1421@gmail.com";
 
 const SOCIALS = [
-  { icon: <Github size={15} />,   label: "GitHub",   href: "https://github.com/Monishkumar-14" },
-  { icon: <Linkedin size={15} />, label: "LinkedIn", href: "https://linkedin.com/in/monish-kumar-b55774291" },
-  { icon: <Mail size={15} />,     label: "Email",    href: "mailto:monish1421@gmail.com" },
-  { icon: <LeetCodeIcon />,       label: "LeetCode", href: "https://leetcode.com/monish14_3" },
+  { icon: <Github size={15} aria-hidden="true" />, label: "GitHub", href: LINKS.github, external: true },
+  { icon: <Linkedin size={15} aria-hidden="true" />, label: "LinkedIn", href: LINKS.linkedin, external: true },
+  { icon: <Mail size={15} aria-hidden="true" />, label: "Email", href: LINKS.email },
+  { icon: <LeetCodeIcon />, label: "LeetCode", href: LINKS.leetcode, external: true },
 ];
 
 const SUBJECTS = [
-  { icon: <Briefcase size={13} />, label: "Job Opportunity",   extraField: { name: "company", placeholder: "e.g. Google, Startup Inc.", label: "Company Name" } },
-  { icon: <Handshake size={13} />, label: "Collaboration",     extraField: null },
-  { icon: <Wrench size={13} />, label: "Freelance Project", extraField: { name: "budget",  placeholder: "e.g. ₹50k–₹1L / $500–$2k",  label: "Budget Range" } },
-  { icon: <BookOpen size={13} />, label: "Open Source",       extraField: null },
-  { icon: <MessageCircle size={13} />, label: "Just Saying Hi",    extraField: null },
+  { icon: <Briefcase size={13} aria-hidden="true" />, label: "Job Opportunity" },
+  { icon: <Handshake size={13} aria-hidden="true" />, label: "Collaboration" },
+  { icon: <Wrench size={13} aria-hidden="true" />, label: "Freelance" },
+  { icon: <BookOpen size={13} aria-hidden="true" />, label: "Open Source" },
+  { icon: <MessageCircle size={13} aria-hidden="true" />, label: "Just Saying Hi" },
 ];
 
-// ── Validation helpers ────────────────────────────────────────────
+const MAX_LEN = 2000; // unchanged from the previous form
 const validators = {
-  name:    (v) => v.trim().length >= 2  ? null : "Name must be at least 2 characters",
-  email:   (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : "Enter a valid email address",
-  message: (v) => v.trim().length >= 10 ? null : "Message must be at least 10 characters",
+  name: (v) => (v.trim().length >= 2 ? null : "At least 2 characters"),
+  email: (v) => (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : "Enter a valid email"),
+  message: (v) => (v.trim().length >= 10 ? null : "At least 10 characters"),
 };
 
-// ── Animations ────────────────────────────────────────────────────
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 40 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] },
-});
+const API = import.meta.env.VITE_API_URL || "";
+const INITIAL = { name: "", email: "", subject: "Job Opportunity", message: "" };
 
-// ── FloatingInput — TRUE floating label ───────────────────────────
-// How it works:
-//   • placeholder=" " (single space) keeps the :placeholder-shown selector
-//     active when the field is empty, so peer-placeholder-shown CSS works.
-//   • The <label> starts centred inside the input.
-//   • On focus OR when value exists → label slides up + shrinks.
-//   • No separate <label> outside the component is needed.
-const FloatingInput = ({
-  name, label, type = "text", value, onChange, onBlur,
-  error, touched, required, as: Tag = "input", rows, maxLength,
-}) => {
-  const hasValue  = value.length > 0;
-  const isValid   = touched && !error && hasValue;
-  const isInvalid = touched && !!error;
+/* ── JSON-style info panel ── */
+const Row = ({ n, indent = 0, children }) => (
+  <div className="cx-row">
+    <span className="cx-n" aria-hidden="true">{n}</span>
+    <span className="cx-t" style={{ paddingLeft: `${indent * 1.6}ch` }}>{children}</span>
+  </div>
+);
+const K = ({ children }) => <><span className="cx-k">"{children}"</span><span className="cx-p">: </span></>;
+const S = ({ children, href, external }) => href ? (
+  <a className="cx-s cx-a" href={href} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>"{children}"</a>
+) : <span className="cx-s">"{children}"</span>;
+const P = ({ children }) => <span className="cx-p">{children}</span>;
 
-  // For textarea the label starts at top; for input it starts centred.
-  const labelBase    = Tag === "textarea" ? "top-3 -translate-y-0" : "top-1/2 -translate-y-1/2";
-  // Floated position (focus or has value)
-  const labelFloated = "!top-2 !translate-y-0 !text-[10px] !leading-none";
+const InfoPanel = () => (
+  <section className="cx-win" aria-label="Contact information">
+    <header className="cx-win__bar">
+      <span className="cx-dots" aria-hidden="true"><i /><i /><i /></span>
+      <span className="cx-win__file"><Code2 size={14} aria-hidden="true" /> contact_info.json</span>
+    </header>
+    <pre className="cx-code" aria-label="contact_info.json">
+      <Row n={1}><P>{"{"}</P></Row>
+      <Row n={2} indent={1}><K>status</K><S>open_to_work</S><P>,</P></Row>
+      <Row n={3} indent={1}><K>email</K><S href={LINKS.email}>{EMAIL}</S><P>,</P></Row>
+      <Row n={4} indent={1}><K>socials</K><P>{"{"}</P></Row>
+      <Row n={5} indent={2}><K>github</K><S href={LINKS.github} external>Monishkumar-14</S><P>,</P></Row>
+      <Row n={6} indent={2}><K>linkedin</K><S href={LINKS.linkedin} external>monishkumar-ceg</S></Row>
+      <Row n={7} indent={1}><P>{"},"}</P></Row>
+      <Row n={8} indent={1}><K>leetcode</K><S href={LINKS.leetcode} external>monish14_3</S><P>,</P></Row>
+      <Row n={9} indent={1}><K>location</K><S>Chennai, India</S><P>,</P></Row>
+      <Row n={10} indent={1}><K>response</K><S>Usually within 24hrs</S></Row>
+      <Row n={11}><P>{"}"}</P></Row>
+      <Row n={12}>{" "}</Row>
+      <Row n={13}><span className="cx-c">{"// Waiting for connection..."}</span></Row>
+      <Row n={14}><span className="cx-cursor" aria-hidden="true">_</span></Row>
+    </pre>
+  </section>
+);
 
-  return (
-    <div className="relative">
-      <Tag
-        id={name}
-        name={name}
-        value={value}
-        onChange={onChange}
-        onBlur={onBlur}
-        type={type}
-        // ⚠️ IMPORTANT: placeholder must be a single space so
-        //    peer-placeholder-shown triggers correctly when empty.
-        placeholder=" "
-        required={required}
-        rows={rows}
-        maxLength={maxLength}
-        className={[
-          // Base glass input styles (defined in your global CSS)
-          "glass-input w-full px-4 text-sm transition-all duration-200 peer",
-          // Extra top padding so text doesn't overlap the floated label
-          Tag === "textarea" ? "pt-6 pb-3 resize-none" : "pt-5 pb-2",
-          isValid   ? "!border-green-500/50 !bg-green-500/5"  : "",
-          isInvalid ? "!border-red-500/50   !bg-red-500/5"    : "",
-          // Focus glow
-          "focus:ring-2 focus:ring-violet-500/30 outline-none",
-        ].join(" ")}
-      />
+/* ── Form panel ── */
+const FormPanel = ({ reduce }) => {
+  const [form, setForm] = useState(INITIAL);
+  const [touched, setTouched] = useState({});
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  const [trap, setTrap] = useState(""); // honeypot: real users never see or fill this
+  const refs = { name: useRef(null), email: useRef(null), message: useRef(null) };
+  const subjectRefs = useRef([]);
 
-      {/* ── Floating Label ── */}
-      <label
-        htmlFor={name}
-        className={[
-          // Base position
-          `absolute left-4 pointer-events-none select-none`,
-          `text-sm text-white/40 transition-all duration-200`,
-          labelBase,
-          // Float up when peer is focused OR has a value
-          // (peer-focus always floats; peer-placeholder-shown is true when empty=no float)
-          "peer-focus:" + labelFloated,
-          // When NOT placeholder-shown (i.e. has a value) → float
-          hasValue ? labelFloated : "",
-          // Color changes
-          "peer-focus:text-violet-400",
-          hasValue && !isInvalid ? "text-violet-400/70" : "",
-          isInvalid ? "!text-red-400/70" : "",
-          isValid   ? "!text-green-400/70" : "",
-        ].join(" ")}
-      >
-        {label}{required && <span className="ml-0.5 text-violet-400/60">*</span>}
-      </label>
+  const errors = { name: validators.name(form.name), email: validators.email(form.email), message: validators.message(form.message) };
+  const isValid = !errors.name && !errors.email && !errors.message;
 
-      {/* ── Validation Icon ── */}
-      <AnimatePresence>
-        {isValid && (
-          <motion.span
-            key="ok"
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.6 }}
-            className={`absolute right-3 ${Tag === "textarea" ? "top-3" : "top-1/2 -translate-y-1/2"} text-green-400`}
-          >
-            <CheckCircle2 size={14} />
-          </motion.span>
-        )}
-        {isInvalid && (
-          <motion.span
-            key="err"
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.6 }}
-            className={`absolute right-3 ${Tag === "textarea" ? "top-3" : "top-1/2 -translate-y-1/2"} text-red-400`}
-          >
-            <AlertCircle size={14} />
-          </motion.span>
-        )}
-      </AnimatePresence>
-
-      {/* ── Error Message ── */}
-      <AnimatePresence>
-        {isInvalid && (
-          <motion.p
-            key="msg"
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            className="text-[10px] text-red-400 mt-1 ml-1"
-          >
-            {error}
-          </motion.p>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
-// ── Component ─────────────────────────────────────────────────────
-const Contact = () => {
-  const [form, setForm] = useState({
-    name: "", email: "", subject: "Job Opportunity", company: "", budget: "", message: "",
-  });
-  const [touched,   setTouched]   = useState({});
-  const [activeSub, setActiveSub] = useState("Job Opportunity");
-  const [loading,   setLoading]   = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  const activeSubject = SUBJECTS.find((s) => s.label === activeSub);
-  const extraField    = activeSubject?.extraField ?? null;
-
-  const errors = {
-    name:    validators.name(form.name),
-    email:   validators.email(form.email),
-    message: validators.message(form.message),
-  };
-  const isFormValid = !errors.name && !errors.email && !errors.message;
-
-  const handleChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleBlur = (e) => {
-    setTouched((prev) => ({ ...prev, [e.target.name]: true }));
-  };
-
-  const pickSubject = (label) => {
-    setActiveSub(label);
-    setForm((prev) => ({ ...prev, subject: label, company: "", budget: "" }));
-  };
+  const handleChange = (e) => { setSubmitError(null); setForm((p) => ({ ...p, [e.target.name]: e.target.value })); };
+  const handleBlur = (e) => setTouched((p) => ({ ...p, [e.target.name]: true }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (sending) return; // no duplicate submissions
     setTouched({ name: true, email: true, message: true });
-
-    if (!isFormValid) {
-      toast.error("Please fix the errors before sending.");
+    if (!isValid) {
+      const first = ["name", "email", "message"].find((k) => errors[k]);
+      refs[first]?.current?.focus();
       return;
     }
-
-    setLoading(true);
+    if (trap) return; // bot filled the hidden field: send nothing, show nothing
+    setSending(true);
+    setSubmitError(null);
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/messages`, form);
-      setSubmitted(true);
-      toast.success("Message sent! Monish will reply soon.");
-      setForm({ name: "", email: "", subject: "Job Opportunity", company: "", budget: "", message: "" });
+      // Same endpoint and payload as before.
+      await axios.post(`${API}/api/messages`, {
+        name: form.name.trim(), email: form.email.trim(), subject: form.subject, message: form.message.trim(),
+      });
+      setSent(true); // only after the server confirmed (2xx)
+      setForm(INITIAL);
       setTouched({});
-      setActiveSub("Job Opportunity");
-      setTimeout(() => setSubmitted(false), 5000);
+      toast.success("Message sent successfully!");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Something went wrong. Please try again.");
+      const msg = err.response?.data?.message
+        || (err.request ? "Couldn't reach the server. Check your connection and try again." : "Failed to send. Please try again.");
+      setSubmitError(msg); // entered data is kept
+      toast.error(msg);
     } finally {
-      setLoading(false);
+      setSending(false);
     }
   };
 
-  const charPct = form.message.length / 500;
-  const charColor =
-    form.message.length > 450 ? "text-red-400" :
-    form.message.length > 350 ? "text-amber-400" : "text-white/25";
+  const onSubjectKey = (e, i) => {
+    const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+    if (!d) return;
+    e.preventDefault();
+    const n = (i + d + SUBJECTS.length) % SUBJECTS.length;
+    setForm((p) => ({ ...p, subject: SUBJECTS[n].label }));
+    subjectRefs.current[n]?.focus();
+  };
+
+  const fieldErr = (k) => touched[k] && errors[k];
 
   return (
-    <div className="min-h-screen py-24 px-6">
-      <div className="max-w-5xl mx-auto">
+    <section className="cx-win cx-win--form" aria-label="Send me a message">
+      <header className="cx-win__bar">
+        <span className="cx-dots" aria-hidden="true"><i /><i /><i /></span>
+        <span className="cx-win__file cx-win__file--tab"><b className="cx-ts" aria-hidden="true">TS</b> sendMessage.ts</span>
+      </header>
 
-        {/* ── Header ── */}
-        <motion.div {...fadeUp(0)} className="mb-14">
-          <p className="text-[11px] font-semibold uppercase tracking-[3px] text-violet-400 mb-3">
-            06 — Contact
-          </p>
-          <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight mb-4">
-            Let's Build{" "}
-            <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent">
-              Something Great
-            </span>{" "}
-            Together
-          </h2>
-          <p className="text-sm text-white/40 leading-relaxed max-w-lg">
-            Available for internships, freelance projects &amp; collaborations.
-            Drop a message — I reply within 24 hours.
-          </p>
+      {sent ? (
+        <div className="cx-sent" role="status">
+          <CheckCircle2 size={44} aria-hidden="true" />
+          <p className="cx-sent__t">Message Sent!</p>
+          <p className="cx-sent__d">I'll get back to you within 24 hours.</p>
+          <button type="button" className="cx-btn cx-btn--ghost" onClick={() => setSent(false)}>Send Another</button>
+        </div>
+      ) : (
+        <form className="cx-form" onSubmit={handleSubmit} noValidate aria-busy={sending}>
+          <div className="cx-mail">
+            <div className="cx-mail__head"><Mail size={16} aria-hidden="true" /> mail.compose</div>
+            <div className="cx-mail__to">
+              <span>to: <a href={LINKS.email}>{EMAIL}</a></span>
+              <span>response: <b>usually within 24hrs</b></span>
+            </div>
 
-          <motion.div {...fadeUp(0.15)} className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-6">
-            {[
-              { dot: "bg-violet-400", text: "Open to full-time roles" },
-              { dot: "bg-cyan-400",   text: "Remote & on-site" },
-              { dot: "bg-pink-400",   text: "Trusted by peers & mentors" },
-            ].map(({ dot, text }) => (
-              <span key={text} className="flex items-center gap-2">
-                <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
-                <span className="text-[11px] text-white/35 font-medium">{text}</span>
-              </span>
-            ))}
-          </motion.div>
-        </motion.div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.45fr] gap-5">
-
-          {/* ══ LEFT — Info ══ */}
-          <div className="flex flex-col gap-4">
-
-            <motion.div {...fadeUp(0.1)} className="glass-card p-7">
-              {/* Availability badge */}
-              <div className="flex items-center gap-3 p-4 rounded-[16px] bg-green-500/7 border border-green-500/20 mb-6">
-                <motion.div
-                  className="w-2.5 h-2.5 rounded-full bg-green-400 flex-shrink-0"
-                  animate={{ boxShadow: ["0 0 6px #4ade80", "0 0 20px #4ade80", "0 0 6px #4ade80"] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                />
-                <div>
-                  <p className="text-[12px] font-bold text-green-400">Available for Opportunities</p>
-                  <p className="text-[10px] text-green-400/55 mt-0.5">
-                    Actively seeking roles · Chennai / Remote
-                  </p>
+            <div className="cx-mail__body">
+              <div className="cx-two">
+                <div className="cx-field">
+                  <label htmlFor="contact-name">Name *</label>
+                  <input ref={refs.name} id="contact-name" name="name" type="text" autoComplete="name" required
+                    value={form.name} onChange={handleChange} onBlur={handleBlur} placeholder="Your Name"
+                    aria-invalid={!!fieldErr("name")} aria-describedby={fieldErr("name") ? "err-name" : undefined} />
+                  {fieldErr("name") && <p id="err-name" className="cx-err" role="alert"><AlertCircle size={12} aria-hidden="true" /> {errors.name}</p>}
+                </div>
+                <div className="cx-field">
+                  <label htmlFor="contact-email">Email *</label>
+                  <input ref={refs.email} id="contact-email" name="email" type="email" autoComplete="email" required
+                    value={form.email} onChange={handleChange} onBlur={handleBlur} placeholder="your@email.com"
+                    aria-invalid={!!fieldErr("email")} aria-describedby={fieldErr("email") ? "err-email" : undefined} />
+                  {fieldErr("email") && <p id="err-email" className="cx-err" role="alert"><AlertCircle size={12} aria-hidden="true" /> {errors.email}</p>}
                 </div>
               </div>
 
-              <h3 className="text-lg font-extrabold mb-2">Get in Touch</h3>
-              <p className="text-sm text-white/42 leading-relaxed mb-6">
-                Whether it's a job opportunity, project collaboration, or just a hello — I'm always happy to connect!
-              </p>
-
-              <div className="flex flex-col gap-3">
-                {CONTACT_ITEMS.map(({ icon, iconBg, label, value, href }, i) => (
-                  <motion.a
-                    key={label}
-                    href={href || undefined}
-                    target={href ? "_blank" : undefined}
-                    rel="noreferrer"
-                    initial={{ opacity: 0, x: -16 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.15 + i * 0.07, duration: 0.5, ease: "easeOut" }}
-                    whileHover={{ x: 5 }}
-                    className={`flex items-center gap-4 p-4 rounded-[14px] bg-white/4 border border-white/8 transition-all ${
-                      href
-                        ? "hover:bg-violet-500/10 hover:border-violet-500/25 cursor-pointer group"
-                        : "cursor-default"
-                    }`}
-                  >
-                    <div className={`w-10 h-10 rounded-[12px] flex items-center justify-center text-lg flex-shrink-0 border ${iconBg}`}>
-                      {icon}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[10px] text-white/30 uppercase tracking-[1px] mb-0.5">{label}</p>
-                      <p className="text-[13px] font-semibold text-white/80 truncate">{value}</p>
-                    </div>
-                    {href && (
-                      <span className="ml-auto text-white/20 group-hover:text-violet-400 transition-colors text-xs">↗</span>
-                    )}
-                  </motion.a>
-                ))}
+              <div className="cx-field">
+                <span id="subject-label" className="cx-label">Subject</span>
+                <div className="cx-subjects" role="radiogroup" aria-labelledby="subject-label">
+                  {SUBJECTS.map(({ icon, label }, i) => {
+                    const on = form.subject === label;
+                    return (
+                      <button key={label} type="button" role="radio" aria-checked={on} tabIndex={on ? 0 : -1}
+                        ref={(el) => { subjectRefs.current[i] = el; }}
+                        className={`cx-subj${on ? " is-on" : ""}`}
+                        onClick={() => setForm((p) => ({ ...p, subject: label }))} onKeyDown={(e) => onSubjectKey(e, i)}>
+                        {icon} {label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </motion.div>
 
-            <motion.div {...fadeUp(0.18)} className="glass-card p-5">
-              <p className="text-[10px] font-semibold uppercase tracking-[2px] text-white/28 mb-4">
-                Find Me Online
-              </p>
-              <div className="flex flex-wrap gap-2.5">
-                {SOCIALS.map(({ icon, label, href }, i) => (
-                  <motion.a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noreferrer"
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.2 + i * 0.06 }}
-                    whileHover={{ scale: 1.08, y: -3 }}
-                    whileTap={{ scale: 0.94 }}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-[12px] bg-white/6 border border-white/10 text-white/60 text-xs font-semibold hover:bg-violet-500/15 hover:border-violet-500/30 hover:text-violet-300 transition-all"
-                  >
-                    <span className="text-sm">{icon}</span>
-                    {label}
-                  </motion.a>
-                ))}
+              <div className="cx-field">
+                <label htmlFor="contact-message">Message *</label>
+                <textarea ref={refs.message} id="contact-message" name="message" rows={6} required maxLength={MAX_LEN}
+                  value={form.message} onChange={handleChange} onBlur={handleBlur}
+                  placeholder="Tell me about your project, timeline, and goals..."
+                  aria-invalid={!!fieldErr("message")} aria-describedby={fieldErr("message") ? "err-message" : undefined} />
+                <div className="cx-msgfoot">
+                  {fieldErr("message") ? <p id="err-message" className="cx-err" role="alert"><AlertCircle size={12} aria-hidden="true" /> {errors.message}</p> : <span />}
+                  <span className="cx-count" aria-live="off">{form.message.length}/{MAX_LEN}</span>
+                </div>
               </div>
-            </motion.div>
 
+              {/* honeypot */}
+              <div className="cx-trap" aria-hidden="true">
+                <label>Website<input type="text" name="website" tabIndex={-1} autoComplete="off" value={trap} onChange={(e) => setTrap(e.target.value)} /></label>
+              </div>
+            </div>
           </div>
 
-          {/* ══ RIGHT — Form ══ */}
-          <motion.div {...fadeUp(0.2)} className="glass-card p-9">
-            <p className="text-[10px] font-semibold uppercase tracking-[2px] text-white/28 mb-6">
-              Send a Message
-            </p>
+          {submitError && <p className="cx-banner" role="alert"><AlertCircle size={16} aria-hidden="true" /> {submitError}</p>}
 
-            <form onSubmit={handleSubmit} noValidate>
+          <button type="submit" className="cx-btn cx-btn--send" disabled={sending}>
+            {sending ? <><span className={`cx-spin${reduce ? " is-static" : ""}`} aria-hidden="true" /> SENDING...</> : <><Send size={16} aria-hidden="true" /> SEND MESSAGE</>}
+          </button>
+        </form>
+      )}
+    </section>
+  );
+};
 
-              {/* Name + Email row — NO external labels, label lives inside FloatingInput */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <FloatingInput
-                  name="name"
-                  label="Your Name"
-                  value={form.name}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={errors.name}
-                  touched={touched.name}
-                  required
-                />
-                <FloatingInput
-                  name="email"
-                  type="email"
-                  label="Email Address"
-                  value={form.email}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={errors.email}
-                  touched={touched.email}
-                  required
-                />
-              </div>
+const Contact = () => {
+  const reduce = useReducedMotion();
+  return (
+    <section id="contact" className="sect contact" aria-labelledby="contact-title">
+      <div className="sect__bg" aria-hidden="true" />
+      <div className="sect__inner">
+        <motion.h2 {...fadeUp(0, reduce)} id="contact-title" className="sect__title">
+          <span className="sect__icon"><Mail size={34} aria-hidden="true" /></span>$ ./contact.exe
+        </motion.h2>
+        <motion.p {...fadeUp(0.05, reduce)} className="cx-sub">Interested in working together? Drop me a message.</motion.p>
 
-              {/* Subject chips */}
-              <div className="mb-4">
-                <label className="block text-[11px] font-semibold uppercase tracking-[1px] text-white/35 mb-3">
-                  I'm reaching out about
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {SUBJECTS.map(({ icon, label }) => (
-                    <motion.button
-                      key={label}
-                      type="button"
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => pickSubject(label)}
-                      className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold border transition-all ${
-                        activeSub === label
-                          ? "bg-violet-500/20 border-violet-500/40 text-violet-300 shadow-[0_0_12px_rgba(139,92,246,0.2)]"
-                          : "bg-white/5 border-white/9 text-white/45 hover:bg-white/10 hover:text-white"
-                      }`}
-                    >
-                      <span>{icon}</span> {label}
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Smart extra field (animated in/out) — also uses floating label */}
-              <AnimatePresence>
-                {extraField && (
-                  <motion.div
-                    key={extraField.name}
-                    initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                    animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
-                    exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="overflow-hidden"
-                  >
-                    {/*
-                      Extra field (company / budget) — we use a plain floating-label
-                      input here manually since it's not validated and has a violet tint.
-                    */}
-                    <div className="relative">
-                      <input
-                        id={extraField.name}
-                        name={extraField.name}
-                        value={form[extraField.name] || ""}
-                        onChange={handleChange}
-                        type="text"
-                        placeholder=" "
-                        className="glass-input w-full px-4 pt-5 pb-2 text-sm !border-violet-500/25 !bg-violet-500/5 focus:ring-2 focus:ring-violet-500/30 outline-none peer transition-all duration-200"
-                      />
-                      <label htmlFor={extraField.name} className={[
-                        "absolute left-4 pointer-events-none select-none text-sm transition-all duration-200",
-                        "text-violet-400/60",
-                        "top-1/2 -translate-y-1/2",
-                        // Float when focused
-                        "peer-focus:!top-2 peer-focus:!translate-y-0 peer-focus:!text-[10px] peer-focus:!leading-none peer-focus:text-violet-400",
-                        // Float when has value
-                        (form[extraField.name] || "").length > 0
-                          ? "!top-2 !translate-y-0 !text-[10px] !leading-none"
-                          : "",
-                      ].join(" ")}>
-                        {extraField.label}
-                        <span className="ml-1 normal-case text-[10px] text-white/25">(optional)</span>
-                      </label>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Subject text input — floating label */}
-              <div className="mb-4">
-                <div className="relative">
-                  <input
-                    id="subject"
-                    name="subject"
-                    value={form.subject}
-                    onChange={handleChange}
-                    type="text"
-                    placeholder=" "
-                    className="glass-input w-full px-4 pt-5 pb-2 text-sm focus:ring-2 focus:ring-violet-500/30 outline-none peer transition-all duration-200"
-                  />
-                  <label htmlFor="subject" className={[
-                    "absolute left-4 pointer-events-none select-none text-sm transition-all duration-200 text-white/40",
-                    "top-1/2 -translate-y-1/2",
-                    "peer-focus:!top-2 peer-focus:!translate-y-0 peer-focus:!text-[10px] peer-focus:!leading-none peer-focus:text-violet-400",
-                    form.subject.length > 0 ? "!top-2 !translate-y-0 !text-[10px] !leading-none text-violet-400/70" : "",
-                  ].join(" ")}>
-                    Subject
-                  </label>
-                </div>
-              </div>
-
-              {/* Message — floating label textarea */}
-              <div className="mb-5">
-                <div className="flex justify-between items-center mb-2">
-                  {/* No label here — it floats inside the textarea */}
-                  <span /> {/* spacer */}
-                  <div className="flex items-center gap-2">
-                    <div className="w-16 h-1 rounded-full bg-white/10 overflow-hidden">
-                      <motion.div
-                        className={`h-full rounded-full ${
-                          form.message.length > 450 ? "bg-red-400" :
-                          form.message.length > 350 ? "bg-amber-400" : "bg-violet-400"
-                        }`}
-                        animate={{ width: `${Math.min(charPct * 100, 100)}%` }}
-                        transition={{ duration: 0.2 }}
-                      />
-                    </div>
-                    <span className={`text-[10px] font-mono ${charColor}`}>
-                      {form.message.length} / 500
-                    </span>
-                  </div>
-                </div>
-                <FloatingInput
-                  as="textarea"
-                  name="message"
-                  label="Your Message"
-                  value={form.message}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={errors.message}
-                  touched={touched.message}
-                  rows={5}
-                  maxLength={500}
-                  required
-                />
-              </div>
-
-              {/* Submit */}
-              <motion.button
-                type="submit"
-                disabled={loading}
-                aria-label="Send message"
-                whileHover={!loading ? { scale: 1.02, y: -2 } : {}}
-                whileTap={!loading ? { scale: 0.98 } : {}}
-                className="w-full py-4 rounded-[14px] text-sm font-bold btn-primary-glass flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
-              >
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/8 to-transparent -translate-x-full hover:translate-x-full transition-transform duration-700 pointer-events-none" />
-
-                <AnimatePresence mode="wait">
-                  {loading ? (
-                    <motion.span
-                      key="loading"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="flex items-center gap-2"
-                    >
-                      <motion.div
-                        className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-                      />
-                      Sending...
-                    </motion.span>
-                  ) : submitted ? (
-                    <motion.span
-                      key="sent"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="flex items-center gap-2 text-green-300"
-                    >
-                      <CheckCircle2 size={15} /> Message Sent Successfully!
-                    </motion.span>
-                  ) : (
-                    <motion.span
-                      key="send"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex items-center gap-2"
-                    >
-                      <Send size={15} /> Send Message
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </motion.button>
-
-              {/* Trust footer */}
-              <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
-                {["Your data is secure", "No spam, ever", "Reply within 24h"].map((t, i) => (
-                  <span key={t} className="flex items-center gap-2">
-                    {i > 0 && <span className="w-1 h-1 rounded-full bg-white/15" />}
-                    <span className="text-[10px] text-white/22 flex items-center gap-1">{i === 0 && <Shield size={10} />}{t}</span>
-                  </span>
-                ))}
-              </div>
-
-            </form>
+        <div className="cx-grid">
+          <motion.div {...fadeUp(0.1, reduce)} className="cx-left">
+            <InfoPanel />
+            <ul className="cx-socials" aria-label="Social links">
+              {SOCIALS.map(({ icon, label, href, external }) => (
+                <li key={label}>
+                  <a className="cx-social" href={href} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    aria-label={external ? `${label} (opens in a new tab)` : `${label}: ${EMAIL}`}>
+                    {icon} {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </motion.div>
-
+          <motion.div {...fadeUp(0.15, reduce)} className="cx-right"><FormPanel reduce={reduce} /></motion.div>
         </div>
+
+        <footer className="cx-foot">
+          <p className="cx-foot__1"><FileCode2 size={18} aria-hidden="true" /> Monishkumar E M <span aria-hidden="true">|</span> Full-Stack Developer &amp; AI Engineer</p>
+          <p className="cx-foot__2">Built with &lt;3 using React, Node.js &amp; Tailwind CSS</p>
+          <p className="cx-foot__3">© 2026 Monishkumar E M. All rights reserved.</p>
+        </footer>
       </div>
-    </div>
+    </section>
   );
 };
 

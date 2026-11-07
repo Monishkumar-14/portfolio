@@ -1,133 +1,296 @@
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import {
+  Github, ChevronDown, Play, Eye, Terminal, ExternalLink,
+} from "lucide-react";
+import "./Hero.css";
 
 const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 30 },
+  initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
-  transition: { duration: 0.7, delay, ease: "easeOut" },
+  transition: { duration: 0.6, delay, ease: "easeOut" },
 });
 
-const stats = [
-  { num: "6+",   label: "Certifications" },
-  { num: "3+",  label: "Years Experience"},
-  { num: "10+", label: "GitHub Repos"   },
-];
+const LOADED_MODULES = ["React", "Node.js", "Python", "PostgreSQL", "FastAPI", "AI/ML"];
 
-const trust = [
-  "Built real-world projects",
-  "Experienced in Full-Stack + AI",
-  "Open to internships & roles",
-];
+// Intro copy. Swap in the longer B.Tech / CEG paragraph here if you prefer it.
+const INTRO_TEXT =
+  "Specializing in scalable full-stack applications, backend systems, and AI-powered solutions.";
 
-const Hero = () => (
-  <div className="min-h-screen flex items-center justify-center px-6 pt-24 pb-16">
-    <div className="max-w-3xl w-full text-center">
+const scrollToSection = (selector) =>
+  document.querySelector(selector)?.scrollIntoView({ behavior: "smooth" });
 
-      {/* ── Status badge ── */}
-      <motion.div {...fadeUp(0)} className="inline-flex items-center gap-2 px-5 py-2 rounded-full
-        bg-violet-500/15 border border-violet-500/30 text-violet-300 text-sm font-medium mb-9"
-      >
-        <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse shadow-[0_0_8px_#7c3aed]" />
-        Open to Full-Time Roles · Chennai / Remote
-      </motion.div>
+/* ═══════════════════════════════════════════════════════════
+   Initialize OS — interaction logic unchanged
+   ═══════════════════════════════════════════════════════════ */
+const InitializeComponent = () => {
+  const [progress, setProgress] = useState(0);
+  const [status, setStatus] = useState("Initializing...");
+  const [started, setStarted] = useState(false);
+  const intervalRef = useRef(null);
 
-      {/* ── Primary headline ── */}
-      <motion.h2 {...fadeUp(0.1)}
-        className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight mb-3"
-      >
-        Building{" "}
-        <span className="grad-text animate-[gradShift_4s_linear_infinite]">
-          Scalable Full-Stack Systems
-        </span>
-        {" "}& AI Solutions
-      </motion.h2>
+  const handleInit = () => {
+    if (started && progress >= 100) {
+      scrollToSection("#projects");
+      return;
+    }
+    setStarted(true);
+    setProgress(0);
+    setStatus("Loading...");
+    intervalRef.current = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(intervalRef.current);
+          setStatus("Complete");
+          setTimeout(() => scrollToSection("#about"), 400);
+          return 100;
+        }
+        return prev + 4;
+      });
+    }, 50);
+  };
 
-      {/* ── Name (secondary) ── */}
-      <motion.h1 {...fadeUp(0.2)}
-        className="text-7xl md:text-8xl font-extrabold tracking-tighter leading-none mb-5"
-        style={{ letterSpacing: "-3px" }}
-      >
-        Hi, I'm <span className="grad-text">Monish</span>
-      </motion.h1>
+  useEffect(() => {
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, []);
 
-      {/* ── Subtitle ── */}
-      <motion.p {...fadeUp(0.3)} className="text-[15px] text-white/70 mb-5 leading-relaxed max-w-xl mx-auto">
-        <span className="text-white font-semibold">Full-Stack Engineer</span> specializing in
-        scalable APIs, system design &amp; AI integration
-      </motion.p>
+  const done = started && progress >= 100;
 
-      {/* ── Description ── */}
-      <motion.p {...fadeUp(0.4)}
-        className="text-sm text-white/55 leading-relaxed max-w-lg mx-auto mb-10"
-      >
-        I build high-performance web applications with clean architecture,
-        scalable backend systems, and intelligent AI-powered features.
-      </motion.p>
-
-      {/* ── CTA buttons ── */}
-      <motion.div {...fadeUp(0.5)} className="flex gap-3 justify-center flex-wrap mb-7">
-        <motion.a
-          href="#projects"
-          onClick={(e) => { e.preventDefault(); document.querySelector("#projects")?.scrollIntoView({ behavior: "smooth" }); }}
-          whileHover={{ scale: 1.04, boxShadow: "0 0 22px rgba(124,58,237,0.55)" }}
-          whileTap={{ scale: 0.96 }}
-          className="btn-primary-glass px-8 py-3.5 text-sm font-semibold inline-block"
-        >
-          Explore My Work ↓
-        </motion.a>
-
-        <motion.a
-          href="/Monishkumar_Resume.pdf"
-          target="_blank"
-          rel="noreferrer"
-          whileHover={{ scale: 1.04, boxShadow: "0 0 16px rgba(255,255,255,0.08)" }}
-          whileTap={{ scale: 0.96 }}
-          className="btn-sec-glass px-8 py-3.5 text-sm font-semibold inline-block"
-        >
-          View Resume
-        </motion.a>
-
-        <motion.a
-          href="#contact"
-          onClick={(e) => { e.preventDefault(); document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" }); }}
-          whileHover={{ scale: 1.04, boxShadow: "0 0 16px rgba(167,139,250,0.25)" }}
-          whileTap={{ scale: 0.96 }}
-          className="px-8 py-3.5 text-sm font-semibold rounded-xl border border-violet-400/35
-            text-violet-300 hover:bg-violet-400/10 transition-colors inline-block"
-        >
-          Contact Me
-        </motion.a>
-      </motion.div>
-
-      {/* ── Trust signals ── */}
-      <motion.div {...fadeUp(0.6)}
-        className="flex gap-5 justify-center flex-wrap mb-14"
-      >
-        {trust.map((t) => (
-          <span key={t} className="flex items-center gap-1.5 text-xs text-white/60 font-medium">
-            <span className="text-emerald-400">✔</span> {t}
+  return (
+    <button type="button" onClick={handleInit} className="hero-cut hero-init" aria-label="Initialize Portfolio">
+      <span className="hero-cut__face">
+        <span className="hero-init__icon"><Terminal size={20} /></span>
+        <span className="hero-init__body">
+          <span className="hero-init__top">
+            <span className="hero-init__title">Initialize OS</span>
+            <ExternalLink size={13} className="hero-init__ext" aria-hidden="true" />
           </span>
-        ))}
-      </motion.div>
+          <span className="hero-init__bar" style={{ display: "block" }}>
+            <span className="hero-init__fill" style={{ display: "block", width: `${started ? progress : 0}%` }} />
+          </span>
+          <span className="hero-init__meta">
+            <span className="hero-init__cmd">$ sudo boot_gui</span>
+            <span className={`hero-init__status${done ? " is-done" : ""}`}>{started ? status : "Loading ..."}</span>
+          </span>
+        </span>
+      </span>
+    </button>
+  );
+};
 
-      {/* ── Stats row ── */}
-      <motion.div {...fadeUp(0.7)} className="flex flex-wrap justify-center gap-3">
-        {stats.map(({ num, label }) => (
-          <motion.div
-            key={label}
-            whileHover={{ scale: 1.06, y: -4, borderColor: "rgba(167,139,250,0.4)" }}
-            className="glass px-7 py-4 rounded-2xl text-center min-w-[115px]
-              border border-white/[0.07] hover:shadow-[0_8px_32px_rgba(124,58,237,0.15)]
-              transition-shadow"
-          >
-            <div className="text-2xl font-bold grad-text">{num}</div>
-            <div className="text-[10px] text-white/40 mt-1 uppercase tracking-widest">{label}</div>
-          </motion.div>
-        ))}
-      </motion.div>
+/* ═══════════════════════════════════════════════════════════
+   GitHub
+   ═══════════════════════════════════════════════════════════ */
+const GitHubComponent = () => (
+  <a href="https://github.com/Monishkumar-14" target="_blank" rel="noopener noreferrer" className="hero-cut hero-gh">
+    <span className="hero-cut__face">
+      <Github size={26} className="hero-gh__icon" aria-hidden="true" />
+      <span>
+        <span className="hero-gh__label">Check out</span>
+        <span className="hero-gh__name">GitHub</span>
+      </span>
+    </span>
+  </a>
+);
 
+/* ═══════════════════════════════════════════════════════════
+   Code editor — word-by-word typewriter reveal
+   `indent` is the nesting level (1.5em each, as in the reference).
+   ═══════════════════════════════════════════════════════════ */
+const CODE_LINES = [
+  { indent: 0, tokens: [{ text: "// Welcome to Monish's workspace", cls: "syntax-comment" }] },
+  { indent: 0, tokens: [
+    { text: "import", cls: "syntax-keyword" }, { text: " " },
+    { text: "{", cls: "syntax-punctuation" }, { text: " " },
+    { text: "Developer", cls: "syntax-variable" }, { text: " " },
+    { text: "}", cls: "syntax-punctuation" }, { text: " " },
+    { text: "from", cls: "syntax-keyword" }, { text: " " },
+    { text: "'@monish/core'", cls: "syntax-string" },
+    { text: ";", cls: "syntax-punctuation" },
+  ]},
+  { indent: 0, tokens: [] },
+  { indent: 0, tokens: [
+    { text: "const", cls: "syntax-keyword" }, { text: " " },
+    { text: "Portfolio", cls: "syntax-function" }, { text: " " },
+    { text: "=", cls: "syntax-operator" }, { text: " " },
+    { text: "()", cls: "syntax-paren" }, { text: " " },
+    { text: "=>", cls: "syntax-operator" }, { text: " " },
+    { text: "{", cls: "syntax-punctuation" },
+  ]},
+  { indent: 1, tokens: [
+    { text: "return", cls: "syntax-keyword" }, { text: " " },
+    { text: "(", cls: "syntax-punctuation" },
+  ]},
+  { indent: 2, tokens: [
+    { text: "<", cls: "syntax-tag" },
+    { text: "Developer", cls: "syntax-jsx" },
+  ]},
+  { indent: 3, tokens: [
+    { text: "name", cls: "syntax-attr" }, { text: "=", cls: "syntax-operator" },
+    { text: '"Monishkumar E M"', cls: "syntax-string syntax-strong" },
+  ]},
+  { indent: 3, tokens: [
+    { text: "role", cls: "syntax-attr" }, { text: "=", cls: "syntax-operator" },
+    { text: '"Full-Stack Engineer"', cls: "syntax-string" },
+  ]},
+  { indent: 3, tokens: [
+    { text: "passion", cls: "syntax-attr" }, { text: "=", cls: "syntax-operator" },
+    { text: '"AI & Systems"', cls: "syntax-string" },
+  ]},
+  { indent: 2, tokens: [{ text: "/>", cls: "syntax-tag" }] },
+  { indent: 1, tokens: [{ text: ")", cls: "syntax-punctuation" }, { text: ";", cls: "syntax-punctuation" }] },
+  { indent: 0, tokens: [{ text: "}", cls: "syntax-punctuation" }, { text: ";", cls: "syntax-punctuation" }] },
+];
+
+// A "word" = any non-whitespace token; a blank line counts as one step.
+const TOTAL_WORDS = CODE_LINES.reduce(
+  (n, l) => n + (l.tokens.length === 0 ? 1 : l.tokens.filter((t) => t.text.trim()).length),
+  0
+);
+const WORD_DELAY_MS = 110;
+const START_DELAY_MS = 500;
+
+const CodeEditorPanel = () => {
+  const reduceMotion =
+    typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const [visible, setVisible] = useState(reduceMotion ? TOTAL_WORDS : 0);
+
+  useEffect(() => {
+    if (reduceMotion) return undefined;
+    let interval;
+    const start = setTimeout(() => {
+      interval = setInterval(() => {
+        setVisible((v) => {
+          if (v >= TOTAL_WORDS) { clearInterval(interval); return v; }
+          return v + 1;
+        });
+      }, WORD_DELAY_MS);
+    }, START_DELAY_MS);
+    return () => { clearTimeout(start); clearInterval(interval); };
+  }, [reduceMotion]);
+
+  const typing = visible < TOTAL_WORDS;
+
+  const renderCode = () => {
+    let idx = 0;
+    return CODE_LINES.map((line, i) => {
+      const style = { "--indent": line.indent };
+      if (line.tokens.length === 0) {
+        idx++;
+        return <div key={i} className="hero-code__line" style={style}>{" "}</div>;
+      }
+      return (
+        <div key={i} className="hero-code__line" style={style}>
+          {line.tokens.map((tok, t) => {
+            if (!tok.text.trim()) return <span key={t}>{tok.text}</span>;
+            idx++;
+            const shown = idx <= visible;
+            return (
+              <React.Fragment key={t}>
+                <span className={`hero-code__tok ${tok.cls || ""}${shown ? "" : " is-hidden"}`}>{tok.text}</span>
+                {typing && idx === visible && <span className="hero-caret" aria-hidden="true" />}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      );
+    });
+  };
+
+  return (
+    <div className="hero-editor">
+      <div className="hero-editor__bar">
+        <div className="hero-editor__dots" aria-hidden="true">
+          <i style={{ background: "#FF5F56" }} />
+          <i style={{ background: "#FFBD2E" }} />
+          <i style={{ background: "#27C93F" }} />
+        </div>
+        <div className="hero-editor__title"><i aria-hidden="true" />portfolio.tsx</div>
+      </div>
+
+      <div className="hero-code">
+        <div className="hero-code__nums" aria-hidden="true">
+          {CODE_LINES.map((_, n) => <div key={n}>{n + 1}</div>)}
+        </div>
+        <pre className="hero-code__lines" style={{ margin: 0, font: "inherit" }} aria-label="portfolio.tsx source code">
+          {renderCode()}
+        </pre>
+      </div>
+
+      <div className="hero-editor__actions">
+        <button type="button" onClick={() => scrollToSection("#about")} className="hero-btn hero-btn--primary">
+          <Play size={16} aria-hidden="true" /> Run Profile
+        </button>
+        <button type="button" onClick={() => scrollToSection("#projects")} className="hero-btn hero-btn--ghost">
+          <Eye size={16} aria-hidden="true" /> View Projects
+        </button>
+      </div>
     </div>
-  </div>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════
+   Hero
+   ═══════════════════════════════════════════════════════════ */
+const Hero = () => (
+  <section className="hero" aria-label="Introduction">
+    <div className="hero__label" aria-hidden="true">{"<System.Init />"}</div>
+
+    <div className="hero__inner">
+      {/* LEFT COLUMN */}
+      <motion.div {...fadeUp(0)} className="hero__left">
+        <div className="hero__badge">
+          <span className="hero__badge-dot" />
+          SYSTEM.KERNEL :: v2.5.0 ONLINE
+        </div>
+
+        <h1 className="hero__title">
+          Hello, I'm
+          <br />
+          <span className="hero__name">Monishkumar E M</span>
+        </h1>
+
+        <p className="hero__role">
+          <span className="hero__tag">{"<Full-Stack Engineer />"}</span>
+          <span className="hero__tagline">Engineering Scalable Systems.</span>
+        </p>
+
+        <p className="hero__intro">{INTRO_TEXT}</p>
+
+        <div className="hero__ctas">
+          <InitializeComponent />
+          <GitHubComponent />
+        </div>
+
+        <div className="hero__modules">
+          <span className="hero__modules-label">LOADED_MODULES:</span>
+          {LOADED_MODULES.map((mod) => (
+            <span key={mod} className="hero__chip">{mod}</span>
+          ))}
+        </div>
+
+        <div className="hero__faint" aria-hidden="true">while(alive) {"{ code() }"}</div>
+      </motion.div>
+
+      {/* RIGHT COLUMN */}
+      <motion.div {...fadeUp(0.15)} className="hero__right">
+        <CodeEditorPanel />
+      </motion.div>
+    </div>
+
+    {/* Scroll cue */}
+    <motion.button
+      type="button"
+      className="hero__scroll"
+      aria-label="Scroll to about section"
+      onClick={() => scrollToSection("#about")}
+      animate={{ y: [0, 6, 0] }}
+      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+    >
+      <ChevronDown size={26} strokeWidth={2.5} />
+    </motion.button>
+  </section>
 );
 
 export default Hero;

@@ -30,16 +30,16 @@ const Resume = () => {
 
         {/* Header */}
         <motion.div {...fadeUp(0)} className="mb-14">
-          <p className="text-[11px] font-semibold uppercase tracking-[3px] text-violet-400 mb-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[3px] text-blue-600 dark:text-blue-400 mb-3">
             05 — Resume
           </p>
-          <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight mb-4">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight mb-4 text-[#14213D] dark:text-[#F1F5F9]">
             My{" "}
-            <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="text-blue-600 dark:text-blue-400">
               Resume
             </span>
           </h2>
-          <p className="text-sm text-white/40 leading-relaxed max-w-lg">
+          <p className="text-sm text-[#586780] dark:text-[#A6B4C8] leading-relaxed max-w-lg">
             A snapshot of my experience, skills, and projects.
           </p>
         </motion.div>
@@ -48,14 +48,14 @@ const Resume = () => {
         <motion.div {...fadeUp(0.1)} className="glass-card overflow-hidden">
 
           {/* Toolbar */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/8 bg-white/3 flex-wrap gap-3">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[#DCE4EF] dark:border-[#29384F] bg-[#EAF1FB]/50 dark:bg-[#17243A]/50 flex-wrap gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-[10px] bg-violet-500/20 border border-violet-500/30 flex items-center justify-center text-sm">
+              <div className="w-8 h-8 rounded-[10px] bg-blue-50 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm">
                 <FileText size={16} />
               </div>
               <div>
-                <p className="text-sm font-bold text-white/85">Monishkumar_Resume.pdf</p>
-                <p className="text-[10px] text-white/35 mt-0.5">Full-Stack Developer · 2026</p>
+                <p className="text-sm font-bold text-[#14213D] dark:text-[#F1F5F9]">Monishkumar_Resume.pdf</p>
+                <p className="text-[10px] text-[#586780] dark:text-[#A6B4C8] mt-0.5">Full-Stack Developer · 2026</p>
               </div>
             </div>
 

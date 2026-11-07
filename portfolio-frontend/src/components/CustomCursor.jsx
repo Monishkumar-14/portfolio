@@ -1,5 +1,5 @@
 // src/components/CustomCursor.jsx
-// Glowing cursor trail — desktop only, theme-aware
+// Glowing cursor trail — desktop only, terminal-OS theme
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 
@@ -56,19 +56,19 @@ export default function CustomCursor() {
     return null;
   }
 
-  // Theme-aware colors
+  // Theme-aware terminal colors
   const ringBorder = isDark
-    ? "1.5px solid rgba(139,92,246,0.35)"
-    : "1.5px solid rgba(124,58,237,0.25)";
+    ? "1.5px solid rgba(255, 107, 53, 0.35)"
+    : "1.5px solid rgba(224, 90, 43, 0.25)";
   const ringShadow = isDark
-    ? "0 0 12px rgba(139,92,246,0.15), 0 0 24px rgba(6,182,212,0.08)"
-    : "0 0 10px rgba(124,58,237,0.1), 0 0 20px rgba(124,58,237,0.05)";
+    ? "0 0 12px rgba(255, 107, 53, 0.15)"
+    : "0 0 10px rgba(224, 90, 43, 0.1)";
   const dotBg = isDark
-    ? "rgba(167,139,250,0.9)"
-    : "rgba(124,58,237,0.7)";
+    ? "rgba(255, 107, 53, 0.9)"
+    : "rgba(224, 90, 43, 0.8)";
   const dotShadow = isDark
-    ? "0 0 8px rgba(139,92,246,0.5), 0 0 20px rgba(6,182,212,0.25)"
-    : "0 0 6px rgba(124,58,237,0.3), 0 0 14px rgba(124,58,237,0.15)";
+    ? "0 0 8px rgba(255, 107, 53, 0.5)"
+    : "0 0 6px rgba(224, 90, 43, 0.3)";
 
   return (
     <>

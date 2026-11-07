@@ -1,0 +1,25 @@
+/* Shared base for every section. Scoped to .sect so nothing else is affected.
+   1u = 1 reference px at a 1917px viewport (same unit model as Hero.css).
+   Sections are TRANSPARENT: the charcoal base, top-left glow and square grid come from the single
+   global <Background /> layer, so there are no seams between sections. */
+.sect {
+  --u: max(0.6px, min(0.05216vw, 1.2px));
+  --orange: #ff6b35;
+  --blue: #4d8dff;
+  --mono: var(--font-mono, "JetBrains Mono", "Fira Code", ui-monospace, monospace);
+  --sans: var(--font-body, "Inter", system-ui, -apple-system, "Segoe UI", sans-serif);
+  position: relative; z-index: 1; overflow: clip; box-sizing: border-box;   /* z-index 1: always above the fixed background */
+  color: #f0f2f4; font-family: var(--sans);
+  padding: calc(110 * var(--u)) 0 calc(130 * var(--u));
+}
+.sect *, .sect *::before, .sect *::after { box-sizing: border-box; }
+.sect__inner { position: relative; z-index: 1; width: min(calc(100% - 48px), calc(1438 * var(--u))); margin: 0 auto; }
+.sect__title {
+  display: flex; align-items: center; gap: calc(22 * var(--u)); margin: 0 0 calc(60 * var(--u));
+  font: 700 max(calc(40 * var(--u)), 26px)/1.1 var(--mono); letter-spacing: -0.01em; color: #f0f2f4;
+}
+.sect__icon { color: var(--orange); display: inline-flex; }
+@media (max-width: 999px) {
+  .sect { --u: clamp(0.5px, calc((100vw - 48px) / 690), 1.05px); padding: 48px 0 56px; }
+  .sect__title { margin-bottom: 24px; }
+}

@@ -1,10 +1,15 @@
-import { useState }    from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion }      from "framer-motion";
-import { Eye, EyeOff, Lock, User, Zap } from "lucide-react";
+import { motion, MotionConfig } from "framer-motion";
+import { Lock, User, Terminal, ArrowLeft } from "lucide-react";
 import axios           from "axios";
 import toast           from "react-hot-toast";
 import { useAuth }     from "../context/AuthContext";
+import Background      from "../components/Background";
+import { Field, PasswordInput, Spinner } from "./AdminUI";
+import "./Admin.css";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -14,8 +19,18 @@ const AdminLogin = () => {
   const [show,    setShow]    = useState(false);
   const [loading, setLoading] = useState(false);
 
+  /* Pre-warm: ping the backend health-check the moment this page mounts.
+     Free-tier hosts (Render, Railway…) spin down after inactivity;
+     this wakes the server + MongoDB connection while the user types. */
+  useEffect(() => {
+    const controller = new AbortController();
+    axios.get(`${API_URL}/`, { signal: controller.signal, timeout: 15000 }).catch(() => {});
+    return () => controller.abort();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     if (!form.username || !form.password) {
       toast.error("Please fill in all fields.");
       return;
@@ -23,7 +38,7 @@ const AdminLogin = () => {
     setLoading(true);
     try {
       const { data } = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/admin/login`,
+        `${API_URL}/api/admin/login`,
         form
       );
       login(data.token);
@@ -37,136 +52,58 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6"
-      style={{ background: "#0a0a1a" }}>
-
-      {/* Background orbs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute w-96 h-96 rounded-full -top-20 -left-20
-          bg-violet-600/20 blur-[100px]"/>
-        <div className="absolute w-80 h-80 rounded-full bottom-10 right-0
-          bg-cyan-500/15 blur-[90px]"/>
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 40, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0,  scale: 1    }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative z-10 w-full max-w-[420px]"
-      >
-        {/* Card */}
-        <div className="glass-card p-10">
-
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br
-              from-violet-600 to-cyan-500 flex items-center justify-center
-              text-3xl mx-auto mb-5
-              shadow-[0_8px_32px_rgba(124,58,237,0.4)]">
-              <Zap size={24}/>
-            </div>
-            <h1 className="text-2xl font-extrabold tracking-tight mb-1">
-              Admin Portal
-            </h1>
-            <p className="text-sm text-white/40">
-              Monishkumar Portfolio Management
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-
-            {/* Username */}
-            <div className="mb-4">
-              <label htmlFor="username" className="block text-[10px] font-semibold uppercase
-                tracking-[1.5px] text-white/35 mb-2">
-                Username
-              </label>
-              <div className="relative">
-                <User size={14} className="absolute left-4 top-1/2 -translate-y-1/2
-                  text-white/30"/>
-                <input
-                  id="username"
-                  type="text"
-                  value={form.username}
-                  onChange={(e) => setForm({ ...form, username: e.target.value })}
-                  placeholder="admin"
-                  className="glass-input w-full pl-10 pr-4 py-3 text-sm"
-                />
+    <MotionConfig reducedMotion="user">
+      <div className="adm">
+        <Background />
+        <div className="adm-center">
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }} className="adm-login">
+            <section className="adm-win" aria-labelledby="login-title">
+              <div className="adm-win__bar">
+                <span className="adm-dots" aria-hidden="true"><i/><i/><i/></span>
+                <span className="adm-win__file">admin_login.sh</span>
               </div>
-            </div>
 
-            {/* Password */}
-            <div className="mb-6">
-              <label htmlFor="password" className="block text-[10px] font-semibold uppercase
-                tracking-[1.5px] text-white/35 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock size={14} className="absolute left-4 top-1/2 -translate-y-1/2
-                  text-white/30"/>
-                <input
-                  id="password"
-                  type={show ? "text" : "password"}
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  placeholder="••••••••"
-                  className="glass-input w-full pl-10 pr-12 py-3 text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShow((s) => !s)}
-                  aria-label="Toggle password visibility"
-                  className="absolute right-4 top-1/2 -translate-y-1/2
-                    text-white/30 hover:text-white/70 transition-colors"
-                >
-                  {show ? <EyeOff size={14}/> : <Eye size={14}/>}
-                </button>
+              <div className="adm-login__body">
+                <div className="adm-login__head">
+                  <span className="adm-logo"><Terminal size={24} aria-hidden="true" /></span>
+                  <h1 id="login-title" className="adm-h1" style={{ fontSize: 24 }}>Admin Portal</h1>
+                  <p className="adm-sub">Monishkumar Portfolio Management</p>
+                </div>
+
+                <form onSubmit={handleSubmit} className="adm-stack" noValidate>
+                  <Field id="username" label="Username">
+                    <div className="adm-inwrap">
+                      <User size={14} aria-hidden="true" />
+                      <input id="username" type="text" value={form.username} autoComplete="username"
+                        onChange={(e) => setForm({ ...form, username: e.target.value })}
+                        placeholder="admin" className="adm-input adm-input--icon" />
+                    </div>
+                  </Field>
+
+                  <Field id="password" label="Password">
+                    <PasswordInput id="password" value={form.password} autoComplete="current-password"
+                      onChange={(e) => setForm({ ...form, password: e.target.value })}
+                      show={show} onToggle={() => setShow((s) => !s)} />
+                  </Field>
+
+                  <button type="submit" disabled={loading} className="adm-btn adm-btn--primary adm-btn--block" style={{ marginTop: 6 }}>
+                    {loading ? (<><Spinner size={15}/> SIGNING IN...</>) : "SIGN IN →"}
+                  </button>
+                </form>
+
+                <p className="adm-login__fine"><Lock size={11} aria-hidden="true" style={{ display: "inline", marginRight: 6, verticalAlign: "-1px" }}/>Secured with JWT authentication</p>
               </div>
+            </section>
+
+            <div style={{ textAlign: "center" }}>
+              <button type="button" onClick={() => navigate("/")} className="adm-backlink">
+                <ArrowLeft size={13} aria-hidden="true"/> Back to Portfolio
+              </button>
             </div>
-
-            {/* Submit */}
-            <motion.button
-              type="submit"
-              disabled={loading}
-              whileHover={!loading ? { scale: 1.02, y: -1 } : {}}
-              whileTap={!loading ? { scale: 0.98 } : {}}
-              className="w-full py-3.5 rounded-[14px] text-sm font-bold
-                btn-primary-glass flex items-center justify-center gap-2
-                disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <>
-                  <motion.div
-                    className="w-4 h-4 border-2 border-white/30
-                      border-t-white rounded-full"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-                  />
-                  Signing in...
-                </>
-              ) : (
-                "Sign In →"
-              )}
-            </motion.button>
-
-          </form>
-
-          <p className="text-center text-[11px] text-white/20 mt-6">
-            <Lock size={12} className="inline mr-1"/> Secured with JWT Authentication
-          </p>
+          </motion.div>
         </div>
-
-        {/* Back link */}
-        <motion.button
-          whileHover={{ x: -3 }}
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 text-xs text-white/30
-            hover:text-white/60 transition-colors mx-auto mt-5"
-        >
-          ← Back to Portfolio
-        </motion.button>
-      </motion.div>
-    </div>
+      </div>
+    </MotionConfig>
   );
 };
 
