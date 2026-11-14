@@ -244,6 +244,7 @@ export default function FloatingChatbot() {
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
   const triggerRef = useRef(null);
+  const panelRef = useRef(null);
   const flowRef = useRef(initialFlow);
   const sendingRef = useRef(false);
   const idRef = useRef(0);
@@ -274,6 +275,22 @@ export default function FloatingChatbot() {
     const handleEsc = (e) => { if (e.key === "Escape" && isOpen) setIsOpen(false); };
     document.addEventListener("keydown", handleEsc);
     return () => document.removeEventListener("keydown", handleEsc);
+  }, [isOpen]);
+
+  // Close when clicking outside the chat panel
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const handleOutsideClick = (e) => {
+      if (panelRef.current && panelRef.current.contains(e.target)) return;
+      if (triggerRef.current && triggerRef.current.contains(e.target)) return;
+      setIsOpen(false);
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("touchstart", handleOutsideClick, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    };
   }, [isOpen]);
 
   // Keep the panel inside the visual viewport when the mobile keyboard opens.
@@ -477,35 +494,32 @@ export default function FloatingChatbot() {
   return (
     <MotionConfig reducedMotion="user">
     <>
-      {/* Floating trigger button */}
-      <AnimatePresence>
-        {!isOpen && (
-          <motion.button
-            ref={triggerRef}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            onClick={() => setIsOpen(true)}
-            aria-label="Open Monish AI Assistant"
-            className="cbx-launch"
-            // 24px from the bottom on desktop; on phones, 12px above the glass tab bar (--mnav-offset is set by MobileTabBar)
-            style={{ bottom: "calc(var(--mnav-offset, 12px) + 12px)" }}
-          >
-            <img
-              src="/monish-profile.jpg"
-              alt="Monish AI"
-              className="cbx-launch__img"
-              style={{ objectPosition: "center 15%" }}
-              width={40}
-              height={40}
-            />
-            {/* Availability dot */}
-            <span className="cbx-launch__dot" aria-hidden="true" />
-          </motion.button>
-        )}
-      </AnimatePresence>
+      {/* Floating trigger button — always mounted for toggle; hides behind panel when open */}
+      <motion.button
+        ref={triggerRef}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        whileHover={{ scale: 1.05 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        onClick={() => setIsOpen((prev) => !prev)}
+        aria-label={isOpen ? "Close Monish AI Assistant" : "Open Monish AI Assistant"}
+        className="cbx-launch"
+        style={{
+          bottom: "calc(var(--mnav-offset, 12px) + 12px)",
+          ...(isOpen ? { opacity: 0, pointerEvents: "none" } : {}),
+        }}
+      >
+        <img
+          src="/monish-profile.jpg"
+          alt="Monish AI"
+          className="cbx-launch__img"
+          style={{ objectPosition: "center 15%" }}
+          width={36}
+          height={36}
+        />
+        {/* Availability dot */}
+        <span className="cbx-launch__dot" aria-hidden="true" />
+      </motion.button>
 
       {/* Floating chat panel */}
       <AnimatePresence>
@@ -515,6 +529,7 @@ export default function FloatingChatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
+            ref={panelRef}
             role="dialog"
             aria-label="Monish AI Assistant"
             className="cbx-panel fixed z-50 flex flex-col overflow-hidden rounded-xl"

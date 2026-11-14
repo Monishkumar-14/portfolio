@@ -136,7 +136,7 @@ const Navbar = () => {
               >
                 {/* One element per section: a small dot when inactive, the full icon when active */}
                 <span className="vnav__dot" aria-hidden="true">
-                  <Icon size={20} strokeWidth={1.6} />
+                  <Icon size={16} strokeWidth={1.6} />
                 </span>
                 <span className="vnav__label" aria-hidden="true">{">"} {label}</span>
               </a>
