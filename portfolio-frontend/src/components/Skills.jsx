@@ -42,15 +42,15 @@ const GROUPS = [
   { label: "Databases", items: [
     { name: "PostgreSQL", icon: "postgresql/postgresql-original.svg" },
     { name: "SQLite", icon: "sqlite/sqlite-original.svg" },
-    { name: "Qdrant", url: "https://qdrant.tech/images/logo_with_text.svg", mono: true, badge: "Qd" },
+    { name: "Qdrant", url: "https://cdn.simpleicons.org/qdrant/FF6B35", badge: "Qd" },
     { name: "MongoDB", icon: "mongodb/mongodb-original.svg" },
   ]},
   { label: "AI & Machine Learning", items: [
     { name: "Machine Learning", icon: "tensorflow/tensorflow-original.svg", badge: "ML" },
     { name: "Deep Learning", icon: "pytorch/pytorch-original.svg", badge: "DL" },
     { name: "RAG", icon: "elasticsearch/elasticsearch-original.svg", badge: "RAG" },
-    { name: "LangChain", url: "https://raw.githubusercontent.com/langchain-ai/langchain/master/docs/static/img/brand/wordmark.png", mono: true, badge: "LC" },
-    { name: "Ollama", url: "https://ollama.com/public/ollama.png", mono: true, badge: "Ol" },
+    { name: "LangChain", url: "https://cdn.simpleicons.org/langchain/e6e6e6", badge: "LC" },
+    { name: "Ollama", url: "https://cdn.simpleicons.org/ollama/e6e6e6", badge: "Ol" },
     { name: "LLMs", icon: "openai/openai-original.svg", mono: true, badge: "LLM" },
     { name: "NLP", icon: "scikitlearn/scikitlearn-original.svg", badge: "NLP" },
   ]},

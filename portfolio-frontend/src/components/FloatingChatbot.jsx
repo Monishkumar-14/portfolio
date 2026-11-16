@@ -521,6 +521,28 @@ export default function FloatingChatbot() {
         <span className="cbx-launch__dot" aria-hidden="true" />
       </motion.button>
 
+      {/* Discoverable label beside the chatbot button */}
+      {!isOpen && (
+        <motion.div
+          className="cbx-label"
+          initial={{ opacity: 0, x: 12 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1.2, duration: 0.4, ease: "easeOut" }}
+          onClick={() => setIsOpen(true)}
+          role="button"
+          tabIndex={0}
+          aria-label="Chat with Monish's AI assistant"
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setIsOpen(true); } }}
+          style={{ bottom: "calc(var(--mnav-offset, 12px) + 20px)" }}
+        >
+          <span className="cbx-label__main">
+            <span className="cbx-label__prompt">{">"}</span>
+            Chat with <span className="cbx-label__accent">Monish's AI</span>
+          </span>
+          <span className="cbx-label__sub">Ask about my projects, skills & experience</span>
+        </motion.div>
+      )}
+
       {/* Floating chat panel */}
       <AnimatePresence>
         {isOpen && (

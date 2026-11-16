@@ -36,6 +36,78 @@
   pointer-events: none;
 }
 
+
+/* ── Launcher label: discoverable text beside the profile button ─────────────────────── */
+.cbx-label {
+  position: fixed;
+  right: calc(24px + 48px + 12px);     /* button right + button width + gap */
+  z-index: 50;
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--bg-card, #1f1f1f);
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), 0 0 12px rgba(255, 107, 53, 0.06);
+  cursor: pointer;
+  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, monospace);
+  white-space: nowrap;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color .2s ease, box-shadow .2s ease, opacity .3s ease;
+}
+.cbx-label:hover {
+  border-color: rgba(255, 107, 53, 0.6);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(255, 107, 53, 0.1);
+}
+.cbx-label__main {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; line-height: 1;
+  color: var(--text-muted, #a0a0a0);
+}
+.cbx-label__prompt {
+  color: var(--primary-accent, #ff6b35);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.cbx-label__accent {
+  color: var(--primary-accent, #ff6b35);
+}
+.cbx-label__sub {
+  font-size: 10px; font-weight: 400; line-height: 1;
+  color: var(--text-faint, #666);
+  padding-left: 17px;                  /* aligns with text after the prompt symbol */
+}
+
+/* Connector: small triangle pointing right toward the profile button */
+.cbx-label::after {
+  content: "";
+  position: absolute;
+  top: 50%; right: -6px;
+  transform: translateY(-50%);
+  border: 5px solid transparent;
+  border-left-color: rgba(255, 107, 53, 0.3);
+  border-right: none;
+}
+
+/* Mobile: compact label */
+@media (max-width: 639px) {
+  .cbx-label {
+    right: calc(24px + 48px + 8px);
+    padding: 8px 12px;
+  }
+  .cbx-label__main { font-size: 11px; }
+  .cbx-label__sub { display: none; }     /* hide subtext on mobile for compactness */
+}
+
+/* Very narrow phones: position label above the button instead */
+@media (max-width: 380px) {
+  .cbx-label {
+    right: 24px;
+    bottom: auto;                       /* overridden by inline style + offset */
+  }
+  .cbx-label::after { display: none; }
+}
+
 /* ── Panel sizing ─────────────────────────────────────────────────────────────────────── */
 /* Base (phones / small tablets): the pre-existing size, kept inside the viewport */
 .cbx-panel {
